@@ -1,0 +1,31 @@
+.item-form ::ng-deep mat-form-field {
+  font-size: 0.85rem; /* smaller text */
+  margin-bottom: 8px;
+
+  .mat-form-field-infix {
+    padding: 4px 8px; /* smaller input area */
+  }
+
+  .mat-form-field-label {
+    font-size: 0.75rem; /* smaller label */
+  }
+
+  input.mat-input-element,
+  textarea.mat-input-element {
+    font-size: 0.85rem;
+    padding: 4px 0;
+    height: 24px;
+  }
+
+  mat-error {
+    font-size: 0.7rem;
+    margin-top: 2px;
+  }
+
+  mat-select .mat-select-trigger {
+    height: 24px;
+    line-height: 24px;
+    font-size: 0.85rem;
+    padding: 0 8px;
+  }
+}
