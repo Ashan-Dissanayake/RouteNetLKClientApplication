@@ -1,0 +1,49 @@
+<mat-card class="listbox-container">
+  <mat-card class="source-list">
+    <mat-selection-list #SourceList>
+<!--      <form [formGroup]="form">-->
+<!--        <mat-form-field appearance="outline" class="searchFields">-->
+<!--          <mat-label>Search Here</mat-label>-->
+<!--          <input matInput formControlName="sourceListSearch" (keyup)="filterSourceList()">-->
+<!--        </mat-form-field>-->
+<!--      </form>-->
+      @for (item of sourceList; track sourceList) {
+        <mat-list-option [value]="item">
+          {{ item[displayProperty] || 'No Such Property' }}
+        </mat-list-option>
+      }
+    </mat-selection-list>
+  </mat-card>
+
+  <mat-card class="button-panel">
+    <button mat-raised-button color="primary" (click)="moveItems(true)">
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+    <button mat-raised-button color="primary" (click)="moveItems(false)">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <button mat-raised-button color="accent" (click)="moveAllItems(true)">
+      <mat-icon>double_arrow</mat-icon> <!-- Use CSS to rotate if needed -->
+    </button>
+    <button mat-raised-button color="accent" (click)="moveAllItems(false)">
+      <mat-icon class="flip-horizontal">double_arrow</mat-icon>
+    </button>
+  </mat-card>
+
+
+  <mat-card class="destination-list">
+    <mat-selection-list #DestinationList>
+<!--      <form [formGroup]="form">-->
+<!--        <mat-form-field appearance="outline">-->
+<!--          <mat-label>Search Here</mat-label>-->
+<!--          <input matInput formControlName="destinationListSearch" (keyup)="filterDestinationList()">-->
+<!--        </mat-form-field>-->
+<!--      </form>-->
+      @for (item of destinationList; track destinationList) {
+        <mat-list-option [value]="item">
+          {{ item[displayProperty] || 'No Such Property' }}
+        </mat-list-option>
+      }
+    </mat-selection-list>
+  </mat-card>
+</mat-card>
