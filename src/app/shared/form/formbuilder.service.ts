@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, ValidatorFn, Validators} from '@angular/forms';
 import {FormField} from './formfieldata.model';
 import {Regex} from '../models/regex.model';
+import {update} from 'lodash';
 
 @Injectable({ providedIn: 'root' })
 export class FormbuilderService {
@@ -25,7 +26,6 @@ export class FormbuilderService {
 
       // Regex fields
       if (field.mode === 'regex') {
-        console.log(`Field ${field.name} → Regex:`, dataMap['regexes']?.[field.name]);
         const regexRule = (dataMap['regexes'] as Regex)?.[field.name];
         if (regexRule) validators.push(Validators.pattern(regexRule.regex));
       }
@@ -37,7 +37,7 @@ export class FormbuilderService {
 
     });
 
-    return this.fb.group(group);
+    return this.fb.group(group,{updateOn:"change"});
   }
 }
 

@@ -1,15 +1,17 @@
-.item-form {
+.mainform {
+
   ::ng-deep {
+
     mat-form-field {
-      font-size: 0.85rem; // smaller text
+      font-size: 0.85rem;
       margin-bottom: 8px;
 
       .mat-form-field-infix {
-        padding: 4px 8px; // smaller input area
+        padding: 4px 8px;
       }
 
       .mat-form-field-label {
-        font-size: 0.75rem; // smaller label
+        font-size: 0.75rem;
       }
 
       input.mat-input-element,

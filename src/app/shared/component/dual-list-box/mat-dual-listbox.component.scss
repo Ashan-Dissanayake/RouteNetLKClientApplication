@@ -1,49 +1,62 @@
 :host {
+
   .listbox-container {
+    min-height: 250px;
     display: -webkit-box;
     align-items: center;
-    padding: 1%;
     box-shadow: unset;
     background: unset;
+    left: -20px;
+    padding:1%;
+    width: 100%;
 
     .source-list,
     .destination-list {
+      min-height: 210px;
+      display: flex;
+      flex-direction: column;
       width: 40%;
-      height: 260px;
-      overflow: auto;
-      background: #fdfbff;
+      background: rgba(227, 227, 227, 0.08);
       border: #333333 1px solid;
       box-shadow: unset;
+      max-height: 180px;
+
 
       mat-form-field {
-        background: #fdfbff;
+        background: #f5f4f4;
       }
-    }
+
+      mat-selection-list {
+        flex: 1;
+        overflow: auto;
+      }
+  }
   }
 
   .button-panel {
+    top: 20px;
     width: 8%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 25px;
+    gap: 10px;
     box-shadow: none;
     background: none;
     margin: 0 15px;
 
     button {
-      top: 25px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 1rem;
-      font-weight: 500;
+      //display: flex;
+      //justify-content: center;
+      //align-items: center;
+      //font-size: 1rem;
+      //font-weight: 100;
+      //width: fit-content;
       color: #333333;
       background: #fdfbff;
-      width: fit-content;
       border-radius: 10px;
       border: 1px solid #818181;
+      padding:unset;
 
       &:hover {
         background: #f4823b;
@@ -69,13 +82,14 @@
     display: none;
   }
 
+  /*
   mat-form-field {
     --mat-form-field-container-height: 40px;
     --mat-form-field-container-vertical-padding: 8px;
     width: 95%;
     justify-items: center;
     position: sticky;
-    top: 4.1%;
+    //top: 4.1%;
     background: #fdfbff;
     z-index: 1;
     left: 2.5%;
@@ -84,5 +98,5 @@
   .center-input {
     text-align: center;
   }
+   */
 }
-

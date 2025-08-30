@@ -15,19 +15,17 @@ import {
 import {MatGridList, MatGridTile} from '@angular/material/grid-list';
 import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
 import {FormField} from '../../../shared/form/formfieldata.model';
-import {getFormFields} from '../../../shared/form/formfield.factory';
 import {BranchFacadeService} from '../branchfacade.service';
 import {forkJoin} from 'rxjs';
 import {MatDualListboxComponent} from '../../../shared/component/dual-list-box/mat-dual-listbox.component';
+import {getFormFields} from '../../../shared/form/formfield.factory';
 
 @Component({
   selector: 'app-test',
   imports: [
     ReactiveFormsModule,
     MatFormField,
-    MatFormField,
     MatInput,
-    MatFormField,
     MatLabel,
     MatError,
     NgIf,
@@ -69,6 +67,7 @@ export class BranchComponent implements OnInit {
   ngOnInit() {
     this.branchFormMeta = getFormFields(Branch.prototype);
 
+
     forkJoin({
       branchtype: this.branchFacade.loadBranchTypes(),
       branchstatus: this.branchFacade.loadBranchStatuses(),
@@ -82,6 +81,7 @@ export class BranchComponent implements OnInit {
       error: (err) => console.error('Failed to load form data', err)
     });
   }
+
 
 
 }

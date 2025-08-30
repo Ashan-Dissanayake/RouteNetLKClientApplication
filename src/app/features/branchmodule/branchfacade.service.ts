@@ -9,9 +9,13 @@ import {BranchStatus} from './model/branchstatus';
 import {District} from './model/district';
 import {DistrictService} from './services/district.service';
 import {Regex} from '../../shared/models/regex.model';
+import {FormGroup} from '@angular/forms';
+import {Branch} from './model/branch';
 
 @Injectable({ providedIn: 'root' })
 export class BranchFacadeService {
+
+  branch:Branch = new Branch();
 
   constructor(
     private branchtypeService: BranchtypeService,
@@ -34,6 +38,10 @@ export class BranchFacadeService {
 
   loadRegexes(): Observable<Regex> {
     return this.regexService.getRegexes('branches').pipe(map(res => res.data));
+  }
+
+  createBranch(branchFrom:FormGroup){
+      this.branch = branchFrom.getRawValue();
   }
 
 }
