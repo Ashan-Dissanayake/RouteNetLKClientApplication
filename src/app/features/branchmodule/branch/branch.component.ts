@@ -2,7 +2,6 @@ import {Component, OnInit,} from '@angular/core';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
 import {MatError, MatFormField, MatInput, MatInputModule, MatLabel} from '@angular/material/input';
-import {Branch} from "../model/branch";
 import {FormbuilderService} from '../../../shared/form/formbuilder.service';
 import {MatSelect} from '@angular/material/select';
 import {MatNativeDateModule, MatOption} from '@angular/material/core';
@@ -18,7 +17,7 @@ import {FormField} from '../../../shared/form/formfieldata.model';
 import {BranchFacadeService} from '../branchfacade.service';
 import {forkJoin} from 'rxjs';
 import {MatDualListboxComponent} from '../../../shared/component/dual-list-box/mat-dual-listbox.component';
-import {getFormFields} from '../../../shared/form/formfield.factory';
+import {BranchFormMeta} from '../branchform.meta';
 
 @Component({
   selector: 'app-test',
@@ -58,15 +57,14 @@ export class BranchComponent implements OnInit {
   branchFormMeta: FormField[] = [];
   allDataLoaded: boolean = false;
 
-
   constructor(
     private formBuilder: FormbuilderService,
     public branchFacade: BranchFacadeService
   ) {}
 
   ngOnInit() {
-    this.branchFormMeta = getFormFields(Branch.prototype);
 
+    this.branchFormMeta = BranchFormMeta;
 
     forkJoin({
       branchtype: this.branchFacade.loadBranchTypes(),
@@ -81,7 +79,5 @@ export class BranchComponent implements OnInit {
       error: (err) => console.error('Failed to load form data', err)
     });
   }
-
-
 
 }

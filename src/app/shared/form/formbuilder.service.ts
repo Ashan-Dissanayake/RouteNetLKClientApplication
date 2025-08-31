@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, ValidatorFn, Validators} from '@angular/forms';
-import {FormField} from './formfieldata.model';
 import {Regex} from '../models/regex.model';
-import {update} from 'lodash';
+import {FormField} from './formfieldata.model';
 
 @Injectable({ providedIn: 'root' })
 export class FormbuilderService {
@@ -29,6 +28,12 @@ export class FormbuilderService {
         const regexRule = (dataMap['regexes'] as Regex)?.[field.name];
         if (regexRule) validators.push(Validators.pattern(regexRule.regex));
       }
+
+      if(field.mode ==='date'){
+
+      }
+
+
 
       group[field.name] = new FormControl(
         { value: initialValue ?? '', disabled: !!field.disabled },

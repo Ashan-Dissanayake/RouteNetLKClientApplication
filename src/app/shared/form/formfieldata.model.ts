@@ -1,21 +1,27 @@
 export interface FormField {
   name: string;
-  type: FormFieldType;
+  type: FieldType;
   required: boolean;
   label?: string;
   placeholder?: string;
   disabled?: boolean;
-  widget?: string;
-  options?:{id:number,name:string}[];
-  mode:FormFieldMode;
+  options?:OptionsField[];
+  mode:FieldMode;
+  dateConfig?: {
+    minDate?: Date;
+    maxDate?: Date;
+  };
 }
 
-export type FormFieldType =
+type OptionsField = {id:number,name:string}
+
+
+type FieldType =
   | 'text' | 'number' | 'date' | 'file' | 'checkbox' | 'radio'
   | 'select' | 'autocomplete' | 'textarea' | 'password' | 'email'
   | 'tel' | 'currency' | 'toggle'
   | 'chips'|'dualist';
 
 
-type FormFieldMode = 'regex' | 'options' | 'none';
+type FieldMode = 'regex' | 'options' | 'none'|'date';
 
