@@ -8,7 +8,7 @@ import { BranchStatus } from '../model/branchstatus';
 import { BranchType } from '../model/branchtype';
 import { District } from '../model/district';
 import { Province } from '../model/province';
-  import {ButtonMeta, DashBoardMeta, FilterMeta, FormMeta} from '../branch.meta';
+import {ButtonMeta, DashBoardMeta, FilterMeta, FormMeta} from '../branch.meta';
 import {StatsGridComponent} from '../../../shared/component/stats-grid/stats-grid.component';
 import {ButtonPanelComponent} from '../../../shared/component/button-panel/button-panel.component';
 import {MatFormField} from '@angular/material/form-field';
@@ -18,7 +18,7 @@ import {MatSelect} from '@angular/material/select';
 import {MatOption} from '@angular/material/core';
 import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
 import {MatDualListboxComponent} from '../../../shared/component/dual-list-box/mat-dual-listbox.component';
-import {MatDialog} from '@angular/material/dialog';
+import {DynamicFieldComponent} from '../../../shared/form/dynamic-field.component';
 
 
 @Component({
@@ -40,7 +40,7 @@ import {MatDialog} from '@angular/material/dialog';
     MatDatepickerToggle,
     MatDatepicker,
     MatDatepickerInput,
-    MatDualListboxComponent
+    MatDualListboxComponent, DynamicFieldComponent,
   ],
   templateUrl: './branch.component.html',
   styleUrls: ['./branch.component.scss']
@@ -68,7 +68,6 @@ export class BranchComponent implements OnInit {
   constructor(
     private formBuilder: FormbuilderService,
     private branchFacade: BranchFacadeService,
-    private dialogService:MatDialog
   ) {}
 
   ngOnInit() {

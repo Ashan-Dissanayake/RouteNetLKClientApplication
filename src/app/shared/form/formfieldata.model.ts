@@ -24,21 +24,3 @@ export  type FieldType =
 
 
 type FieldMode = 'regex' | 'options' | 'none'|'date';
-
-// ----------------For Search Fields--------------------
-
-interface FilterOption {
-  id: number;
-  name: string;
-}
-
-interface FilterField {
-  key: string;
-  label: string;
-  type: 'input' | 'select';
-  placeholder?: string;
-  value?: any;
-  options?: FilterOption[];
-  required?: boolean;
-  disabled?: boolean;
-}
