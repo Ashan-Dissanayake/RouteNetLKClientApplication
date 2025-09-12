@@ -1,7 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif;}
 
 mat-form-field {
   width: 100%;
@@ -24,10 +24,50 @@ mat-form-field input {
   font-size: 14px !important;
 }
 
-mat-card {  width: 100%;  height:100%;  margin: 10px 10px -10px 10px ;}
+//mat-card {  width: 100%;  height:100%;  margin: 10px 10px -10px 10px ;}
 
-mat-card-content { overflow: auto; height: 100%; }
+//mat-card-content { overflow: auto; height: 100%; }
 
-mat-card-header { background: #ea841c; color: white ;margin-bottom: 20px;border-top-left-radius: 8px;border-top-right-radius: 8px }
+//mat-card-header { background: #ea841c; color: white ;margin-bottom: 20px;border-top-left-radius: 8px;border-top-right-radius: 8px }
 
 mat-card-title{ padding-bottom: 8px}
+
+.mainform {
+
+  ::ng-deep {
+
+    mat-form-field {
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+
+      .mat-form-field-infix {
+        padding: 4px 8px;
+      }
+
+      .mat-form-field-label {
+        font-size: 0.75rem;
+      }
+
+      input.mat-input-element,
+      textarea.mat-input-element {
+        font-size: 0.85rem;
+        padding: 4px 0;
+        height: 24px;
+      }
+
+      mat-error {
+        font-size: 0.7rem;
+        margin-top: 2px;
+      }
+
+      mat-select {
+        .mat-select-trigger {
+          height: 24px;
+          line-height: 24px;
+          font-size: 0.85rem;
+          padding: 0 8px;
+        }
+      }
+    }
+  }
+}

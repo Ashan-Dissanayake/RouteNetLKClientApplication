@@ -13,7 +13,6 @@ export class RegexService extends BaseHttpService<any>{
     super(http);
   }
 
-
   getRegexes(type: string): Observable<ApiResponse<Regex,false>> {
     return this.getObject<Regex>(`${ApiEndpoints.regexes}/${type}`);
   }

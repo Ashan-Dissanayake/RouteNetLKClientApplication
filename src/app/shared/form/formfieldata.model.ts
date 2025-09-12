@@ -16,7 +16,7 @@ export interface FormField {
 type OptionsField = {id:number,name:string}
 
 
-type FieldType =
+export  type FieldType =
   | 'text' | 'number' | 'date' | 'file' | 'checkbox' | 'radio'
   | 'select' | 'autocomplete' | 'textarea' | 'password' | 'email'
   | 'tel' | 'currency' | 'toggle'
@@ -25,3 +25,20 @@ type FieldType =
 
 type FieldMode = 'regex' | 'options' | 'none'|'date';
 
+// ----------------For Search Fields--------------------
+
+interface FilterOption {
+  id: number;
+  name: string;
+}
+
+interface FilterField {
+  key: string;
+  label: string;
+  type: 'input' | 'select';
+  placeholder?: string;
+  value?: any;
+  options?: FilterOption[];
+  required?: boolean;
+  disabled?: boolean;
+}

@@ -1,0 +1,23 @@
+button {
+  background-color: #ff7b00 !important;
+  color: white !important;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-right: 8px;
+  margin-bottom: 10px;
+  align-items: center;
+
+  &:hover:not(.mat-disabled) {
+    background-color: #de5d00 !important;
+  }
+
+
+}
+
+/* Disabled state */
+button:disabled {
+  background-color: #b0bec5 !important;
+  color: white !important;
+  cursor: not-allowed;
+}

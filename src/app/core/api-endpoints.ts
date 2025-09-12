@@ -11,4 +11,5 @@ export const ApiEndpoints = {
     districts:`${baseUrl}/districts/list`,
     regexes: `${baseUrl}/regexes`,
     branches: `${baseUrl}/branches`,
+    provinces:`${baseUrl}/provinces/list`,
 } as const;

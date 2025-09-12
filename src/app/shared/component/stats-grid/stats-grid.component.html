@@ -1,0 +1,8 @@
+<mat-grid-list [cols]="cols" [rowHeight]="rowHeight" [gutterSize]="gutterSize">
+  <mat-grid-tile *ngFor="let stat of stats">
+    <mat-card class="card">
+      {{ stat.label }}<br>
+      <span class="value">{{ stat.value }}</span>
+    </mat-card>
+  </mat-grid-tile>
+</mat-grid-list>

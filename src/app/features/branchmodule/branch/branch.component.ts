@@ -1,83 +1,135 @@
-import {Component, OnInit,} from '@angular/core';
-import {FormGroup, ReactiveFormsModule} from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormbuilderService } from '../../../shared/form/formbuilder.service';
+import { BranchFacadeService } from '../branchfacade.service';
+import { forkJoin } from 'rxjs';
+import { Branch } from '../model/branch';
+import { BranchStatus } from '../model/branchstatus';
+import { BranchType } from '../model/branchtype';
+import { District } from '../model/district';
+import { Province } from '../model/province';
+  import {ButtonMeta, DashBoardMeta, FilterMeta, FormMeta} from '../branch.meta';
+import {StatsGridComponent} from '../../../shared/component/stats-grid/stats-grid.component';
+import {ButtonPanelComponent} from '../../../shared/component/button-panel/button-panel.component';
+import {MatFormField} from '@angular/material/form-field';
+import {MatError, MatInput, MatLabel} from '@angular/material/input';
 import {NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
-import {MatError, MatFormField, MatInput, MatInputModule, MatLabel} from '@angular/material/input';
-import {FormbuilderService} from '../../../shared/form/formbuilder.service';
 import {MatSelect} from '@angular/material/select';
-import {MatNativeDateModule, MatOption} from '@angular/material/core';
-import {
-  MatDatepicker,
-  MatDatepickerInput,
-  MatDatepickerModule,
-  MatDatepickerToggle
-} from '@angular/material/datepicker';
-import {MatGridList, MatGridTile} from '@angular/material/grid-list';
-import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
-import {FormField} from '../../../shared/form/formfieldata.model';
-import {BranchFacadeService} from '../branchfacade.service';
-import {forkJoin} from 'rxjs';
+import {MatOption} from '@angular/material/core';
+import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
 import {MatDualListboxComponent} from '../../../shared/component/dual-list-box/mat-dual-listbox.component';
-import {BranchFormMeta} from '../branchform.meta';
+import {MatDialog} from '@angular/material/dialog';
+
 
 @Component({
-  selector: 'app-test',
-  imports: [
-    ReactiveFormsModule,
+  selector: 'app-branch',
+  standalone: true,
+  imports: [ReactiveFormsModule,
+    StatsGridComponent,
+    ButtonPanelComponent,
+    NgForOf,
     MatFormField,
+    NgSwitchCase,
     MatInput,
-    MatLabel,
-    MatError,
     NgIf,
     NgSwitch,
-    NgSwitchCase,
-    NgForOf,
+    MatLabel,
+    MatError,
     MatSelect,
     MatOption,
-    MatDatepickerInput,
-    MatDatepicker,
     MatDatepickerToggle,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatInputModule,
-    MatGridList,
-    MatGridTile,
-    MatCard,
-    MatCardHeader,
-    MatCardContent,
-    MatCardTitle,
+    MatDatepicker,
+    MatDatepickerInput,
     MatDualListboxComponent
   ],
   templateUrl: './branch.component.html',
-  standalone: true,
-  styleUrl: './branch.component.scss'
+  styleUrls: ['./branch.component.scss']
 })
 export class BranchComponent implements OnInit {
 
+  stats = DashBoardMeta;
+  buttons = ButtonMeta;
+  mainFormMeta = FormMeta;
+  filterFormMeta =FilterMeta;
+
   form: FormGroup = new FormGroup({});
-  branchFormMeta: FormField[] = [];
-  allDataLoaded: boolean = false;
+  searchForm: FormGroup = new FormGroup({});
+
+  branches!: Branch[];
+  branchstatuses!: BranchStatus[];
+  branchTypes!: BranchType[];
+  districts!: District[];
+  provinces!: Province[];
+  regexes!: any;
+
+  allDataLoaded = false;
+  showForm = false;
 
   constructor(
     private formBuilder: FormbuilderService,
-    public branchFacade: BranchFacadeService
+    private branchFacade: BranchFacadeService,
+    private dialogService:MatDialog
   ) {}
 
   ngOnInit() {
+    this.initialize();
+  }
 
-    this.branchFormMeta = BranchFormMeta;
+  initialize() {
 
     forkJoin({
-      branchtype: this.branchFacade.loadBranchTypes(),
-      branchstatus: this.branchFacade.loadBranchStatuses(),
-      districts:this.branchFacade.loadDistricts(),
+      branches: this.branchFacade.loadBranches(),
+      branchstatuses: this.branchFacade.loadBranchStatuses(),
+      branchTypes: this.branchFacade.loadBranchTypes(),
+      districts: this.branchFacade.loadDistricts(),
+      provinces: this.branchFacade.loadProvinces(),
       regexes: this.branchFacade.loadRegexes()
     }).subscribe({
       next: (dataMap) => {
-        this.form = this.formBuilder.build(this.branchFormMeta, dataMap);
+
+        this.branches = dataMap['branches'];
+        this.branchstatuses = dataMap['branchstatuses'];
+        this.branchTypes = dataMap['branchTypes'];
+        this.districts = dataMap['districts'];
+        this.provinces = dataMap['provinces'];
+        this.regexes = dataMap['regexes'];
+
+        // Build main form
+        this.form = this.formBuilder.build(this.mainFormMeta, {
+          branchtype: this.branchTypes,
+          branchstatus: this.branchstatuses,
+          districts: this.districts,
+          regexes: this.regexes,
+        });
+
+        //Build Search Form
+        this.searchForm = this.formBuilder.build(this.filterFormMeta,{
+          ssbranchtype: this.branchTypes,
+          ssbranchstatus: this.branchstatuses,
+        });
+
         this.allDataLoaded = true;
+        console.log(this.searchForm.getRawValue())
+        console.log(this.form.getRawValue())
+
       },
-      error: (err) => console.error('Failed to load form data', err)
+      error: (err) => console.error('Failed to load data', err)
     });
+
   }
 
+  handleAction(actionType: string) {
+    switch (actionType) {
+      case 'create': {
+
+      } break;
+      case 'export-csv': console.log('exportCsv() called'); break;
+      case 'export-excel': console.log('exportExcel() called'); break;
+      case 'bulk-deactivate': console.log('bulkDeactivate() called'); break;
+    }
+  }
+
+  onAction(name: string, element: any) {}
+
 }
+

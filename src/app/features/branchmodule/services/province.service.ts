@@ -5,24 +5,20 @@ import {ApiEndpoints} from '../../../core/api-endpoints';
 import {BranchType} from '../model/branchtype';
 import {BaseHttpService} from '../../../core/basehttp.service';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
-import {BranchtypeService} from './branchtype.service';
-import {Branch} from '../model/branch';
+import {District} from '../model/district';
+import {Province} from '../model/province';
 
 
 @Injectable({ providedIn: 'root' })
-export class BranchService extends BaseHttpService <Branch>{
+export class ProvinceService extends BaseHttpService <Province>{
 
   constructor(protected override http: HttpClient) {
     super(http);
   }
 
 
-  get():Observable<ApiResponse<Branch>>{
-   return  this.getAll(ApiEndpoints.branches);
-  }
-
-  save(branch:Branch):Observable<Branch>{
-    return this.post(ApiEndpoints.branches,branch);
+  get():Observable<ApiResponse<Province>>{
+   return  this.getAll(ApiEndpoints.provinces);
   }
 
 }

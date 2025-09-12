@@ -1,38 +1,101 @@
-.mainform {
+mat-sidenav-container {
+  height: calc(100vh - 64px);
+}
 
-  ::ng-deep {
+mat-toolbar{
+  background-color: #140648;
+  color: white;
 
-    mat-form-field {
-      font-size: 0.85rem;
-      margin-bottom: 8px;
+  button mat-icon{
+    color: white;
+  }
+}
 
-      .mat-form-field-infix {
-        padding: 4px 8px;
+mat-sidenav {
+  border-radius: unset;
+  width: 250px;
+  background-color: #140648;
+  color: white;
+  padding: 20px;
+  box-sizing: border-box;
+  height: 100%;
+  overflow-y: auto;
+  transition: width 0.3s ease;
+
+  &.mini {
+    width: 60px;
+  }
+
+  mat-nav-list {
+    list-style: none;
+    padding: 0;
+
+    a.mat-mdc-list-item {
+      color: white !important;
+      text-decoration: none;
+      display: block;
+      padding: 12px;
+      border-radius: 4px;
+      transition: background 0.2s;
+
+      &:hover {
+        background-color: #c2c2c29f;
       }
 
-      .mat-form-field-label {
-        font-size: 0.75rem;
+      &.active {
+        background-color: rgba(255, 255, 255, 0.2);
       }
 
-      input.mat-input-element,
-      textarea.mat-input-element {
-        font-size: 0.85rem;
-        padding: 4px 0;
-        height: 24px;
+      mat-icon {
+        color: white;
       }
 
-      mat-error {
-        font-size: 0.7rem;
-        margin-top: 2px;
+      span {
+        color: white;
       }
+    }
 
-      mat-select {
-        .mat-select-trigger {
-          height: 24px;
-          line-height: 24px;
-          font-size: 0.85rem;
-          padding: 0 8px;
-        }
+    .sub-menu {
+      padding-left: 16px;
+      overflow: hidden;
+
+      a.mat-mdc-list-item {
+        color: white !important;
+      }
+    }
+
+    .sub-item {
+      padding-left: 32px;
+    }
+
+    .expand-icon {
+      position: absolute;
+      right: 8px;
+      color: white;
+    }
+  }
+}
+
+mat-sidenav-content {
+  padding: 16px;
+}
+
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 800px) {
+  mat-sidenav-content {
+    padding: 8px;
+  }
+  mat-sidenav {
+    mat-nav-list {
+      .sub-menu {
+        padding-left: 8px;
+      }
+      .sub-item {
+        padding-left: 16px;
       }
     }
   }

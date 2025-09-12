@@ -41,11 +41,11 @@ export class BaseHttpService<T> {
     return this.http.post<T>(url, data);
   }
 
-  put(url: string, id: number | string, data: T): Observable<T> {
-    return this.http.put<T>(`${url}/${id}`, data);
+  put(url: string, data: T): Observable<T> {
+    return this.http.put<T>(url, data);
   }
 
-  delete(url: string, id: number | string): Observable<void> {
+  delete(url: string, id: number): Observable<void> {
     return this.http.delete<void>(`${url}/${id}`);
   }
 }

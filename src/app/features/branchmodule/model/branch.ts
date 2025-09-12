@@ -1,4 +1,6 @@
 import {Branchcoverage} from './branchcoverage';
+import {BranchStatus} from './branchstatus';
+import {BranchType} from './branchtype';
 
 export class Branch {
 
@@ -9,8 +11,8 @@ export class Branch {
   docreated!: Date;
   districts!:Branchcoverage;
   remarks!: string;
-  branchtype!: boolean;
-  branchstatus!: string;
+  branchtype!: BranchType;
+  branchstatus!: BranchStatus;
 
 }
 

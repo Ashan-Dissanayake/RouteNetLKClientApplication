@@ -1,0 +1,35 @@
+<div class="button-panel" >
+  <ng-container *ngFor="let btn of buttons">
+
+    <!-- Regular Button -->
+    <button
+      *ngIf="!btn.dropdown"
+      mat-raised-button
+      [color]="btn.color || 'primary'"
+      [disabled]="btn.disabled"
+      (click)="onClick(btn)"
+    >
+      <mat-icon *ngIf="btn.icon">{{ btn.icon }}</mat-icon>
+      {{ btn.label }}
+    </button>
+
+    <!-- Dropdown Button -->
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item *ngFor="let item of btn.dropdown" (click)="onClick(item)">
+        {{ item.label }}
+      </button>
+    </mat-menu>
+
+    <button
+      *ngIf="btn.dropdown"
+      mat-raised-button
+      [color]="btn.color || 'primary'"
+      [matMenuTriggerFor]="menu"
+    >
+      <mat-icon *ngIf="btn.icon">{{ btn.icon }}</mat-icon>
+      {{ btn.label }}
+      <mat-icon>arrow_drop_down</mat-icon>
+    </button>
+
+  </ng-container>
+</div>

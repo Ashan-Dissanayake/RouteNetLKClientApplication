@@ -1,0 +1,19 @@
+.container {
+  padding: 10px;
+  .filters app-search{
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+}
+
+
+mat-table {
+  width: 100%;
+}
+
+mat-paginator {
+  margin-top: 20px;
+}
+

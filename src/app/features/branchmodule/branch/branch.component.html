@@ -1,89 +1,87 @@
-<mat-grid-list [cols]="12" rowHeight="5rem">
+<div class="container">
+  <h2>Branch Management</h2>
+</div>
+  <!-- Summary Cards with mat-grid-list -->
+  <app-stats-grid [stats]="stats"></app-stats-grid>
 
-  <mat-grid-tile [colspan]="4" [rowspan]="10">
-    <mat-card id="form">
-      <mat-card-header >
-        <mat-card-title>Branch Detail</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <form  *ngIf="form && allDataLoaded" [formGroup]="form">
-          <ng-container *ngFor="let field of branchFormMeta" [ngSwitch]="field.type">
-            <!-- Text Input -->
-            <mat-form-field *ngSwitchCase="'text'" appearance="outline">
-              <mat-label>{{ field.label || field.name }}</mat-label>
-              <input matInput [formControlName]="field.name"  />
-              <mat-error *ngIf="form.get(field.name)?.invalid && (form.get(field.name)?.dirty || form.get(field.name)?.touched)">
-                <ng-container *ngIf="form.get(field.name)?.hasError('required')">This field is required.</ng-container>
-                <ng-container *ngIf="form.get(field.name)?.hasError('pattern')">Invalid format.</ng-container>
-              </mat-error>
-            </mat-form-field>
+  <!-- Action Buttons -->
+  <app-button-panel [buttons]="buttons" (actionClicked)="handleAction($event)"></app-button-panel>
 
-            <!-- Select Input -->
-            <mat-form-field *ngSwitchCase="'select'" appearance="outline">
-              <mat-label>{{ field.label || field.name }}</mat-label>
-              <mat-select [formControlName]="field.name">
-                <mat-option *ngFor="let opt of field.options" [value]="opt">{{ opt.name }}</mat-option>
-              </mat-select>
-              <mat-error *ngIf="form.get(field.name)?.invalid && (form.get(field.name)?.dirty || form.get(field.name)?.touched)">
-                <ng-container *ngIf="form.get(field.name)?.hasError('required')">This field is required.</ng-container>
-              </mat-error>
-            </mat-form-field>
+<div id="serverSearch">
+  <form *ngIf="allDataLoaded  && searchForm" [formGroup]="searchForm">
+    <ng-container *ngFor="let field of filterFormMeta" [ngSwitch]="field.type">
+      <mat-form-field *ngSwitchCase="'text'" appearance="outline">
+        <mat-label>{{ field.label || field.name }}</mat-label>
+        <input matInput [formControlName]="field.name"  />
+      </mat-form-field>
 
-            <!-- Date Input -->
-            <mat-form-field *ngSwitchCase="'date'" appearance="outline">
-              <mat-label>{{ field.label || field.name }}</mat-label>
-              <input [min]="field.dateConfig?.minDate" [max]="field.dateConfig?.maxDate" matInput [matDatepicker]="picker" [formControlName]="field.name" />
-              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-              <mat-datepicker #picker></mat-datepicker>
-              <mat-error *ngIf="form.get(field.name)?.invalid && (form.get(field.name)?.dirty || form.get(field.name)?.touched)">
-                <ng-container *ngIf="form.get(field.name)?.hasError('required')">This field is required.</ng-container>
-              </mat-error>
-            </mat-form-field>
-
-            <!-- Dual Listbox -->
-            <mat-form-field *ngSwitchCase="'dualist'" appearance="outline">
-              <mat-label>{{ field.label || field.name }}</mat-label>
-              <mat-dual-listbox
-                formControlName="{{ field.name }}"
-                [sourceList]="field.options || []"
-                displayProperty="name"
-                [destinationObjectReference]="['id']">
-              </mat-dual-listbox>
-              <mat-error *ngIf="form.get(field.name)?.hasError('required')">
-                This field is required.
-              </mat-error>
-            </mat-form-field>
-
-          </ng-container>
-        </form>
-      </mat-card-content>
-    </mat-card>
-  </mat-grid-tile>
-
-  <mat-grid-tile [colspan]="8" [rowspan]="4">
-    <mat-card id="ssearch">
-      <mat-card-header>
-        <mat-card-title>Item Search</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-      </mat-card-content>
-    </mat-card>
-  </mat-grid-tile>
+      <!-- Select Input -->
+      <mat-form-field *ngSwitchCase="'select'" appearance="outline">
+        <mat-label>{{ field.label || field.name }}</mat-label>
+        <mat-select [formControlName]="field.name">
+          <mat-option *ngFor="let opt of field.options" [value]="opt">{{ opt.name }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </ng-container>
+  </form>
+</div>
 
 
-  <mat-grid-tile [colspan]="8" [rowspan]="6">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>Item Table</mat-card-title>
+  <!-- Main Form -->
+<div>
+  <form  *ngIf="form && allDataLoaded" [formGroup]="form">
+    <ng-container *ngFor="let field of mainFormMeta" [ngSwitch]="field.type">
+      <!-- Text Input -->
+      <mat-form-field *ngSwitchCase="'text'" appearance="outline">
+        <mat-label>{{ field.label || field.name }}</mat-label>
+        <input matInput [formControlName]="field.name"  />
+        <mat-error *ngIf="form.get(field.name)?.invalid && (form.get(field.name)?.dirty || form.get(field.name)?.touched)">
+          <ng-container *ngIf="form.get(field.name)?.hasError('required')">This field is required.</ng-container>
+          <ng-container *ngIf="form.get(field.name)?.hasError('pattern')">Invalid format.</ng-container>
+        </mat-error>
+      </mat-form-field>
 
-      </mat-card-header>
-      <mat-card-content>
+      <!-- Select Input -->
+      <mat-form-field *ngSwitchCase="'select'" appearance="outline">
+        <mat-label>{{ field.label || field.name }}</mat-label>
+        <mat-select [formControlName]="field.name">
+          <mat-option *ngFor="let opt of field.options" [value]="opt">{{ opt.name }}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get(field.name)?.invalid && (form.get(field.name)?.dirty || form.get(field.name)?.touched)">
+          <ng-container *ngIf="form.get(field.name)?.hasError('required')">This field is required.</ng-container>
+        </mat-error>
+      </mat-form-field>
 
-      </mat-card-content>
-    </mat-card>
-  </mat-grid-tile>
-</mat-grid-list>
+      <!-- Date Input -->
+      <mat-form-field *ngSwitchCase="'date'" appearance="outline">
+        <mat-label>{{ field.label || field.name }}</mat-label>
+        <input [min]="field.dateConfig?.minDate" [max]="field.dateConfig?.maxDate" matInput [matDatepicker]="picker" [formControlName]="field.name" />
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-error *ngIf="form.get(field.name)?.invalid && (form.get(field.name)?.dirty || form.get(field.name)?.touched)">
+          <ng-container *ngIf="form.get(field.name)?.hasError('required')">This field is required.</ng-container>
+        </mat-error>
+      </mat-form-field>
 
+      <!-- Dual Listbox -->
+      <mat-form-field *ngSwitchCase="'dualist'" appearance="outline">
+        <mat-label>{{ field.label || field.name }}</mat-label>
+        <mat-dual-listbox
+          formControlName="{{ field.name }}"
+          [sourceList]="field.options || []"
+          displayProperty="name"
+          [destinationObjectReference]="['id']">
+        </mat-dual-listbox>
+        <mat-error *ngIf="form.get(field.name)?.hasError('required')">
+          This field is required.
+        </mat-error>
+      </mat-form-field>
+    </ng-container>
+  </form>
+</div>
 
+<div *ngIf="!showForm">
+  <h1>Table View</h1>
+</div>
 
 
