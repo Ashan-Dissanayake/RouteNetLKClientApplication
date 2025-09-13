@@ -2,15 +2,13 @@
   <ng-container *ngFor="let btn of buttons">
 
     <!-- Regular Button -->
-    <button
-      *ngIf="!btn.dropdown"
+    <button *ngIf="!btn.dropdown"
       mat-raised-button
       [color]="btn.color || 'primary'"
       [disabled]="btn.disabled"
       (click)="onClick(btn)"
     >
-      <mat-icon *ngIf="btn.icon">{{ btn.icon }}</mat-icon>
-      {{ btn.label }}
+      <mat-icon *ngIf="btn.icon">{{ btn.icon }}</mat-icon> {{ btn.label }}
     </button>
 
     <!-- Dropdown Button -->
@@ -26,8 +24,7 @@
       [color]="btn.color || 'primary'"
       [matMenuTriggerFor]="menu"
     >
-      <mat-icon *ngIf="btn.icon">{{ btn.icon }}</mat-icon>
-      {{ btn.label }}
+      <mat-icon *ngIf="btn.icon">{{ btn.icon }}</mat-icon> {{ btn.label }}
       <mat-icon>arrow_drop_down</mat-icon>
     </button>
 

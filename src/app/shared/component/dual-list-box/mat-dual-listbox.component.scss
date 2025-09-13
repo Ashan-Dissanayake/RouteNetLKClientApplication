@@ -7,15 +7,15 @@
     box-shadow: unset;
     background: unset;
     left: -20px;
-    padding:1%;
-    width: 100%;
+    padding: 25px 1% 1%;
+    padding-inline-start: 40px;
 
     .source-list,
     .destination-list {
       min-height: 210px;
       display: flex;
       flex-direction: column;
-      width: 40%;
+      width: 42%;
       background: rgba(227, 227, 227, 0.08);
       border: #333333 1px solid;
       box-shadow: unset;
@@ -34,7 +34,6 @@
   }
 
   .button-panel {
-    top: 20px;
     width: 8%;
     display: flex;
     flex-direction: column;
@@ -44,6 +43,9 @@
     box-shadow: none;
     background: none;
     margin: 0 15px;
+    -webkit-padding-start: 22px;
+    -webkit-padding-end: 22px;
+    bottom: 9px;
 
     button {
       //display: flex;

@@ -1,7 +1,7 @@
 import {Component, Input, input} from '@angular/core';
 import {MatFormField} from '@angular/material/form-field';
 import {MatError, MatInput, MatLabel} from '@angular/material/input';
-import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {FormField} from './formfieldata.model';
 import {NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
 import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';

@@ -9,10 +9,10 @@ export class Branch {
   address!: string;
   telephone!: string;
   docreated!: Date;
-  districts!:Branchcoverage;
   remarks!: string;
   branchtype!: BranchType;
   branchstatus!: BranchStatus;
+  districts!:Branchcoverage;
 
 }
 

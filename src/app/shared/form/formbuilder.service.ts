@@ -29,6 +29,10 @@ export class FormbuilderService {
         if (regexRule) validators.push(Validators.pattern(regexRule.regex));
       }
 
+      if(field.mode == 'date'){
+
+      }
+
       group[field.name] = new FormControl(
         { value: initialValue ?? '', disabled: !!field.disabled },
         validators

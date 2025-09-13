@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, TemplateRef} from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { FormbuilderService } from '../../../shared/form/formbuilder.service';
 import { BranchFacadeService } from '../branchfacade.service';
@@ -19,6 +19,9 @@ import {MatOption} from '@angular/material/core';
 import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
 import {MatDualListboxComponent} from '../../../shared/component/dual-list-box/mat-dual-listbox.component';
 import {DynamicFieldComponent} from '../../../shared/form/dynamic-field.component';
+import {MatDialog, MatDialogRef} from '@angular/material/dialog';
+import {DialogService} from '../../../core/dialog.service';
+import {MatButton} from '@angular/material/button';
 
 
 @Component({
@@ -28,19 +31,7 @@ import {DynamicFieldComponent} from '../../../shared/form/dynamic-field.componen
     StatsGridComponent,
     ButtonPanelComponent,
     NgForOf,
-    MatFormField,
-    NgSwitchCase,
-    MatInput,
-    NgIf,
-    NgSwitch,
-    MatLabel,
-    MatError,
-    MatSelect,
-    MatOption,
-    MatDatepickerToggle,
-    MatDatepicker,
-    MatDatepickerInput,
-    MatDualListboxComponent, DynamicFieldComponent,
+    DynamicFieldComponent, NgIf
   ],
   templateUrl: './branch.component.html',
   styleUrls: ['./branch.component.scss']
@@ -62,12 +53,17 @@ export class BranchComponent implements OnInit {
   provinces!: Province[];
   regexes!: any;
 
+  popupDialogRef!: MatDialogRef<any>;
+
+
   allDataLoaded = false;
   showForm = false;
 
   constructor(
     private formBuilder: FormbuilderService,
     private branchFacade: BranchFacadeService,
+    private dialogService:DialogService,
+    private dialog:MatDialog
   ) {}
 
   ngOnInit() {
@@ -108,9 +104,6 @@ export class BranchComponent implements OnInit {
         });
 
         this.allDataLoaded = true;
-        console.log(this.searchForm.getRawValue())
-        console.log(this.form.getRawValue())
-
       },
       error: (err) => console.error('Failed to load data', err)
     });
@@ -120,7 +113,7 @@ export class BranchComponent implements OnInit {
   handleAction(actionType: string) {
     switch (actionType) {
       case 'create': {
-
+            this.openFormPopup();
       } break;
       case 'export-csv': console.log('exportCsv() called'); break;
       case 'export-excel': console.log('exportExcel() called'); break;
@@ -128,7 +121,20 @@ export class BranchComponent implements OnInit {
     }
   }
 
-  onAction(name: string, element: any) {}
+
+  openFormPopup() {
+    this.dialogService.showFormPopup({
+      heading: 'Edit Details',
+      form: this.form,
+      meta: this.mainFormMeta,
+    }).subscribe(result => {
+      if (result) {
+        console.log('Popup form submitted:', result);
+      } else {
+        console.log('Popup cancelled');
+      }
+    });
+  }
 
 }
 
