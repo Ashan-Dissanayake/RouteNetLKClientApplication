@@ -16,9 +16,8 @@ export class BranchService extends BaseHttpService <Branch>{
     super(http);
   }
 
-
-  get():Observable<ApiResponse<Branch>>{
-   return  this.getAll(ApiEndpoints.branches);
+  get(params?:any):Observable<ApiResponse<Branch>>{
+   return  this.getAll(ApiEndpoints.branches,params);
   }
 
   save(branch:Branch):Observable<Branch>{

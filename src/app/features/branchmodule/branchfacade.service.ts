@@ -44,10 +44,6 @@ export class BranchFacadeService {
     return this.districtService.get().pipe(map(res=>res.data));
   }
 
-  loadBranches():Observable<Branch[]>{
-    return this.branchService.get().pipe(map(res=>res.data));
-  }
-
   loadProvinces():Observable<Province[]>{
     return this.provinceService.get().pipe(map(res=>res.data));
   }
@@ -56,6 +52,26 @@ export class BranchFacadeService {
     return this.regexService.getRegexes('branches').pipe(map(res => res.data));
   }
 
+  loadBranches(): Observable<Branch[]> {
+    return this.getBranches();
+  }
+
+  searchBranches(criteria: any): Observable<Branch[]> {
+    const normalized = Object.fromEntries(
+      Object.entries(criteria).map(([key, value]) => {
+        if (typeof value === 'string') return [key, value.trim().toLowerCase()];
+        if (value && typeof value === 'object' && 'id' in value) return [key, value.id];
+        return [key, value];
+      })
+    );
+
+    return this.getBranches(normalized);
+  }
+
+
+  private getBranches(params?: any): Observable<Branch[]> {
+    return this.branchService.get(params).pipe(map(res => res.data));
+  }
 
   createBranch(branchFrom:FormGroup){
     this.branch = branchFrom.getRawValue();
@@ -70,7 +86,7 @@ export class BranchFacadeService {
       });
   }
 
-  searchBranch(searchData:any){
 
-  }
+
+
 }

@@ -1,27 +1,22 @@
-import {Component, OnInit, TemplateRef} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { FormbuilderService } from '../../../shared/form/formbuilder.service';
 import { BranchFacadeService } from '../branchfacade.service';
-import { forkJoin } from 'rxjs';
+import {debounceTime, distinctUntilChanged, forkJoin, Subject, takeUntil} from 'rxjs';
 import { Branch } from '../model/branch';
 import { BranchStatus } from '../model/branchstatus';
 import { BranchType } from '../model/branchtype';
 import { District } from '../model/district';
 import { Province } from '../model/province';
-import {ButtonMeta, DashBoardMeta, FilterMeta, FormMeta} from '../branch.meta';
+import {ActionPannelMeta, DashBoardMeta, FilterMeta, FormMeta, TableMeta} from '../branch.meta';
 import {StatsGridComponent} from '../../../shared/component/stats-grid/stats-grid.component';
 import {ButtonPanelComponent} from '../../../shared/component/button-panel/button-panel.component';
-import {MatFormField} from '@angular/material/form-field';
-import {MatError, MatInput, MatLabel} from '@angular/material/input';
-import {NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
-import {MatSelect} from '@angular/material/select';
-import {MatOption} from '@angular/material/core';
-import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
-import {MatDualListboxComponent} from '../../../shared/component/dual-list-box/mat-dual-listbox.component';
+import {NgForOf, NgIf} from '@angular/common';
 import {DynamicFieldComponent} from '../../../shared/form/dynamic-field.component';
-import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {DialogService} from '../../../core/dialog.service';
 import {MatButton} from '@angular/material/button';
+import {DataTableComponent} from '../../../shared/component/data-table/data-table.component';
+import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
 
 
 @Component({
@@ -31,15 +26,20 @@ import {MatButton} from '@angular/material/button';
     StatsGridComponent,
     ButtonPanelComponent,
     NgForOf,
-    DynamicFieldComponent, NgIf
+    DynamicFieldComponent,
+    NgIf,
+    DataTableComponent,
+    TableCellDirective,
+    MatButton
   ],
   templateUrl: './branch.component.html',
   styleUrls: ['./branch.component.scss']
 })
-export class BranchComponent implements OnInit {
+export class BranchComponent implements OnInit,OnDestroy {
 
+  columns =TableMeta
   stats = DashBoardMeta;
-  buttons = ButtonMeta;
+  actionbuttons = ActionPannelMeta;
   mainFormMeta = FormMeta;
   filterFormMeta =FilterMeta;
 
@@ -53,17 +53,15 @@ export class BranchComponent implements OnInit {
   provinces!: Province[];
   regexes!: any;
 
-  popupDialogRef!: MatDialogRef<any>;
-
-
   allDataLoaded = false;
-  showForm = false;
+
+  private destroy$ = new Subject<void>();
+
 
   constructor(
     private formBuilder: FormbuilderService,
     private branchFacade: BranchFacadeService,
     private dialogService:DialogService,
-    private dialog:MatDialog
   ) {}
 
   ngOnInit() {
@@ -71,7 +69,6 @@ export class BranchComponent implements OnInit {
   }
 
   initialize() {
-
     forkJoin({
       branches: this.branchFacade.loadBranches(),
       branchstatuses: this.branchFacade.loadBranchStatuses(),
@@ -81,7 +78,6 @@ export class BranchComponent implements OnInit {
       regexes: this.branchFacade.loadRegexes()
     }).subscribe({
       next: (dataMap) => {
-
         this.branches = dataMap['branches'];
         this.branchstatuses = dataMap['branchstatuses'];
         this.branchTypes = dataMap['branchTypes'];
@@ -99,28 +95,40 @@ export class BranchComponent implements OnInit {
 
         //Build Search Form
         this.searchForm = this.formBuilder.build(this.filterFormMeta,{
-          ssbranchtype: this.branchTypes,
           ssbranchstatus: this.branchstatuses,
         });
 
         this.allDataLoaded = true;
+        this.OnSearchFormChanges();
       },
       error: (err) => console.error('Failed to load data', err)
     });
-
   }
 
-  handleAction(actionType: string) {
+
+  OnSearchFormChanges(){
+    this.searchForm.valueChanges
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((data) => {
+        this.branchFacade.searchBranches(data).subscribe((branches) => {
+          this.branches = branches;
+        });
+      });
+  }
+
+  onActionPannel(actionType: string) {
     switch (actionType) {
-      case 'create': {
-            this.openFormPopup();
-      } break;
+      case 'create': this.openFormPopup(); break;
       case 'export-csv': console.log('exportCsv() called'); break;
       case 'export-excel': console.log('exportExcel() called'); break;
       case 'bulk-deactivate': console.log('bulkDeactivate() called'); break;
+      case 'clear-search':this.searchForm.reset();
     }
   }
-
 
   openFormPopup() {
     this.dialogService.showFormPopup({
@@ -135,6 +143,29 @@ export class BranchComponent implements OnInit {
       }
     });
   }
+
+  onRowClick(row: any) {
+    console.log('row clicked', row);
+  }
+
+  onRowActionClick(action: string, row: any) {
+    switch (action) {
+      case 'edit':this.editUser(row); break;
+      case 'delete': console.log(row); break;
+      default:console.warn('Unknown action:', action);
+    }
+  }
+
+  private editUser(row: any) {
+    this.form.patchValue(row);
+    this.openFormPopup();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
 
 }
 

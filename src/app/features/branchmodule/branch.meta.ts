@@ -8,7 +8,7 @@ export  const DashBoardMeta = [
   { label: 'Regular', value: 184 }
 ];
 
-export const ButtonMeta: ButtonAction[] =[
+export const ActionPannelMeta: ButtonAction[] =[
   { label: 'Create', type: 'create', icon: 'add' },
   {
     label: 'Export', type: 'export', icon: 'download',
@@ -17,7 +17,8 @@ export const ButtonMeta: ButtonAction[] =[
       { label: 'Excel', type: 'export-excel' }
     ]
   },
-  { label: 'Bulk Deactivate', type: 'bulk-deactivate', icon: 'delete',disabled:true }
+  { label: 'Bulk Deactivate', type: 'bulk-deactivate', icon: 'delete',disabled:true },
+  { label: 'Clear Search', type: 'clear-search', icon: 'cancel' }
 ];
 
 
@@ -41,7 +42,19 @@ export const FormMeta:FormField[] = [
 
 export const FilterMeta: FormField[] = [
   { name: 'ssname', type: 'text', label: 'Branch Name', required: false, mode:"none" },
-  { name: 'ssbranchtype', type: 'select', label: 'Branch Type', required: false, mode: 'options' },
+  { name: 'sscode', type: 'text', label: 'Branch Code', required: false, mode: 'none' },
   { name: 'ssbranchstatus', type: 'select', label: 'Branch Status', required: false, mode: 'options' },
 ] as FormField[];
 
+// define columns: keys must match fields (or nested paths) and labels shown in headers
+export const TableMeta= [
+  { key: 'name', label: 'Name' },
+  { key: 'code', label: 'Code' },
+  { key: 'address', label: 'Address' },
+  { key: 'email', label: 'Email' },
+  { key: 'telephone', label: 'Telephone' },
+  { key: 'docreated', label: 'Date of Created' },
+  { key: 'branchtype.name', label: 'Branch Type' },
+  { key: 'branchstatus.name', label: 'Branch Status' },
+  { key: 'actions', label: 'Actions' } // provide a template for this column below
+];

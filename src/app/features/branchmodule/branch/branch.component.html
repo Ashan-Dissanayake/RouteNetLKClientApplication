@@ -5,24 +5,35 @@
   <app-stats-grid [stats]="stats"></app-stats-grid>
 
   <!-- Action Buttons -->
-  <app-button-panel [buttons]="buttons" (actionClicked)="handleAction($event)"></app-button-panel>
+  <app-button-panel [buttons]="actionbuttons" (actionClicked)="onActionPannel($event)"></app-button-panel>
 
+<!-- Search Form -->
 <div *ngIf="searchForm && allDataLoaded" id="serverSearch">
   <form [formGroup]="searchForm">
     <dynamic-field
       *ngFor="let field of filterFormMeta"
       [formInstance]="searchForm"
-      [field]="field">
+      [field]="field"
+    >
     </dynamic-field>
   </form>
-
 </div>
 
+<!-- Data-Table -->
+<app-data-table
+  [data]="branches"
+  [columns]="columns"
+  [sortable]="true"
+  [paginatable]="true"
+  [pageSizeOptions]="[5,10]"
+  (rowClick)="onRowClick($event)"
+>
+  <!-- Custom actions column -->
+  <ng-template tableCell="actions" let-row>
+    <button mat-button (click)="onRowActionClick('edit', row); $event.stopPropagation()">Edit</button>
+  </ng-template>
+</app-data-table>
 
 
-
-<div *ngIf="!showForm">
-  <h1>Table View</h1>
-</div>
 
 
