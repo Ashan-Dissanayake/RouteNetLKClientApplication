@@ -2,10 +2,8 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {ApiEndpoints} from '../../../core/api-endpoints';
-import {BranchType} from '../model/branchtype';
 import {BaseHttpService} from '../../../core/basehttp.service';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
-import {BranchtypeService} from './branchtype.service';
 import {Branch} from '../model/branch';
 
 
@@ -22,6 +20,18 @@ export class BranchService extends BaseHttpService <Branch>{
 
   save(branch:Branch):Observable<Branch>{
     return this.post(ApiEndpoints.branches,branch);
+  }
+
+  update(branch:Branch):Observable<Branch>{
+    return this.put(ApiEndpoints.branches,branch);
+  }
+
+  deactivate(ids: number[] | number): Observable<number[]> {
+    // Ensure we always send an array to the backend
+    const payload = Array.isArray(ids) ? ids : [ids];
+    return this.http.delete<number[]>(ApiEndpoints.branches, {
+      body: payload
+    });
   }
 
 }

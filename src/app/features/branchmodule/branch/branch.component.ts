@@ -1,28 +1,32 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import { FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { FormbuilderService } from '../../../shared/form/formbuilder.service';
-import { BranchFacadeService } from '../branchfacade.service';
+import {FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {FormbuilderService} from '../../../shared/form/formbuilder.service';
+import {BranchFacadeService} from '../branchfacade.service';
 import {debounceTime, distinctUntilChanged, forkJoin, Subject, takeUntil} from 'rxjs';
-import { Branch } from '../model/branch';
-import { BranchStatus } from '../model/branchstatus';
-import { BranchType } from '../model/branchtype';
-import { District } from '../model/district';
-import { Province } from '../model/province';
+import {Branch} from '../model/branch';
+import {BranchStatus} from '../model/branchstatus';
+import {BranchType} from '../model/branchtype';
+import {District} from '../model/district';
+import {Province} from '../model/province';
 import {ActionPannelMeta, DashBoardMeta, FilterMeta, FormMeta, TableMeta} from '../branch.meta';
 import {StatsGridComponent} from '../../../shared/component/stats-grid/stats-grid.component';
-import {ButtonPanelComponent} from '../../../shared/component/button-panel/button-panel.component';
+import {
+  ButtonAction,
+  ButtonClickEvent,
+  ButtonPanelComponent
+} from '../../../shared/component/button-panel/button-panel.component';
 import {NgForOf, NgIf} from '@angular/common';
 import {DynamicFieldComponent} from '../../../shared/form/dynamic-field.component';
 import {DialogService} from '../../../core/dialog.service';
 import {MatButton} from '@angular/material/button';
-import {DataTableComponent} from '../../../shared/component/data-table/data-table.component';
+import {CheckboxEvent, DataTableComponent} from '../../../shared/component/data-table/data-table.component';
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
-
 
 @Component({
   selector: 'app-branch',
   standalone: true,
-  imports: [ReactiveFormsModule,
+  imports: [
+    ReactiveFormsModule,
     StatsGridComponent,
     ButtonPanelComponent,
     NgForOf,
@@ -33,139 +37,218 @@ import {TableCellDirective} from '../../../shared/component/data-table/table-cel
     MatButton
   ],
   templateUrl: './branch.component.html',
-  styleUrls: ['./branch.component.scss']
+  styleUrls: ['./branch.component.scss'],
 })
 export class BranchComponent implements OnInit,OnDestroy {
 
-  columns =TableMeta
-  stats = DashBoardMeta;
-  actionbuttons = ActionPannelMeta;
-  mainFormMeta = FormMeta;
-  filterFormMeta =FilterMeta;
+  // --- Metadata ---
+  readonly tableColumnsMeta = TableMeta;
+  readonly dashboardStatsMeta = DashBoardMeta;
+  readonly actionButtonsMeta: ButtonAction[] = ActionPannelMeta;
+  readonly mainFormDefinition = FormMeta;
+  readonly filterFormDefinition = FilterMeta;
 
-  form: FormGroup = new FormGroup({});
-  searchForm: FormGroup = new FormGroup({});
+  // --- Forms ---
+  branchDataForm: FormGroup = new FormGroup({});
+  branchSearchForm: FormGroup = new FormGroup({});
 
-  branches!: Branch[];
-  branchstatuses!: BranchStatus[];
-  branchTypes!: BranchType[];
-  districts!: District[];
-  provinces!: Province[];
-  regexes!: any;
+  // --- Data ---
+  branchList!: Branch[];
+  branchStatusList!: BranchStatus[];
+  branchTypeList!: BranchType[];
+  districtList!: District[];
+  provinceList!: Province[];
+  regexValidators!: any;
 
-  allDataLoaded = false;
+  isInitialDataLoaded  = false;
+  selectedRows = new Set<any>();
 
   private destroy$ = new Subject<void>();
-
 
   constructor(
     private formBuilder: FormbuilderService,
     private branchFacade: BranchFacadeService,
-    private dialogService:DialogService,
+    private dialogService: DialogService
   ) {}
 
   ngOnInit() {
-    this.initialize();
+    this.loadInitialMetaData();
+    this.actionButtonsMeta.forEach(btn => {
+      if (btn.type === 'bulk-deactivate') {
+        btn.disabled = () => this.selectedRows.size === 0;
+      }
+    });
   }
 
-  initialize() {
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  // Initialization & Data Loading
+  private loadInitialMetaData() {
     forkJoin({
-      branches: this.branchFacade.loadBranches(),
-      branchstatuses: this.branchFacade.loadBranchStatuses(),
+      branchStatuses: this.branchFacade.loadBranchStatuses(),
       branchTypes: this.branchFacade.loadBranchTypes(),
       districts: this.branchFacade.loadDistricts(),
       provinces: this.branchFacade.loadProvinces(),
       regexes: this.branchFacade.loadRegexes()
     }).subscribe({
-      next: (dataMap) => {
-        this.branches = dataMap['branches'];
-        this.branchstatuses = dataMap['branchstatuses'];
-        this.branchTypes = dataMap['branchTypes'];
-        this.districts = dataMap['districts'];
-        this.provinces = dataMap['provinces'];
-        this.regexes = dataMap['regexes'];
-
-        // Build main form
-        this.form = this.formBuilder.build(this.mainFormMeta, {
-          branchtype: this.branchTypes,
-          branchstatus: this.branchstatuses,
-          districts: this.districts,
-          regexes: this.regexes,
-        });
-
-        //Build Search Form
-        this.searchForm = this.formBuilder.build(this.filterFormMeta,{
-          ssbranchstatus: this.branchstatuses,
-        });
-
-        this.allDataLoaded = true;
-        this.OnSearchFormChanges();
-      },
-      error: (err) => console.error('Failed to load data', err)
+      next: data => this.handleInitialMetaData(data),
+      error: err => this.dialogService.showMessage({
+        heading: 'Error',
+        message: `Failed to save branch. ${err.message || err}`
+      })
     });
   }
 
+  private handleInitialMetaData(data: any) {
+    this.branchStatusList = data.branchStatuses;
+    this.branchTypeList = data.branchTypes;
+    this.districtList = data.districts;
+    this.provinceList = data.provinces;
+    this.regexValidators = data.regexes;
 
-  OnSearchFormChanges(){
-    this.searchForm.valueChanges
+    this.buildForms();
+    this.isInitialDataLoaded = true;
+    this.loadBranchTableData();
+    this.subscribeToSearchFormChanges();
+  }
+
+  private buildForms() {
+    // Main Form
+    this.branchDataForm = this.formBuilder.build(this.mainFormDefinition, {
+      branchtype: this.branchTypeList,
+      branchstatus: this.branchStatusList,
+      branchcoverages: this.districtList,
+      regexes: this.regexValidators
+    });
+
+    // Search Form
+    this.branchSearchForm = this.formBuilder.build(this.filterFormDefinition, {
+      ssbranchstatus: this.branchStatusList
+    });
+  }
+
+  private loadBranchTableData() {
+    this.branchFacade.loadBranches()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => this.branchList = data);
+  }
+
+  // --- Search/Filter Logic ---
+  private subscribeToSearchFormChanges() {
+    this.branchSearchForm.valueChanges
       .pipe(
         debounceTime(300),
         distinctUntilChanged(),
         takeUntil(this.destroy$)
       )
-      .subscribe((data) => {
-        this.branchFacade.searchBranches(data).subscribe((branches) => {
-          this.branches = branches;
-        });
+      .subscribe(searchData => {
+        this.branchFacade.searchBranches(searchData)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe(branches => this.branchList = branches);
       });
   }
 
-  onActionPannel(actionType: string) {
-    switch (actionType) {
-      case 'create': this.openFormPopup(); break;
-      case 'export-csv': console.log('exportCsv() called'); break;
-      case 'export-excel': console.log('exportExcel() called'); break;
-      case 'bulk-deactivate': console.log('bulkDeactivate() called'); break;
-      case 'clear-search':this.searchForm.reset();
-    }
-  }
-
-  openFormPopup() {
+  // Form Popup & Submit
+  openBranchFormPopup() {
     this.dialogService.showFormPopup({
-      heading: 'Edit Details',
-      form: this.form,
-      meta: this.mainFormMeta,
+      heading: this.branchDataForm.value.id ? 'Edit Details' : 'Create New Branch',
+      form: this.branchDataForm,
+      meta: this.mainFormDefinition
     }).subscribe(result => {
-      if (result) {
-        console.log('Popup form submitted:', result);
-      } else {
-        console.log('Popup cancelled');
-      }
+      if (result) this.handleBranchFormSubmit(result);
+      else this.branchDataForm.reset();
     });
   }
 
-  onRowClick(row: any) {
-    console.log('row clicked', row);
+  private handleBranchFormSubmit(branchData: any) {
+    const obs$ = branchData.id
+      ? this.branchFacade.updateBranch(branchData)
+      : this.branchFacade.createBranch(branchData);
+
+    obs$?.pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.dialogService.showMessage({ heading: 'Success', message: 'Branch saved successfully' });
+        this.loadBranchTableData();
+        this.branchDataForm.reset();
+      },
+      error: err => this.dialogService.showMessage({
+        heading: 'Error',
+        message: `Failed to save branch. ${err.message || err}`
+      })
+    });
   }
 
-  onRowActionClick(action: string, row: any) {
-    switch (action) {
-      case 'edit':this.editUser(row); break;
-      case 'delete': console.log(row); break;
-      default:console.warn('Unknown action:', action);
+  prepareFormForEdit(row: Branch) {
+    console.log(row)
+    this.branchDataForm.patchValue(row);
+    this.openBranchFormPopup();
+  }
+
+  // Table Row Actions
+  onRowDataClick(row: any) {
+    console.log('Row clicked:', row);
+  }
+
+  onRowActionExecuted(action: string, row: any) {
+    if (action === 'edit') this.prepareFormForEdit(row);
+  }
+
+  // Action Panel Handlers
+  private actionHandlers: Record<string, () => void> = {
+    'create': () => this.openBranchFormPopup(),
+    'export-csv': () => console.log('Export CSV called'),
+    'export-excel': () => console.log('Export Excel called'),
+    'bulk-deactivate': () => this.deleteSelected(),
+    'clear-search': () => this.branchSearchForm.reset()
+  };
+
+  onActionPanelClick(event: ButtonClickEvent) {
+    const handler = this.actionHandlers[event.type];
+    if (handler) handler();
+    else console.warn(`No handler defined for action: ${event.type}`);
+  }
+
+  onDropdownOnlyClick(event: ButtonClickEvent) {
+    const dropdownTypes = ['export-csv', 'export-excel'];
+    if (dropdownTypes.includes(event.type)) {
+      console.log(`Dropdown action executed: ${event.type}`);
+      this.actionHandlers[event.type]?.();
+    } else {
+      console.warn(`Unhandled dropdown action: ${event.type}`);
     }
   }
 
-  private editUser(row: any) {
-    this.form.patchValue(row);
-    this.openFormPopup();
+  // Selection Handling
+  onRowCheckboxChanged(event: CheckboxEvent<any>) {
+    if (event.checked) this.selectedRows.add(event.row.id);
+    else this.selectedRows.delete(event.row.id);
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+  onSelectAll(checked: boolean) {
+    this.selectedRows.clear();
+    if (checked) this.branchList.forEach(row => this.selectedRows.add(row.id));
   }
 
+  deleteSelected() {
+    const toDelete = Array.from(this.selectedRows);
+   const obs$ = this.branchFacade.deleteBranches(toDelete);
+
+    obs$?.pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.dialogService.showMessage({ heading: 'Success', message: 'Branch Deactivated successfully' });
+        this.selectedRows.clear();
+        this.loadBranchTableData();
+      },
+      error: err => this.dialogService.showMessage({
+        heading: 'Error',
+        message: `Failed to Deactivate branch. ${err.message || err}`
+      })
+    });
+
+  }
 
 }
 

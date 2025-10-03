@@ -4,6 +4,7 @@ import {NgForOf, NgIf} from '@angular/common';
 import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
 import {MatIcon} from '@angular/material/icon';
 
+
 @Component({
   selector: 'app-button-panel',
   imports: [
@@ -21,22 +22,46 @@ import {MatIcon} from '@angular/material/icon';
 })
 export class ButtonPanelComponent {
 
-  @Input() buttons: ButtonAction[] = [];  // Dynamic list of buttons
-  @Output() actionClicked = new EventEmitter<string>(); // Emits button type when clicked
+  @Input() buttons: ButtonAction[] = [];
+  @Output() actionClicked = new EventEmitter<ButtonClickEvent>();
+  @Output() dropdownClicked = new EventEmitter<ButtonClickEvent>();
 
-  onClick(button: ButtonAction) {
-    if (!button.disabled) {
-      this.actionClicked.emit(button.type);
+  onClick(button: ButtonAction, fromDropdown = false) {
+    const event: ButtonClickEvent = { type: button.type, source: button };
+    if (!this.isDisabled(button)) {
+      this.actionClicked.emit(event);
+      if (fromDropdown) {
+        this.dropdownClicked.emit(event);
+      }
     }
+  }
+
+  //Evaluate disabled state (supports boolean or function)
+  isDisabled(button: ButtonAction): boolean {
+    return typeof button.disabled === 'function'
+      ? button.disabled()
+      : !!button.disabled;
+  }
+
+  //Return unique menu ID for each button
+  menuId(index: number): string {
+    return `menu-${index}`;
   }
 
 }
 
 export interface ButtonAction {
-  label: string;                   // Button text
-  type: string;                     // Identifier for click handling
-  icon?: string;                    // Optional icon name
-  color?: 'primary' | 'accent' | 'warn';  // Optional color
-  disabled?: boolean;               // Optional disabled
-  dropdown?: { label: string; type: string }[]; // Optional dropdown for nested actions
+  label: string;                                // Button text
+  type: string;                                 // Identifier for click handling
+  icon?: string;                                // Optional icon name
+  iconType?: 'mat' | 'fa' | 'custom';           // Support multiple icon sets
+  color?: 'primary' | 'accent' | 'warn';        // Material color scheme
+  disabled?: boolean | (() => boolean);         // Can be boolean or function
+  dropdown?: ButtonAction[];                    // Nested actions
+  group?: string;                               // Optional grouping
+}
+
+export interface ButtonClickEvent {
+  type: string;
+  source: ButtonAction;
 }

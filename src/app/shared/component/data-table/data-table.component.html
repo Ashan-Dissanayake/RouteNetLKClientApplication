@@ -1,26 +1,31 @@
-<mat-table  [dataSource]="dataSource" matSort *ngIf="dataSource">
+<mat-table [dataSource]="dataSource" matSort *ngIf="dataSource">
 
   <!-- Checkbox Column -->
-  <ng-container  matColumnDef="select">
-    <mat-header-cell class= "checkbox-cell" *matHeaderCellDef></mat-header-cell>
-    <mat-cell class= "checkbox-cell" *matCellDef="let row">
-      <mat-checkbox [(ngModel)]="row.selected" (click)="$event.stopPropagation()">
+  <ng-container matColumnDef="select">
+    <mat-header-cell class="checkbox-cell"  *matHeaderCellDef>
+      <mat-checkbox
+        (change)="toggleSelectAll($event.checked)">
+      </mat-checkbox>
+    </mat-header-cell>
+    <mat-cell class="checkbox-cell" *matCellDef="let row">
+      <mat-checkbox
+        [(ngModel)]="row.selected"
+        (ngModelChange)="onCheckBoxChanged(row, $event)"
+        (click)="$event.stopPropagation()">
       </mat-checkbox>
     </mat-cell>
   </ng-container>
 
-
   <!-- Dynamic columns -->
   <ng-container *ngFor="let col of columns" [matColumnDef]="col.key">
-    <mat-header-cell  *matHeaderCellDef [mat-sort-header]="sortable ? '' : ''">
+    <mat-header-cell *matHeaderCellDef [mat-sort-header]="sortable ? '' :''">
       {{ col.label }}
     </mat-header-cell>
 
-
-    <mat-cell  *matCellDef="let row">
+    <mat-cell *matCellDef="let row">
       <!-- If consumer provided a custom template -->
       <ng-container *ngIf="getTemplateForColumn(col.key) as tpl; else defaultCell">
-        <ng-container *ngTemplateOutlet="tpl; context: { $implicit: row, row: row }"></ng-container>
+        <ng-container *ngTemplateOutlet="tpl; context: { $implicit: row, row: row, action: onActionClicked.bind(this) }"></ng-container>
       </ng-container>
 
       <ng-template #defaultCell>
@@ -29,9 +34,8 @@
     </mat-cell>
   </ng-container>
 
-
   <!-- Rows -->
-  <mat-header-row  *matHeaderRowDef="displayedColumns"></mat-header-row>
+  <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
   <mat-row
     *matRowDef="let row; columns: displayedColumns"
     (click)="onRowClicked(row)">

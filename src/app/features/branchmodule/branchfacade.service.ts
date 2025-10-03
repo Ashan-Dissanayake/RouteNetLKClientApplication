@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import {Injectable} from '@angular/core';
+import {EMPTY, Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 import {BranchtypeService} from './services/branchtype.service';
 import {BranchstatusService} from './services/branchstatus.service';
 import {RegexService} from '../../core/regex.service';
@@ -9,35 +9,31 @@ import {BranchStatus} from './model/branchstatus';
 import {District} from './model/district';
 import {DistrictService} from './services/district.service';
 import {Regex} from '../../shared/models/regex.model';
-import {FormGroup} from '@angular/forms';
 import {Branch} from './model/branch';
-import {DialogService} from '../../core/dialog.service';
 import {BranchService} from './services/branch.service';
 import {Province} from './model/province';
 import {ProvinceService} from './services/province.service';
 
-@Injectable({ providedIn: 'root' })
-export class BranchFacadeService {
-
-  branch:Branch = new Branch();
+@Injectable({
+  providedIn: 'root',
+})export class BranchFacadeService {
 
   constructor(
-    private branchtypeService: BranchtypeService,
-    private branchstatusService: BranchstatusService,
+    private branchTypeService: BranchtypeService,
+    private branchStatusService: BranchstatusService,
     private districtService: DistrictService,
-    private branchService:BranchService,
-    private provinceService:ProvinceService,
-    private regexService: RegexService,
-    private dialogService:DialogService
-  ) {
-  }
+    private branchService: BranchService,
+    private provinceService: ProvinceService,
+    private regexService: RegexService
+  ) {}
 
+  // Load data
   loadBranchTypes(): Observable<BranchType[]> {
-    return this.branchtypeService.get().pipe(map(res => res.data));
+    return this.branchTypeService.get().pipe(map(res => res.data));
   }
 
   loadBranchStatuses(): Observable<BranchStatus[]> {
-    return this.branchstatusService.get().pipe(map(res => res.data));
+    return this.branchStatusService.get().pipe(map(res => res.data));
   }
 
   loadDistricts():Observable<District[]>{
@@ -57,36 +53,55 @@ export class BranchFacadeService {
   }
 
   searchBranches(criteria: any): Observable<Branch[]> {
-    const normalized = Object.fromEntries(
+    const normalized = this.normalizeSearchCriteria(criteria);
+    return this.getBranches(normalized);
+  }
+
+  createBranch(branchData: any): Observable<Branch> {
+    const branch = this.normalizeBranchData(branchData);
+    const status = branch.branchstatus?.name?.toLowerCase();
+    if (status === 'active' || status === 'planned') {
+      return this.branchService.save(branch);
+    }
+    return EMPTY;
+  }
+
+  updateBranch(branchData: any): Observable<Branch> {
+    const branch = this.normalizeBranchData(branchData);
+    return this.branchService.update(branch);
+  }
+
+  deleteBranches(branchIds: number[]): Observable<number[]> {
+    if (!branchIds || branchIds.length === 0) {
+      return EMPTY;
+    }
+    return this.branchService.deactivate(branchIds);
+  }
+
+
+  // Private helpers
+  private getBranches(params?: any): Observable<Branch[]> {
+    return this.branchService.get(params).pipe(map(res => res.data));
+  }
+
+  private normalizeSearchCriteria(criteria: any): any {
+    return Object.fromEntries(
       Object.entries(criteria).map(([key, value]) => {
         if (typeof value === 'string') return [key, value.trim().toLowerCase()];
         if (value && typeof value === 'object' && 'id' in value) return [key, value.id];
         return [key, value];
       })
     );
-
-    return this.getBranches(normalized);
   }
 
-
-  private getBranches(params?: any): Observable<Branch[]> {
-    return this.branchService.get(params).pipe(map(res => res.data));
+  private normalizeBranchData(branchData: any): any {
+    const normalized = { ...branchData };
+    normalized.branchcoverages = (normalized.branchcoverages || []).map((coverage: any) => ({
+      district: coverage.district
+        ? { id: coverage.district.id, name: coverage.district.name }
+        : { id: coverage.id, name: coverage.name }
+    }));
+    return normalized;
   }
-
-  createBranch(branchFrom:FormGroup){
-    this.branch = branchFrom.getRawValue();
-
-    this.dialogService.showConfirmation({ heading: 'Creating a Branch', message: 'Are you sure?' })
-      .subscribe(confirmed => {
-        if (confirmed) {
-          if(this.branch.branchstatus.name.toLowerCase() == 'active' || 'planned'){
-            this.branchService.save(this.branch);
-          }
-        }
-      });
-  }
-
-
-
 
 }

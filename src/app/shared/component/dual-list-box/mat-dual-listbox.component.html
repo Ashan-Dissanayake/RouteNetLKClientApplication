@@ -1,15 +1,9 @@
 <mat-card class="listbox-container">
   <mat-card class="source-list">
     <mat-selection-list #SourceList>
-<!--      <form [formGroup]="form">-->
-<!--        <mat-form-field appearance="outline" class="searchFields">-->
-<!--          <mat-label>Search Here</mat-label>-->
-<!--          <input matInput formControlName="sourceListSearch" (keyup)="filterSourceList()">-->
-<!--        </mat-form-field>-->
-<!--      </form>-->
-      @for (item of sourceList; track sourceList) {
+      @for (item of sourceList; track item) {
         <mat-list-option [value]="item">
-          {{ item[displayProperty] || 'No Such Property' }}
+          {{ displayProperty ? item[displayProperty] : (item | json) }}
         </mat-list-option>
       }
     </mat-selection-list>
@@ -30,18 +24,11 @@
     </button>
   </mat-card>
 
-
   <mat-card class="destination-list">
     <mat-selection-list #DestinationList>
-<!--      <form [formGroup]="form">-->
-<!--        <mat-form-field appearance="outline">-->
-<!--          <mat-label>Search Here</mat-label>-->
-<!--          <input matInput formControlName="destinationListSearch" (keyup)="filterDestinationList()">-->
-<!--        </mat-form-field>-->
-<!--      </form>-->
-      @for (item of destinationList; track destinationList) {
+      @for (item of destinationList; track item) {
         <mat-list-option [value]="item">
-          {{ item[displayProperty] || 'No Such Property' }}
+          {{ displayProperty ? item[displayProperty] : (item | json) }}
         </mat-list-option>
       }
     </mat-selection-list>

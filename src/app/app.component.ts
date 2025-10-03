@@ -7,6 +7,7 @@ import { MatListModule } from '@angular/material/list';
 import { RouterModule } from '@angular/router';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import {NgClass, NgIf} from '@angular/common';
+import {MatDateFormats, provideNativeDateAdapter} from "@angular/material/core";
 
 interface MenuItem {
   icon: string;
@@ -16,9 +17,22 @@ interface MenuItem {
   expanded?: boolean;
 }
 
+const formats: MatDateFormats = {
+  parse: {
+    dateInput: 'yyyy-MM-dd',
+  },
+  display: {
+    dateInput: 'yyyy-MM-dd',
+    monthYearLabel: 'MMM yyyy',
+    dateA11yLabel: 'yyyy-MM-dd',
+    monthYearA11yLabel: 'MMMM yyyy',
+  },
+};
+
 @Component({
   selector: 'app-root',
   standalone: true,
+  providers: [provideNativeDateAdapter(formats)],
   imports: [
     MatSidenavModule,
     MatToolbarModule,
@@ -81,3 +95,5 @@ export class AppComponent {
     }
   }
 }
+
+

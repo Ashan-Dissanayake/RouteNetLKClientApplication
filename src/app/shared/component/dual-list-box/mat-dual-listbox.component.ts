@@ -8,7 +8,6 @@ import {
   SimpleChanges,
   ViewChild,
   OnDestroy,
-  DoCheck,
   Optional,
   Self,
   HostListener
@@ -16,19 +15,16 @@ import {
 import { MatListOption, MatSelectionList } from '@angular/material/list';
 import {
   ControlValueAccessor,
-  FormBuilder,
-  FormControl,
-  FormGroup,
   ReactiveFormsModule,
   NgControl
 } from '@angular/forms';
 import { MatCard } from '@angular/material/card';
 import { MatButton } from '@angular/material/button';
 import { isEqual } from 'lodash';
-import {MatFormField, MatFormFieldControl} from '@angular/material/form-field';
-import {MatInput, MatLabel} from '@angular/material/input';
+import { MatFormFieldControl } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { Subject } from 'rxjs';
+import {JsonPipe} from '@angular/common';
 
 @Component({
   selector: 'mat-dual-listbox',
@@ -41,10 +37,8 @@ import { Subject } from 'rxjs';
     MatListOption,
     MatButton,
     ReactiveFormsModule,
-    // MatInput,
     MatIcon,
-    // MatFormField,
-    // MatLabel
+    JsonPipe
   ],
   providers: [
     {
@@ -59,103 +53,78 @@ export class MatDualListboxComponent<T extends Record<string, any>>
     OnChanges,
     AfterViewInit,
     OnDestroy,
-    DoCheck,
     ControlValueAccessor,
     MatFormFieldControl<T[]> {
 
-  /* ========= Inputs ========= */
+  /* ========= Inputs & Data ========= */
   @Input() sourceList: T[] = [];
   @Input() destinationObjectReference: string[] = [];
   @Input() displayProperty: keyof T | '' = '';
   @Input() placeholder: string = '';
   @Input() required = false;
 
-  /* ========= Internal State ========= */
   protected destinationList: T[] = [];
+  // originalSourceList is now only needed to reset sourceList when value changes
   private originalSourceList: T[] = [];
-  private originalDestinationList: T[] = [];
-
-  protected form!: FormGroup;
 
   @ViewChild('SourceList') SourceList!: MatSelectionList;
   @ViewChild('DestinationList') DestinationList!: MatSelectionList;
 
-  /* ========= ControlValueAccessor via NgControl ========= */
-  private onChange: (value: T[]) => void = () => {};
-  private onTouched: () => void = () => {};
-  disabled = false;
+  private oldDestinationList: T[] = [];
 
-  /* ========= MatFormFieldControl ========= */
+  /* ========= CVA & MatFormFieldControl Properties (Required) ========= */
   static nextId = 0;
   controlType = 'mat-dual-listbox';
   id = `mat-dual-listbox-${MatDualListboxComponent.nextId++}`;
   describedBy = '';
   stateChanges = new Subject<void>();
+  disabled = false;
   focused = false;
-  errorState = false;
 
-  get value(): T[] {
-    return this.destinationList;
+  get errorState(): boolean {
+    const control = this.ngControl?.control;
+    return !!(control && control.invalid && (control.dirty));
   }
+
+  get value(): T[] { return this.destinationList; }
   set value(val: T[] | null) {
     this.destinationList = val || [];
     this.onChange(this.destinationList);
     this.stateChanges.next();
   }
 
-  get empty(): boolean {
-    return !this.destinationList || this.destinationList.length === 0;
-  }
+  get empty(): boolean { return !this.destinationList || this.destinationList.length === 0; }
+  get shouldLabelFloat(): boolean { return this.focused || !this.empty || !!this.placeholder; }
+  setDescribedByIds(ids: string[]): void { this.describedBy = ids.join(' '); }
+  onContainerClick(_: MouseEvent): void { /* focus on the component container */ }
 
-  get shouldLabelFloat(): boolean {
-    return this.focused || !this.empty || !!this.placeholder;
-  }
+  private onChange: (value: T[]) => void = () => {};
+  private onTouched: () => void = () => {};
 
-  setDescribedByIds(ids: string[]): void {
-    this.describedBy = ids.join(' ');
-  }
 
-  onContainerClick(_: MouseEvent): void {
-    // optional: focus search input
-  }
-
-  /* ========= Constructor ========= */
+  /* ========= Constructor & Init ========= */
   constructor(
-    private formBuilder: FormBuilder,
     @Optional() @Self() public ngControl: NgControl
   ) {
-    this.form = this.formBuilder.group({
-      sourceListSearch: new FormControl<string | null>(null),
-      destinationListSearch: new FormControl<string | null>(null),
-    });
-
-    // Automatically register CVA
     if (this.ngControl) {
       this.ngControl.valueAccessor = this;
     }
   }
 
-  /* ========= Lifecycle ========= */
   ngOnInit() {
-    this.form.controls['destinationListSearch'].disable();
+
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['sourceList']) {
+      // Store the original list to ensure proper value mapping on writeValue
       this.originalSourceList = [...this.sourceList];
-      this.resetAndFilterSourceList();
+      this.resetSourceList();
     }
   }
 
   ngAfterViewInit(): void {
-    if (this.DestinationList) {
-      this.DestinationList.options.forEach(option => option._setSelected(true));
-    }
-  }
-
-  ngDoCheck(): void {
-    const control = this.ngControl?.control;
-    this.errorState = !!(control && control.invalid && (control.dirty));
+    //this.DestinationList?.options.forEach(option => option._setSelected(true));
   }
 
   ngOnDestroy() {
@@ -179,17 +148,12 @@ export class MatDualListboxComponent<T extends Record<string, any>>
     }
   }
 
-  /* ========= CVA ========= */
+  /* ========= ControlValueAccessor (CVA) ========= */
   writeValue(value: T[] | null): void {
     if (value) {
       this.destinationList = this.getMappedDestinationValues(value);
-      this.originalDestinationList = [...this.destinationList];
-      this.resetAndFilterSourceList();
-      setTimeout(() => {
-        if (this.DestinationList) {
-          this.DestinationList.options.forEach(option => option._setSelected(true));
-        }
-      });
+      //this.resetSourceList();
+      //setTimeout(() => this.DestinationList?.options.forEach(option => option._setSelected(true)));
     } else {
       this.destinationList = [];
     }
@@ -197,22 +161,11 @@ export class MatDualListboxComponent<T extends Record<string, any>>
     this.stateChanges.next();
   }
 
-  registerOnChange(fn: (value: T[]) => void): void {
-    this.onChange = fn;
-  }
-
-  registerOnTouched(fn: () => void): void {
-    this.onTouched = fn;
-  }
+  registerOnChange(fn: (value: T[]) => void): void { this.onChange = fn; }
+  registerOnTouched(fn: () => void): void { this.onTouched = fn; }
 
   setDisabledState(isDisabled: boolean): void {
     this.disabled = isDisabled;
-    if (isDisabled) {
-      this.form.disable({ emitEvent: false });
-    } else {
-      this.form.enable({ emitEvent: false });
-      this.form.controls['destinationListSearch'].disable({ emitEvent: false });
-    }
     this.stateChanges.next();
   }
 
@@ -230,15 +183,16 @@ export class MatDualListboxComponent<T extends Record<string, any>>
     return value;
   }
 
-  private resetAndFilterSourceList(): void {
+  private resetSourceList(): void {
+    // Recalculates the source list based on items NOT in the destination list
     this.sourceList = this.originalSourceList.filter(item =>
       !this.destinationList.some(destItem => isEqual(destItem, item))
     );
   }
 
   moveItems(isToDestination: boolean): void {
-    const selectedItems = (isToDestination ? this.SourceList : this.DestinationList)
-      .selectedOptions.selected.map(option => option.value as T);
+    const list = isToDestination ? this.SourceList : this.DestinationList;
+    const selectedItems = list.selectedOptions.selected.map(option => option.value as T);
 
     if (isToDestination) {
       this.sourceList = this.sourceList.filter(item => !selectedItems.includes(item));
@@ -248,12 +202,16 @@ export class MatDualListboxComponent<T extends Record<string, any>>
       this.sourceList.push(...selectedItems);
     }
 
-    this.originalDestinationList = [...this.destinationList];
     this.onChange(this.destinationList);
     this.onTouched();
-    this.clearSelection(isToDestination);
+    this.clearSelection(list);
     this.stateChanges.next();
   }
+
+  private getNestedValue(obj: any, keys: string[]): any {
+    return keys.reduce((acc, key) => (acc ? acc[key] : undefined), obj);
+  }
+
 
   moveAllItems(isToDestination: boolean): void {
     if (isToDestination) {
@@ -263,40 +221,12 @@ export class MatDualListboxComponent<T extends Record<string, any>>
       this.sourceList.push(...this.destinationList);
       this.destinationList = [];
     }
-    this.originalDestinationList = [...this.destinationList];
     this.onChange(this.destinationList);
     this.onTouched();
     this.stateChanges.next();
   }
 
-  private clearSelection(isToDestination: boolean): void {
-    if (isToDestination) {
-      this.SourceList.selectedOptions.clear();
-    } else {
-      this.DestinationList.selectedOptions.clear();
-    }
-  }
-
-  filterList(searchControlName: string, originalList: T[], targetList: T[]): T[] {
-    const searchValue = (this.form.controls[searchControlName]?.value || '').toString().toLowerCase();
-    if (searchValue) {
-      targetList = originalList.filter(item =>
-        ((this.displayProperty ? item[this.displayProperty] : item) as unknown as string)
-          ?.toString()
-          .toLowerCase()
-          .includes(searchValue)
-      );
-    } else {
-      targetList = [...originalList];
-    }
-    return targetList;
-  }
-
-  filterSourceList(): void {
-    this.sourceList = this.filterList('sourceListSearch', this.originalSourceList, this.sourceList);
-  }
-
-  filterDestinationList(): void {
-    this.destinationList = this.filterList('destinationListSearch', this.originalDestinationList, this.destinationList);
+  private clearSelection(list: MatSelectionList): void {
+    list.selectedOptions.clear();
   }
 }

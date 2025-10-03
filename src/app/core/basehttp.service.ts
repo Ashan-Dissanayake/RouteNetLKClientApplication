@@ -52,7 +52,8 @@ export class BaseHttpService<T> {
     return this.http.put<T>(url, data);
   }
 
-  delete(url: string, id: number): Observable<void> {
-    return this.http.delete<void>(`${url}/${id}`);
+  delete(url:string, id: number): Observable<T> {
+    return this.http.delete<T>(`${url}/${id}`);
   }
+
 }

@@ -1,13 +1,11 @@
 import {
-  AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef,
+  AfterViewInit, ChangeDetectorRef,
   Component, ContentChildren,
   EventEmitter,
   Input,
-  input,
   OnChanges,
-  OnDestroy,
   Output, QueryList, SimpleChanges,
-  ViewChild, ViewEncapsulation
+  ViewChild
 } from '@angular/core';
 import {TableCellDirective} from './table-cell.directive';
 import {MatSort, MatSortHeader} from '@angular/material/sort';
@@ -21,9 +19,19 @@ import {
   MatTable,
   MatTableDataSource
 } from '@angular/material/table';
-import {NgForOf, NgIf, NgTemplateOutlet} from '@angular/common';
+import { NgForOf, NgIf, NgTemplateOutlet} from '@angular/common';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {FormsModule} from '@angular/forms';
+
+export interface ActionEvent<T = any> {
+  action: string;
+  row: T;
+}
+
+export interface CheckboxEvent<T = any> {
+  row: T;
+  checked: boolean;
+}
 
 export interface ColumnDef {
   key: string;
@@ -57,7 +65,7 @@ export interface ColumnDef {
   standalone: true,
   styleUrl: './data-table.component.scss',
 })
-export class DataTableComponent implements OnChanges, AfterViewInit {
+export class DataTableComponent<T = any> implements OnChanges, AfterViewInit {
 
   @Input() data: any[] = [];
   @Input() columns: ColumnDef[] = [];
@@ -65,9 +73,10 @@ export class DataTableComponent implements OnChanges, AfterViewInit {
   @Input() paginatable = false;
   @Input() pageSizeOptions: number[] = [5, 10, 25];
 
-  @Output() rowClick = new EventEmitter<any>();
-  @Output() actionClick = new EventEmitter<{ action: string; row: any }>();
-
+  @Output() rowClick = new EventEmitter<T>();
+  @Output() actionClick = new EventEmitter<ActionEvent<T>>();
+  @Output() checkBoxClick = new EventEmitter<CheckboxEvent<T>>();
+  @Output() selectAllClick = new EventEmitter<boolean>();
 
   @ContentChildren(TableCellDirective) customCellTemplates!: QueryList<TableCellDirective>;
 
@@ -81,38 +90,46 @@ export class DataTableComponent implements OnChanges, AfterViewInit {
 
   constructor(private cdr: ChangeDetectorRef) {}
 
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges): void {
     if (changes['data']) {
-      this.dataSource.data = this.data ?? [];
+      // avoid mutating input
+      this.dataSource.data = [...(this.data ?? [])];
       this.cdr.markForCheck();
     }
     if (changes['columns']) {
-      // this.displayedColumns = this.columns.map(c => c.key);
       this.displayedColumns = ['select', ...this.columns.map(c => c.key)];
     }
   }
 
-  getValue(row: any, key: string) {
+  getValue(row: T, key: string) {
     if (row == null) return '';
-    return key.split('.').reduce((acc, part) => acc?.[part], row) ?? '';
+    return key.split('.').reduce((acc: any, part) => acc?.[part], row) ?? '';
   }
 
-  onRowClicked(row: any) {
+  onRowClicked(row: T) {
     this.rowClick.emit(row);
+  }
+
+  onActionClicked(action: string, row: T) {
+    this.actionClick.emit({ action, row });
+  }
+
+  onCheckBoxChanged(row: T, checked: boolean) {
+    this.checkBoxClick.emit({ row, checked });
+  }
+
+  toggleSelectAll(checked: boolean) {
+    // Update rows immutably
+    this.dataSource.data = this.dataSource.data.map(r => ({
+      ...r,
+      selected: checked
+    }));
+    this.selectAllClick.emit(checked);
   }
 
   getTemplateForColumn(key: string) {
     return this.templatesMap.get(key) ?? null;
   }
-
-  // emitAction(action: string, row: any) {
-  //   console.log("2111111111111111")
-  //   this.actionClick.emit({ action, row });
-  // }
-
-  // trackByRow(index: number, item: any) {
-  //   return item?.id ?? index;
-  // }
 
   private mapCustomTemplates() {
     this.templatesMap.clear();
@@ -122,7 +139,6 @@ export class DataTableComponent implements OnChanges, AfterViewInit {
       this.templatesMap.set(dir.name, dir.template);
     });
 
-    // also check column.cellTemplate if passed
     for (const col of this.columns) {
       if (col.cellTemplate) {
         this.templatesMap.set(col.key, col.cellTemplate);
@@ -131,7 +147,6 @@ export class DataTableComponent implements OnChanges, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    // Map templates
     this.mapCustomTemplates();
 
     if (this.sortable && this.sort) {
@@ -141,7 +156,6 @@ export class DataTableComponent implements OnChanges, AfterViewInit {
       this.dataSource.paginator = this.paginator;
     }
 
-    // Watch for dynamically added templates
     this.customCellTemplates.changes.subscribe(() => {
       this.mapCustomTemplates();
       this.cdr.markForCheck();

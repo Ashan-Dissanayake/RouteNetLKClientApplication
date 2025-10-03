@@ -1,19 +1,17 @@
 mat-header-row{
-  background-color: #d5d5d5;
+  background-color: #e8e5e5;
   font-weight: 500;
 }
 
 .checkbox-cell {
-  max-width: 15px;
+  max-width: 40px;
 }
 
-mat-cell{
-  min-width: 56px;
-  padding: 2px 6px;
-  font-size: 13px;
-  text-transform: none; /* ERP buttons usually not uppercase */
-
-  &:last-child {
-    margin-right: 0;
-  }
+mat-cell:first-of-type, mat-header-cell:first-of-type{
+  padding:unset!important;
 }
+
+mat-table{
+  background-color: white;
+}
+

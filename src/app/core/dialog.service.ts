@@ -12,17 +12,15 @@ import {FormpopupComponent} from '../shared/component/formpopup/formpopup.compon
 export class DialogService {
   constructor(private dialog: MatDialog) {}
 
-  showMessage(heading: string, message: string): Promise<void> {
-    return new Promise(resolve => {
-      this.dialog.open(MessageComponent, {
-        width: '500px',
-        data: { heading, message }
-      }).afterClosed().subscribe(() => resolve());
-    });
+  showMessage(options: DialogOptions):  Observable<boolean> {
+     return  this.dialog.open(MessageComponent, {
+        width: options.width || '500px',
+        data: {heading: options.heading, message: options.message }
+      }).afterClosed();
   }
 
 
-  showConfirmation(options: ConfirmOptions): Observable<boolean> {
+  showConfirmation(options: DialogOptions): Observable<boolean> {
     return this.dialog.open(ConfirmComponent, {
       width: options.width || '500px',
       data: { heading: options.heading, message: options.message }
@@ -43,7 +41,7 @@ export class DialogService {
 
 }
 
-interface ConfirmOptions {
+interface DialogOptions {
   heading: string;
   message: string;
   width?: string;

@@ -2,38 +2,43 @@
   <h2>Branch Management</h2>
 </div>
   <!-- Summary Cards with mat-grid-list -->
-  <app-stats-grid [stats]="stats"></app-stats-grid>
+  <app-stats-grid [stats]="dashboardStatsMeta"></app-stats-grid>
 
   <!-- Action Buttons -->
-  <app-button-panel [buttons]="actionbuttons" (actionClicked)="onActionPannel($event)"></app-button-panel>
+<app-button-panel
+  [buttons]="actionButtonsMeta"
+  (actionClicked)="onActionPanelClick($event)"
+  (dropdownClicked)="onDropdownOnlyClick($event)">
+</app-button-panel>
 
 <!-- Search Form -->
-<div *ngIf="searchForm && allDataLoaded" id="serverSearch">
-  <form [formGroup]="searchForm">
+<div *ngIf="branchSearchForm && isInitialDataLoaded " id="serverSearch">
+  <form [formGroup]="branchSearchForm">
     <dynamic-field
-      *ngFor="let field of filterFormMeta"
-      [formInstance]="searchForm"
+      *ngFor="let field of filterFormDefinition"
+      [formInstance]="branchSearchForm"
       [field]="field"
     >
     </dynamic-field>
   </form>
 </div>
 
-<!-- Data-Table -->
 <app-data-table
-  [data]="branches"
-  [columns]="columns"
+  [data]="branchList"
+  [columns]="tableColumnsMeta"
   [sortable]="true"
   [paginatable]="true"
   [pageSizeOptions]="[5,10]"
-  (rowClick)="onRowClick($event)"
+  (rowClick)="onRowDataClick($event)"
+  (actionClick)="onRowActionExecuted($event.action, $event.row)"
+  (checkBoxClick)="onRowCheckboxChanged($event)"
+  (selectAllClick)="onSelectAll($event)"
 >
   <!-- Custom actions column -->
-  <ng-template tableCell="actions" let-row>
-    <button mat-button (click)="onRowActionClick('edit', row); $event.stopPropagation()">Edit</button>
+  <ng-template tableCell="actions" let-row let-action="action">
+    <button mat-button (click)="action('edit', row); $event.stopPropagation()">Edit</button>
   </ng-template>
 </app-data-table>
-
 
 
 

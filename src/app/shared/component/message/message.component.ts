@@ -13,7 +13,6 @@ import {NgForOf} from '@angular/common';
     MatDialogActions,
     MatButton,
     MatDialogClose,
-    NgForOf
   ],
   templateUrl: './message.component.html',
   standalone: true,
@@ -22,11 +21,14 @@ import {NgForOf} from '@angular/common';
 export class MessageComponent {
   lines?: [];
 
-  constructor(public dialogRef: MatDialogRef<MessageComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
-    this.lines = this.data.message.split('<br>').filter((line: string) => line !== '');
-  }
+  constructor(
+    public dialogRef: MatDialogRef<MessageComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {}
 
-  ngOnInit(): void { this.dialogRef.addPanelClass('custom-dialog'); }
 
-  onNoClick(): void { this.dialogRef.close(); }
+
+  //ngOnInit(): void { this.dialogRef.addPanelClass('custom-dialog'); }
+
+  //onNoClick(): void { this.dialogRef.close(); }
 }

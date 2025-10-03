@@ -8,32 +8,36 @@ export  const DashBoardMeta = [
   { label: 'Regular', value: 184 }
 ];
 
-export const ActionPannelMeta: ButtonAction[] =[
+export const ActionPannelMeta: ButtonAction[] = [
   { label: 'Create', type: 'create', icon: 'add' },
   {
-    label: 'Export', type: 'export', icon: 'download',
+    label: 'Export',
+    type: 'export',
+    icon: 'download',
     dropdown: [
       { label: 'CSV', type: 'export-csv' },
       { label: 'Excel', type: 'export-excel' }
     ]
   },
-  { label: 'Bulk Deactivate', type: 'bulk-deactivate', icon: 'delete',disabled:true },
+  { label: 'Bulk Deactivate', type: 'bulk-deactivate', icon: 'delete', color: 'warn', disabled: false },
   { label: 'Clear Search', type: 'clear-search', icon: 'cancel' }
 ];
 
 
 export const FormMeta:FormField[] = [
+  { name: 'id', type: 'hidden', label: 'Branch id', required: false, mode: 'none'},
   { name: 'name', type: 'text', label: 'Branch Name', required: true, mode: 'regex'},
   { name: 'code', type: 'text', label: 'Branch Code', required: true, mode: 'regex'},
   { name: 'address', type: 'text', label: 'Branch Address', required: true, mode: 'regex'},
   { name: 'telephone', type: 'text', label: 'Telephone', required: true, mode: 'regex' },
+  { name: 'email', type: 'text', label: 'Email', required: true, mode: 'none' },
   { name: 'docreated', type: 'date', label: 'Date of Created', required: true, mode: 'date',
     dateConfig:{
     minDate:new Date(),
       maxDate:new Date()
     }
   },
-  { name: 'districts', type: 'dualist', label: 'Branch Coverage', required: true, mode: 'options'},
+  { name: 'branchcoverages', type: 'dualist', label: 'Branch Coverage', required: true, mode: 'options',referencePath: ['district']},
   { name: 'remarks', type: 'text', label: 'Remarks', required: false, mode: 'none'},
   { name: 'branchtype', type: 'select', label: 'Branch Type', required: true, mode: 'options'},
   { name: 'branchstatus', type: 'select', label: 'Branch Status', required: true, mode: 'options' }

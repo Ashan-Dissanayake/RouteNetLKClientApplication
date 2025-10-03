@@ -11,6 +11,7 @@ export interface FormField {
     minDate?: Date;
     maxDate?: Date;
   };
+  referencePath?:string[];
 }
 
 type OptionsField = {id:number,name:string}
