@@ -60,7 +60,7 @@ import {ProvinceService} from './services/province.service';
   createBranch(branchData: any): Observable<Branch> {
     const branch = this.normalizeBranchData(branchData);
     const status = branch.branchstatus?.name?.toLowerCase();
-    if (status === 'active' || status === 'planned') {
+    if (status === 'Opened') {
       return this.branchService.save(branch);
     }
     return EMPTY;
@@ -71,8 +71,17 @@ import {ProvinceService} from './services/province.service';
     return this.branchService.update(branch);
   }
 
-  deleteBranches(branchIds: number[]): Observable<number[]> {
-    if (!branchIds || branchIds.length === 0) {
+  deleteBranches(branches: Branch[]): Observable<number[]> {
+    if (!branches || branches.length === 0) {
+      return EMPTY;
+    }
+    // Collect only closed branch IDs
+    const branchIds = branches
+      .filter(b => (b.branchstatus?.name ?? '').toLowerCase() === 'closed')
+      .map(b => b.id)
+      .filter(id => id != null);
+
+    if (branchIds.length === 0) {
       return EMPTY;
     }
     return this.branchService.deactivate(branchIds);

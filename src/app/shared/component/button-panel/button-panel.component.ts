@@ -55,7 +55,7 @@ export interface ButtonAction {
   type: string;                                 // Identifier for click handling
   icon?: string;                                // Optional icon name
   iconType?: 'mat' | 'fa' | 'custom';           // Support multiple icon sets
-  color?: 'primary' | 'accent' | 'warn';        // Material color scheme
+  color?: 'red' | 'accent' | 'warn';        // Material color scheme
   disabled?: boolean | (() => boolean);         // Can be boolean or function
   dropdown?: ButtonAction[];                    // Nested actions
   group?: string;                               // Optional grouping

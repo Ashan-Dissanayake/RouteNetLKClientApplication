@@ -4,7 +4,7 @@
     <!-- Regular Button -->
     <button *ngIf="!btn.dropdown"
             mat-raised-button
-            [color]="btn.color || 'primary'"
+            [color]="btn.color"
             [disabled]="isDisabled(btn)"
             (click)="onClick(btn)"
     >
@@ -22,14 +22,11 @@
     <!-- Dropdown Trigger Button -->
     <button *ngIf="btn.dropdown"
             mat-raised-button
-            [color]="btn.color || 'primary'"
+            [color]="btn.color"
             [disabled]="isDisabled(btn)"
             [matMenuTriggerFor]="menu"
     >
-      <ng-container *ngIf="btn.icon">
-        <mat-icon *ngIf="!btn.iconType || btn.iconType === 'mat'">{{ btn.icon }}</mat-icon>
-        <i *ngIf="btn.iconType === 'fa'" class="fa fa-{{ btn.icon }}"></i>
-      </ng-container>
+        <mat-icon>{{ btn.icon }}</mat-icon>
       {{ btn.label }}
       <mat-icon>arrow_drop_down</mat-icon>
     </button>

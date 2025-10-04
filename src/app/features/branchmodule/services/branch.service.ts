@@ -29,9 +29,7 @@ export class BranchService extends BaseHttpService <Branch>{
   deactivate(ids: number[] | number): Observable<number[]> {
     // Ensure we always send an array to the backend
     const payload = Array.isArray(ids) ? ids : [ids];
-    return this.http.delete<number[]>(ApiEndpoints.branches, {
-      body: payload
-    });
+    return this.http.post<number[]>(ApiEndpoints.branchesdeactivate,ids);
   }
 
 }

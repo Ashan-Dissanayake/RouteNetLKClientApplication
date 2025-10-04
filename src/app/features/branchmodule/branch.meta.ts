@@ -19,7 +19,7 @@ export const ActionPannelMeta: ButtonAction[] = [
       { label: 'Excel', type: 'export-excel' }
     ]
   },
-  { label: 'Bulk Deactivate', type: 'bulk-deactivate', icon: 'delete', color: 'warn', disabled: false },
+  { label: 'Deactivate', type: 'bulk-deactivate', icon: 'delete', disabled: false },
   { label: 'Clear Search', type: 'clear-search', icon: 'cancel' }
 ];
 

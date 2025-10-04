@@ -176,13 +176,12 @@ export class BranchComponent implements OnInit,OnDestroy {
       },
       error: err => this.dialogService.showMessage({
         heading: 'Error',
-        message: `Failed to save branch. ${err.message || err}`
+        message: err.message
       })
     });
   }
 
   prepareFormForEdit(row: Branch) {
-    console.log(row)
     this.branchDataForm.patchValue(row);
     this.openBranchFormPopup();
   }
@@ -223,30 +222,34 @@ export class BranchComponent implements OnInit,OnDestroy {
 
   // Selection Handling
   onRowCheckboxChanged(event: CheckboxEvent<any>) {
-    if (event.checked) this.selectedRows.add(event.row.id);
-    else this.selectedRows.delete(event.row.id);
+    if (event.checked) this.selectedRows.add(event.row);
+    else this.selectedRows.delete(event.row);
   }
 
   onSelectAll(checked: boolean) {
     this.selectedRows.clear();
-    if (checked) this.branchList.forEach(row => this.selectedRows.add(row.id));
+    if (checked) this.branchList.forEach(row => this.selectedRows.add(row));
   }
 
   deleteSelected() {
     const toDelete = Array.from(this.selectedRows);
-   const obs$ = this.branchFacade.deleteBranches(toDelete);
-
-    obs$?.pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => {
-        this.dialogService.showMessage({ heading: 'Success', message: 'Branch Deactivated successfully' });
-        this.selectedRows.clear();
-        this.loadBranchTableData();
-      },
-      error: err => this.dialogService.showMessage({
-        heading: 'Error',
-        message: `Failed to Deactivate branch. ${err.message || err}`
+    this.dialogService.showConfirmation({heading:"Deactivation",message:"Are sure ?"})
+      .subscribe(confirmed=>{
+        if (confirmed){
+          const obs$ = this.branchFacade.deleteBranches(toDelete);
+          obs$?.pipe(takeUntil(this.destroy$)).subscribe({
+            next: () => {
+              this.dialogService.showMessage({ heading: 'Success', message: 'Branch Deactivated successfully' });
+              this.selectedRows.clear();
+              this.loadBranchTableData();
+            },
+            error: err => this.dialogService.showMessage({
+              heading: 'Error',
+              message: `Failed to Deactivate branch. ${err.message || err}`
+            })
+          });
+        }
       })
-    });
 
   }
 
