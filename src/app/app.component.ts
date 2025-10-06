@@ -59,7 +59,7 @@ export class AppComponent {
       children: [
         { icon: 'people', label: 'Employee', route: '/admin/employee' },
         { icon: 'person', label: 'User', route: '/admin/user' },
-        { icon: 'person', label: 'Branch', route: '/admin/branch' }
+        { icon: 'apartment', label: 'Branch', route: '/admin/branch' }
       ],
       expanded: false
     },

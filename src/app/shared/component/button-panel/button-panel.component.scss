@@ -1,15 +1,17 @@
 button {
-  background-color: #ff7b00 !important;
+  //background-color: #1e0f8c !important;
+  background-color: #ea7d38 !important;
   color: white !important;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   margin-right: 8px;
   margin-bottom: 10px;
   align-items: center;
 
   &:hover:not(.mat-disabled) {
-    background-color: #de5d00 !important;
+    background-color: #dc5619 !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.18);
   }
 
 }
@@ -20,3 +22,5 @@ button:disabled {
   color: white !important;
   cursor: not-allowed;
 }
+
+

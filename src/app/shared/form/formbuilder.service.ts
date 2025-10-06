@@ -3,19 +3,19 @@ import {FormBuilder, FormControl, FormGroup, ValidatorFn, Validators} from '@ang
 import {Regex} from '../models/regex.model';
 import {FormField} from './formfieldata.model';
 
+
 @Injectable({ providedIn: 'root' })
 export class FormbuilderService {
 
   constructor(private fb: FormBuilder) {}
 
   build(fields: FormField[], dataMap: Record<string, any>): FormGroup {
+    console.log("111")
     const group: Record<string, FormControl> = {};
 
     fields.forEach((field) => {
       const validators: ValidatorFn[] = [];
       if (field.required) validators.push(Validators.required);
-
-      let initialValue: any = '';
 
       // Options dropdown
       if (field.mode === 'options' && dataMap[field.name]) {
@@ -30,7 +30,7 @@ export class FormbuilderService {
       }
 
       group[field.name] = new FormControl(
-        { value: initialValue ?? '', disabled: !!field.disabled },
+        { value: field.defaultValue ?? '', disabled: !!field.disabled },
         validators
       );
 
@@ -39,9 +39,7 @@ export class FormbuilderService {
     return this.fb.group(group,{updateOn:"change"});
   }
 
-
 }
-
 
 
 

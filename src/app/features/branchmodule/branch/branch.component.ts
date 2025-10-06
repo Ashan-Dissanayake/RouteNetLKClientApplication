@@ -8,19 +8,23 @@ import {BranchStatus} from '../model/branchstatus';
 import {BranchType} from '../model/branchtype';
 import {District} from '../model/district';
 import {Province} from '../model/province';
-import {ActionPannelMeta, DashBoardMeta, FilterMeta, FormMeta, TableMeta} from '../branch.meta';
+import {ActionPanelMeta, DashBoardMeta, FilterMeta, FormMeta, TableMeta} from '../branch.meta';
 import {StatsGridComponent} from '../../../shared/component/stats-grid/stats-grid.component';
 import {
   ButtonAction,
   ButtonClickEvent,
   ButtonPanelComponent
 } from '../../../shared/component/button-panel/button-panel.component';
-import {NgForOf, NgIf} from '@angular/common';
+import {DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {DynamicFieldComponent} from '../../../shared/form/dynamic-field.component';
 import {DialogService} from '../../../core/dialog.service';
 import {MatButton} from '@angular/material/button';
 import {CheckboxEvent, DataTableComponent} from '../../../shared/component/data-table/data-table.component';
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
+import {MatIcon} from '@angular/material/icon';
+import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
+import {MatDivider} from '@angular/material/divider';
+import {MatList,} from '@angular/material/list';
 
 @Component({
   selector: 'app-branch',
@@ -34,7 +38,12 @@ import {TableCellDirective} from '../../../shared/component/data-table/table-cel
     NgIf,
     DataTableComponent,
     TableCellDirective,
-    MatButton
+    MatButton,
+    SideViewComponent,
+    MatDivider,
+    DatePipe,
+    NgClass,
+    MatIcon,
   ],
   templateUrl: './branch.component.html',
   styleUrls: ['./branch.component.scss'],
@@ -44,7 +53,7 @@ export class BranchComponent implements OnInit,OnDestroy {
   // --- Metadata ---
   readonly tableColumnsMeta = TableMeta;
   readonly dashboardStatsMeta = DashBoardMeta;
-  readonly actionButtonsMeta: ButtonAction[] = ActionPannelMeta;
+  readonly actionPanelMeta = ActionPanelMeta;
   readonly mainFormDefinition = FormMeta;
   readonly filterFormDefinition = FilterMeta;
 
@@ -63,6 +72,9 @@ export class BranchComponent implements OnInit,OnDestroy {
   isInitialDataLoaded  = false;
   selectedRows = new Set<any>();
 
+  selectedRow: any = null;
+
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -73,7 +85,7 @@ export class BranchComponent implements OnInit,OnDestroy {
 
   ngOnInit() {
     this.loadInitialMetaData();
-    this.actionButtonsMeta.forEach(btn => {
+    this.actionPanelMeta.forEach(btn => {
       if (btn.type === 'bulk-deactivate') {
         btn.disabled = () => this.selectedRows.size === 0;
       }
@@ -187,8 +199,12 @@ export class BranchComponent implements OnInit,OnDestroy {
   }
 
   // Table Row Actions
-  onRowDataClick(row: any) {
-    console.log('Row clicked:', row);
+  onRowDataClick(row: any): void {
+    this.selectedRow = row;
+  }
+
+  closeSideView(): void {
+    this.selectedRow = null;
   }
 
   onRowActionExecuted(action: string, row: any) {

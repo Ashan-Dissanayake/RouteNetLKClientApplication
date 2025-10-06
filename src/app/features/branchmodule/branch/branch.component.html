@@ -6,10 +6,11 @@
 
   <!-- Action Buttons -->
 <app-button-panel
-  [buttons]="actionButtonsMeta"
+  [buttons]="actionPanelMeta"
   (actionClicked)="onActionPanelClick($event)"
   (dropdownClicked)="onDropdownOnlyClick($event)">
 </app-button-panel>
+
 
 <!-- Search Form -->
 <div *ngIf="branchSearchForm && isInitialDataLoaded " id="serverSearch">
@@ -23,22 +24,112 @@
   </form>
 </div>
 
-<app-data-table
-  [data]="branchList"
-  [columns]="tableColumnsMeta"
-  [sortable]="true"
-  [paginatable]="true"
-  [pageSizeOptions]="[5,10]"
-  (rowClick)="onRowDataClick($event)"
-  (actionClick)="onRowActionExecuted($event.action, $event.row)"
-  (checkBoxClick)="onRowCheckboxChanged($event)"
-  (selectAllClick)="onSelectAll($event)"
->
-  <!-- Custom actions column -->
-  <ng-template tableCell="actions" let-row let-action="action">
-    <button mat-button (click)="action('edit', row); $event.stopPropagation()">Edit</button>
-  </ng-template>
-</app-data-table>
 
 
+<app-side-view
+  [opened]="selectedRow !== null"
+  [data]="selectedRow"
+  [title]="'Branch Details'"
+  [viewTemplate]="branchDetailTemplate"
+  (closed)="closeSideView()">
+
+  <app-data-table
+    [data]="branchList"
+    [columns]="tableColumnsMeta"
+    [sortable]="true"
+    [paginatable]="true"
+    [pageSizeOptions]="[5, 10]"
+    (rowClick)="onRowDataClick($event)"
+    (actionClick)="onRowActionExecuted($event.action, $event.row)"
+    (checkBoxClick)="onRowCheckboxChanged($event)"
+    (selectAllClick)="onSelectAll($event)">
+
+    <ng-template tableCell="actions" let-row let-action="action">
+      <button mat-button (click)="action('edit', row); $event.stopPropagation()">Edit</button>
+    </ng-template>
+  </app-data-table>
+</app-side-view>
+
+<!--Template for detail view -->
+<ng-template #branchDetailTemplate let-row>
+  <div class="branch-detail-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="title-section">
+        <mat-icon color="primary" class="branch-icon">apartment</mat-icon>
+        <div>
+          <h2 class="branch-title">{{ row.name }}</h2>
+          <p class="branch-subtitle">Address: {{ row.address }}</p>
+        </div>
+      </div>
+
+      <span
+        class="status-chip"
+        [ngClass]="row.branchstatus.name ? 'active' : 'inactive'">
+        {{ row.branchstatus.name ? 'ACTIVE' : 'INACTIVE' }}
+      </span>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- General Info -->
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="label">Code</span>
+        <span class="value">{{ row.code || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Contact</span>
+        <span class="value">{{ row.telephone || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Email</span>
+        <span class="value">{{ row.email || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Created Date</span>
+        <span class="value">{{ row.docreated | date: 'mediumDate' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Type</span>
+        <span class="value">{{ row.branchtype?.name || '-' }}</span>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Coverage Areas -->
+    <div class="coverage-section">
+      <h3 class="section-title">
+        <mat-icon color="primary" class="section-icon">map</mat-icon>
+        Coverage Areas
+      </h3>
+
+      <ng-container *ngIf="row.branchcoverages?.length; else noCoverage">
+        <div class="coverage-grid">
+          <div
+            class="coverage-card"
+            *ngFor="let coverage of row.branchcoverages">
+            <mat-icon color="accent">location_on</mat-icon>
+            <div class="district-name">{{ coverage.district?.name }}</div>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #noCoverage>
+        <p class="no-coverage">No coverage areas assigned.</p>
+      </ng-template>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Footer -->
+    <div class="footer-actions">
+      <button mat-stroked-button color="primary">
+        <mat-icon>print</mat-icon>
+        Print
+      </button>
+    </div>
+  </div>
+</ng-template>
 

@@ -34,12 +34,12 @@
     </mat-cell>
   </ng-container>
 
-  <!-- Rows -->
+  <!-- Header Row -->
   <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-  <mat-row
-    *matRowDef="let row; columns: displayedColumns"
-    (click)="onRowClicked(row)">
-  </mat-row>
+<!--  Data Row-->
+  <mat-row *matRowDef="let row; columns: displayedColumns" (click)="onRowClicked(row)"></mat-row>
+
+
 </mat-table>
 
 <mat-paginator *ngIf="paginatable"

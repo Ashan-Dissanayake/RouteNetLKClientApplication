@@ -3,7 +3,6 @@ import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {DynamicFieldComponent} from '../../form/dynamic-field.component';
 import {NgFor, NgIf} from '@angular/common';
-import {MatButton} from '@angular/material/button';
 import {FormField} from '../../form/formfieldata.model';
 import {ButtonAction, ButtonClickEvent, ButtonPanelComponent} from '../button-panel/button-panel.component';
 import {DialogService} from '../../../core/dialog.service';
@@ -23,6 +22,8 @@ import {DialogService} from '../../../core/dialog.service';
   styleUrl: './formpopup.component.scss'
 })
 export class FormpopupComponent {
+
+  isUpdate!:boolean;
 
   constructor(
     public dialogRef: MatDialogRef<FormpopupComponent>,
@@ -62,9 +63,9 @@ export class FormpopupComponent {
       return;
     }
 
-    const isUpdate = !!form.get('id')?.value;
+    this.isUpdate = !!form.get('id')?.value;
 
-    if (isUpdate) {
+    if (this.isUpdate) {
       this.handleUpdate(form);
     } else {
       this.handleCreate(form);
@@ -90,20 +91,20 @@ export class FormpopupComponent {
     `
     }).subscribe(confirmed => {
       if (confirmed) {
-        const submissionPayload = { ...form.value, ...dirtyValues };
+        const submissionPayload = { ...form.getRawValue(), ...dirtyValues };
         this.dialogRef.close(submissionPayload);
       }
     });
   }
 
   private handleCreate(form: FormGroup): void {
-    const heading = 'Creating Branch';
     this.dialogService.showConfirmation({
-      heading,
+      heading:'Creating Branch',
       message: 'Do you want to create this branch?'
     }).subscribe(confirmed => {
       if (confirmed) {
-        this.dialogRef.close(form.value);
+        console.log(form.getRawValue())
+        this.dialogRef.close(form.getRawValue());
       }
     });
   }

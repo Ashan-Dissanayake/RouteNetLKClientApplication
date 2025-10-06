@@ -21,7 +21,6 @@
       box-shadow: unset;
       max-height: 180px;
 
-
       mat-form-field {
         background: #f5f4f4;
       }
@@ -48,12 +47,6 @@
     bottom: 9px;
 
     button {
-      //display: flex;
-      //justify-content: center;
-      //align-items: center;
-      //font-size: 1rem;
-      //font-weight: 100;
-      //width: fit-content;
       color: #333333;
       background: #fdfbff;
       border-radius: 10px;
@@ -84,21 +77,7 @@
     display: none;
   }
 
-  /*
-  mat-form-field {
-    --mat-form-field-container-height: 40px;
-    --mat-form-field-container-vertical-padding: 8px;
-    width: 95%;
-    justify-items: center;
-    position: sticky;
-    //top: 4.1%;
-    background: #fdfbff;
-    z-index: 1;
-    left: 2.5%;
+  .mdc-list-item__primary-text{
+    font-size: 13px!important;
   }
-
-  .center-input {
-    text-align: center;
-  }
-   */
 }

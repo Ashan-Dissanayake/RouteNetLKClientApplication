@@ -1,26 +1,40 @@
+/* === Sidenav Container === */
 mat-sidenav-container {
-  height: calc(100vh - 64px);
+  font-family: "Inter", "Roboto", sans-serif;
 }
 
-mat-toolbar{
-  background-color: #140648;
-  color: white;
+/* === Toolbar === */
+mat-toolbar {
+  background: linear-gradient(90deg, #140648 0%, #1e0f8c 100%);
+  color: #fff;
+  font-weight: 600;
+  font-size: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
 
-  button mat-icon{
-    color: white;
+  button mat-icon {
+    color: #fff;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: scale(1.1);
+    }
   }
 }
 
+/* === Sidenav === */
 mat-sidenav {
   border-radius: unset;
   width: 250px;
   background-color: #140648;
-  color: white;
-  padding: 20px;
+  color: #fff;
+  font-size: 14px;
+  padding: 24px 12px;
   box-sizing: border-box;
-  height: 100%;
-  overflow-y: auto;
-  transition: width 0.3s ease;
+  border-right: 1px solid rgba(255,255,255,0.05);
+  transition: width 0.3s ease, background-color 0.2s ease;
 
   &.mini {
     width: 60px;
@@ -31,73 +45,89 @@ mat-sidenav {
     padding: 0;
 
     a.mat-mdc-list-item {
-      color: white !important;
+      display: flex;
+      align-items: center;
+      color: #fff !important;
       text-decoration: none;
-      display: block;
-      padding: 12px;
-      border-radius: 4px;
-      transition: background 0.2s;
+      padding: 10px 12px;
+      border-radius: 8px;
+      transition: background 0.2s, padding-left 0.2s;
 
       &:hover {
-        background-color: #c2c2c29f;
+        background-color: rgba(255, 255, 255, 0.08);
       }
 
       &.active {
-        background-color: rgba(255, 255, 255, 0.2);
+        background-color: rgba(255, 255, 255, 0.15);
+        font-weight: 600;
       }
 
       mat-icon {
-        color: white;
+        margin-right: 12px;
+        color: #fff;
+        font-size: 20px;
       }
 
       span {
         color: white;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
 
     .sub-menu {
-      padding-left: 16px;
-      overflow: hidden;
-
-      a.mat-mdc-list-item {
-        color: white !important;
-      }
+      padding-left: 20px;
+      transition: max-height 0.3s ease;
     }
 
     .sub-item {
-      padding-left: 32px;
+      padding-left: 28px;
+
+      &:hover {
+        background-color: rgba(255,255,255,0.05);
+      }
     }
 
     .expand-icon {
-      position: absolute;
-      right: 8px;
-      color: white;
+      margin-left: auto;
+      color: #fff;
+      transition: transform 0.3s ease;
+    }
+
+    a[aria-expanded="true"] .expand-icon {
+      transform: rotate(180deg);
     }
   }
 }
 
+/* === Main Content === */
 mat-sidenav-content {
-  padding: 16px;
-  background-color: white;
+  padding: 20px;
+  background-color: #f5f6fa;
+  min-height: 100vh;
 }
 
+/* === Content Wrapper === */
 .content {
-  max-width: 1200px;
+  //max-width: 1280px;
   margin: 0 auto;
 }
 
+/* === Responsive === */
 @media (max-width: 800px) {
-  mat-sidenav-content {
-    padding: 8px;
-  }
   mat-sidenav {
-    mat-nav-list {
-      .sub-menu {
-        padding-left: 8px;
-      }
-      .sub-item {
-        padding-left: 16px;
-      }
+    width: 200px;
+
+    .sub-menu {
+      padding-left: 12px;
     }
+    .sub-item {
+      padding-left: 20px;
+    }
+  }
+
+  mat-sidenav-content {
+    padding: 12px;
   }
 }

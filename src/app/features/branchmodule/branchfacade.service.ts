@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {EMPTY, Observable} from 'rxjs';
+import {EMPTY, Observable, throwError} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {BranchtypeService} from './services/branchtype.service';
 import {BranchstatusService} from './services/branchstatus.service';
@@ -60,10 +60,10 @@ import {ProvinceService} from './services/province.service';
   createBranch(branchData: any): Observable<Branch> {
     const branch = this.normalizeBranchData(branchData);
     const status = branch.branchstatus?.name?.toLowerCase();
-    if (status === 'Opened') {
+    if (status === 'active') {
       return this.branchService.save(branch);
     }
-    return EMPTY;
+    return throwError(() => new Error('Branch should be active'));
   }
 
   updateBranch(branchData: any): Observable<Branch> {
@@ -73,16 +73,15 @@ import {ProvinceService} from './services/province.service';
 
   deleteBranches(branches: Branch[]): Observable<number[]> {
     if (!branches || branches.length === 0) {
-      return EMPTY;
+      return throwError(() => new Error('No branches selected'));
     }
     // Collect only closed branch IDs
     const branchIds = branches
       .filter(b => (b.branchstatus?.name ?? '').toLowerCase() === 'closed')
       .map(b => b.id)
       .filter(id => id != null);
-
     if (branchIds.length === 0) {
-      return EMPTY;
+      return throwError(() => new Error('Selected branches cannot be deactivated because they are not closed'));
     }
     return this.branchService.deactivate(branchIds);
   }

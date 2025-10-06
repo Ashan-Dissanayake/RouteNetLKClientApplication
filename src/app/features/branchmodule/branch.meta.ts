@@ -8,7 +8,7 @@ export  const DashBoardMeta = [
   { label: 'Regular', value: 184 }
 ];
 
-export const ActionPannelMeta: ButtonAction[] = [
+export const ActionPanelMeta: ButtonAction[] = [
   { label: 'Create', type: 'create', icon: 'add' },
   {
     label: 'Export',
@@ -31,13 +31,9 @@ export const FormMeta:FormField[] = [
   { name: 'address', type: 'text', label: 'Branch Address', required: true, mode: 'regex'},
   { name: 'telephone', type: 'text', label: 'Telephone', required: true, mode: 'regex' },
   { name: 'email', type: 'text', label: 'Email', required: true, mode: 'none' },
-  { name: 'docreated', type: 'date', label: 'Date of Created', required: true, mode: 'date',
-    dateConfig:{
-    minDate:new Date(),
-      maxDate:new Date()
-    }
-  },
+  { name: 'docreated', type: 'date', label: 'Date of Created', required: true, mode: 'date',defaultValue:new Date(),disabled:true},
   { name: 'branchcoverages', type: 'dualist', label: 'Branch Coverage', required: true, mode: 'options',referencePath: ['district']},
+  // { name: 'province', type: 'select', label: 'Province', required: true, mode: 'options'},
   { name: 'remarks', type: 'text', label: 'Remarks', required: false, mode: 'none'},
   { name: 'branchtype', type: 'select', label: 'Branch Type', required: true, mode: 'options'},
   { name: 'branchstatus', type: 'select', label: 'Branch Status', required: true, mode: 'options' }

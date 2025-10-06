@@ -11,6 +11,7 @@ export interface FormField {
     minDate?: Date;
     maxDate?: Date;
   };
+  defaultValue:any;
   referencePath?:string[];
 }
 

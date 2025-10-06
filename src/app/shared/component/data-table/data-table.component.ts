@@ -19,7 +19,7 @@ import {
   MatTable,
   MatTableDataSource
 } from '@angular/material/table';
-import { NgForOf, NgIf, NgTemplateOutlet} from '@angular/common';
+import {NgForOf, NgIf, NgTemplateOutlet} from '@angular/common';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {FormsModule} from '@angular/forms';
 
@@ -59,7 +59,7 @@ export interface ColumnDef {
     MatSortHeader,
     MatHeaderCellDef,
     MatCheckbox,
-    FormsModule
+    FormsModule,
   ],
   templateUrl: './data-table.component.html',
   standalone: true,
@@ -163,5 +163,6 @@ export class DataTableComponent<T = any> implements OnChanges, AfterViewInit {
 
     this.cdr.markForCheck();
   }
+
 
 }
