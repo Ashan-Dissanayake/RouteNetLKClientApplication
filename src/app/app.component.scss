@@ -28,9 +28,10 @@ mat-toolbar {
 mat-sidenav {
   border-radius: unset;
   width: 250px;
-  background-color: #140648;
+  background: linear-gradient(180deg, #140648 0%, #1e0f8c 100%);
+  //background-color: #140648;
   color: #fff;
-  font-size: 14px;
+  font-size: 13px;
   padding: 24px 12px;
   box-sizing: border-box;
   border-right: 1px solid rgba(255,255,255,0.05);
@@ -83,7 +84,6 @@ mat-sidenav {
 
     .sub-item {
       padding-left: 28px;
-
       &:hover {
         background-color: rgba(255,255,255,0.05);
       }
@@ -96,22 +96,22 @@ mat-sidenav {
     }
 
     a[aria-expanded="true"] .expand-icon {
-      transform: rotate(180deg);
+      //transform: rotate(180deg);
     }
   }
 }
 
 /* === Main Content === */
 mat-sidenav-content {
-  padding: 20px;
-  background-color: #f5f6fa;
+  padding: 0 20px 0 20px;
+  background-color: #ffffff;
   min-height: 100vh;
 }
 
 /* === Content Wrapper === */
 .content {
   //max-width: 1280px;
-  margin: 0 auto;
+  //margin: 0 auto;
 }
 
 /* === Responsive === */

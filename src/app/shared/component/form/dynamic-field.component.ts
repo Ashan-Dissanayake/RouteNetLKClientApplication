@@ -2,7 +2,7 @@ import {Component, Input} from '@angular/core';
 import {MatFormField, MatFormFieldModule} from '@angular/material/form-field';
 import {MatError, MatInput, MatLabel} from '@angular/material/input';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {FormField} from './formfieldata.model';
+import {FormField} from '../../models/formfieldata.model';
 import {NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
 import {
   MatDatepicker,
@@ -10,7 +10,7 @@ import {
   MatDatepickerModule,
   MatDatepickerToggle
 } from '@angular/material/datepicker';
-import {MatDualListboxComponent} from '../component/dual-list-box/mat-dual-listbox.component';
+import {MatDualListboxComponent} from '../dual-list-box/mat-dual-listbox.component';
 import {MatOption, MatSelect} from '@angular/material/select';
 import {MatNativeDateModule} from '@angular/material/core';
 

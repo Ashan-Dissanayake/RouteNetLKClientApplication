@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, ValidatorFn, Validators} from '@angular/forms';
-import {Regex} from '../models/regex.model';
-import {FormField} from './formfieldata.model';
+import {Regex} from '../shared/models/regex.model';
+import {FormField} from '../shared/models/formfieldata.model';
 
 
 @Injectable({ providedIn: 'root' })
@@ -10,7 +10,6 @@ export class FormbuilderService {
   constructor(private fb: FormBuilder) {}
 
   build(fields: FormField[], dataMap: Record<string, any>): FormGroup {
-    console.log("111")
     const group: Record<string, FormControl> = {};
 
     fields.forEach((field) => {

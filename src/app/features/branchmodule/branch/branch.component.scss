@@ -101,12 +101,6 @@
   word-break: break-word;
 }
 
-.footer-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 8px;
-}
 
 //Coverage section
 .coverage-section {
@@ -176,6 +170,22 @@
     color: #999;
     font-style: italic;
     margin-left: 1rem;
+  }
+
+  //snackbar-need to debug aslo
+  .snackbar-success {
+    background-color: #4caf50;
+    color: #fff;
+  }
+
+  .snackbar-warning {
+    background-color: #ff9800;
+    color: #fff;
+  }
+
+  .snackbar-error {
+    background-color: #f44336;
+    color: #fff;
   }
 
   /* Responsive adjustments */

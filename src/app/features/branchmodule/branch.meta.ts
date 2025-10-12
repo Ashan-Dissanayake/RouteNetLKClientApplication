@@ -1,4 +1,4 @@
-import {FormField} from '../../shared/form/formfieldata.model';
+import {FormField} from '../../shared/models/formfieldata.model';
 import {ButtonAction} from '../../shared/component/button-panel/button-panel.component';
 
 export  const DashBoardMeta = [
@@ -15,7 +15,7 @@ export const ActionPanelMeta: ButtonAction[] = [
     type: 'export',
     icon: 'download',
     dropdown: [
-      { label: 'CSV', type: 'export-csv' },
+      { label: 'pdf', type: 'export-pdf' },
       { label: 'Excel', type: 'export-excel' }
     ]
   },
@@ -58,3 +58,10 @@ export const TableMeta= [
   { key: 'branchstatus.name', label: 'Branch Status' },
   { key: 'actions', label: 'Actions' } // provide a template for this column below
 ];
+
+
+export const PrintTableMeta = [
+  { field: 'code', header: 'Code' },
+  { field: 'name', header: 'Name' },
+  { field: 'email', header: 'District' }
+]

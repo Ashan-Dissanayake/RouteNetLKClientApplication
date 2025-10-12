@@ -1,0 +1,25 @@
+<div #printSection class="print-container">
+  <h2>{{ data.title }}</h2>
+  <table class="print-table">
+    <thead>
+    <tr>
+      <th *ngFor="let col of data.columns">{{ col.header }}</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let row of data.data">
+      <td *ngFor="let col of data.columns">{{ row[col.field] }}</td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div class="print-actions">
+    <app-button-panel
+      [buttons]="buttons"
+      (actionClicked)="handleAction($event)"
+    >
+    </app-button-panel>
+  </div>
+
+
+</div>

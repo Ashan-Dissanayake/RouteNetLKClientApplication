@@ -1,6 +1,6 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {FormbuilderService} from '../../../shared/form/formbuilder.service';
+import {Component, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {FormbuilderService} from '../../../core/formbuilder.service';
 import {BranchFacadeService} from '../branchfacade.service';
 import {debounceTime, distinctUntilChanged, forkJoin, Subject, takeUntil} from 'rxjs';
 import {Branch} from '../model/branch';
@@ -8,15 +8,14 @@ import {BranchStatus} from '../model/branchstatus';
 import {BranchType} from '../model/branchtype';
 import {District} from '../model/district';
 import {Province} from '../model/province';
-import {ActionPanelMeta, DashBoardMeta, FilterMeta, FormMeta, TableMeta} from '../branch.meta';
+import {ActionPanelMeta, DashBoardMeta, FilterMeta, FormMeta, PrintTableMeta, TableMeta} from '../branch.meta';
 import {StatsGridComponent} from '../../../shared/component/stats-grid/stats-grid.component';
 import {
-  ButtonAction,
   ButtonClickEvent,
   ButtonPanelComponent
 } from '../../../shared/component/button-panel/button-panel.component';
 import {DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
-import {DynamicFieldComponent} from '../../../shared/form/dynamic-field.component';
+import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
 import {DialogService} from '../../../core/dialog.service';
 import {MatButton} from '@angular/material/button';
 import {CheckboxEvent, DataTableComponent} from '../../../shared/component/data-table/data-table.component';
@@ -24,7 +23,10 @@ import {TableCellDirective} from '../../../shared/component/data-table/table-cel
 import {MatIcon} from '@angular/material/icon';
 import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
 import {MatDivider} from '@angular/material/divider';
-import {MatList,} from '@angular/material/list';
+import {PrintService} from '../../../core/print-service';
+import {result} from 'lodash';
+import {MatSnackBar} from '@angular/material/snack-bar';
+
 
 @Component({
   selector: 'app-branch',
@@ -44,6 +46,7 @@ import {MatList,} from '@angular/material/list';
     DatePipe,
     NgClass,
     MatIcon,
+    FormsModule,
   ],
   templateUrl: './branch.component.html',
   styleUrls: ['./branch.component.scss'],
@@ -56,6 +59,7 @@ export class BranchComponent implements OnInit,OnDestroy {
   readonly actionPanelMeta = ActionPanelMeta;
   readonly mainFormDefinition = FormMeta;
   readonly filterFormDefinition = FilterMeta;
+  readonly printTableMeta = PrintTableMeta;
 
   // --- Forms ---
   branchDataForm: FormGroup = new FormGroup({});
@@ -73,14 +77,14 @@ export class BranchComponent implements OnInit,OnDestroy {
   selectedRows = new Set<any>();
 
   selectedRow: any = null;
-
+  @ViewChild('printSection', { static: false }) printSectionRef!: ElementRef;
 
   private destroy$ = new Subject<void>();
 
   constructor(
     private formBuilder: FormbuilderService,
     private branchFacade: BranchFacadeService,
-    private dialogService: DialogService
+    private dialogService: DialogService,
   ) {}
 
   ngOnInit() {
@@ -214,7 +218,7 @@ export class BranchComponent implements OnInit,OnDestroy {
   // Action Panel Handlers
   private actionHandlers: Record<string, () => void> = {
     'create': () => this.openBranchFormPopup(),
-    'export-csv': () => console.log('Export CSV called'),
+    'export-pdf': () => this.printTable(),
     'export-excel': () => console.log('Export Excel called'),
     'bulk-deactivate': () => this.deleteSelected(),
     'clear-search': () => this.branchSearchForm.reset()
@@ -227,7 +231,7 @@ export class BranchComponent implements OnInit,OnDestroy {
   }
 
   onDropdownOnlyClick(event: ButtonClickEvent) {
-    const dropdownTypes = ['export-csv', 'export-excel'];
+    const dropdownTypes = ['export-pdf', 'export-excel'];
     if (dropdownTypes.includes(event.type)) {
       console.log(`Dropdown action executed: ${event.type}`);
       this.actionHandlers[event.type]?.();
@@ -266,8 +270,25 @@ export class BranchComponent implements OnInit,OnDestroy {
           });
         }
       })
-
   }
+
+  printTable() {
+    if (this.selectedRows.size > 0) {
+      this.dialogService.showPrintDialog({
+        title: 'Branch Details',
+        mode: 'table',
+        data: Array.from(this.selectedRows),
+        columns: this.printTableMeta
+      }).subscribe((result) => {
+        if (result) {
+          this.selectedRows = new Set<any>();
+        }
+      });
+    } else {
+      this.dialogService.showWarning('Please select at least one record to print.');
+    }
+  }
+
 
 }
 

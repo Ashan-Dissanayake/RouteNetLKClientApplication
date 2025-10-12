@@ -42,3 +42,10 @@
   background: inherit;
   z-index: 2;
 }
+
+.footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}

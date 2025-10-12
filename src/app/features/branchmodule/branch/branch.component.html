@@ -25,13 +25,13 @@
 </div>
 
 
-
 <app-side-view
   [opened]="selectedRow !== null"
   [data]="selectedRow"
   [title]="'Branch Details'"
   [viewTemplate]="branchDetailTemplate"
-  (closed)="closeSideView()">
+  (closed)="closeSideView()"
+>
 
   <app-data-table
     [data]="branchList"
@@ -42,7 +42,8 @@
     (rowClick)="onRowDataClick($event)"
     (actionClick)="onRowActionExecuted($event.action, $event.row)"
     (checkBoxClick)="onRowCheckboxChanged($event)"
-    (selectAllClick)="onSelectAll($event)">
+    (selectAllClick)="onSelectAll($event)"
+  >
 
     <ng-template tableCell="actions" let-row let-action="action">
       <button mat-button (click)="action('edit', row); $event.stopPropagation()">Edit</button>
@@ -52,7 +53,7 @@
 
 <!--Template for detail view -->
 <ng-template #branchDetailTemplate let-row>
-  <div class="branch-detail-container">
+  <div #printSection  class="branch-detail-container">
     <!-- Header -->
     <div class="header">
       <div class="title-section">
@@ -120,16 +121,7 @@
         <p class="no-coverage">No coverage areas assigned.</p>
       </ng-template>
     </div>
-
     <mat-divider></mat-divider>
-
-    <!-- Footer -->
-    <div class="footer-actions">
-      <button mat-stroked-button color="primary">
-        <mat-icon>print</mat-icon>
-        Print
-      </button>
-    </div>
   </div>
 </ng-template>
 

@@ -78,6 +78,7 @@ export class DataTableComponent<T = any> implements OnChanges, AfterViewInit {
   @Output() checkBoxClick = new EventEmitter<CheckboxEvent<T>>();
   @Output() selectAllClick = new EventEmitter<boolean>();
 
+
   @ContentChildren(TableCellDirective) customCellTemplates!: QueryList<TableCellDirective>;
 
   @ViewChild(MatSort) sort!: MatSort;

@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, Output, TemplateRef} from '@angular/core';
 import {MatDrawer, MatDrawerContainer, MatDrawerContent} from '@angular/material/sidenav';
 import {MatIcon} from '@angular/material/icon';
-import {MatIconButton} from '@angular/material/button';
+import {MatButton, MatIconButton} from '@angular/material/button';
 import {NgIf, NgTemplateOutlet} from '@angular/common';
 
 @Component({
@@ -13,7 +13,7 @@ import {NgIf, NgTemplateOutlet} from '@angular/common';
     MatIcon,
     MatIconButton,
     NgTemplateOutlet,
-    NgIf
+    NgIf,
   ],
   templateUrl: './side-view.component.html',
   standalone: true,
@@ -31,6 +31,7 @@ export class SideViewComponent {
   close(): void {
     this.closed.emit();
   }
+
 
 
 }

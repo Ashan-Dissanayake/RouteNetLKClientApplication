@@ -1,11 +1,11 @@
 import {Component, Inject} from '@angular/core';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
-import {DynamicFieldComponent} from '../../form/dynamic-field.component';
+import {DynamicFieldComponent} from '../dynamic-field.component';
 import {NgFor, NgIf} from '@angular/common';
-import {FormField} from '../../form/formfieldata.model';
-import {ButtonAction, ButtonClickEvent, ButtonPanelComponent} from '../button-panel/button-panel.component';
-import {DialogService} from '../../../core/dialog.service';
+import {FormField} from '../../../models/formfieldata.model';
+import {ButtonAction, ButtonClickEvent, ButtonPanelComponent} from '../../button-panel/button-panel.component';
+import {DialogService} from '../../../../core/dialog.service';
 
 @Component({
   selector: 'app-formpopup',
