@@ -61,7 +61,7 @@ export const TableMeta= [
 
 
 export const PrintTableMeta = [
-  { field: 'code', header: 'Code' },
-  { field: 'name', header: 'Name' },
-  { field: 'email', header: 'District' }
+  { key: 'code', header: 'Code' },
+  { key: 'name', header: 'Name' },
+  { key: 'email', header: 'District' }
 ]

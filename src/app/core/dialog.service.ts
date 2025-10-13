@@ -101,6 +101,6 @@ export interface PrintDialogOptions {
   title: string;
   mode: 'table';
   data: any;
-  columns?: { field: string; header: string }[];
+  columns?: { key: string; header: string }[];
   width?: string;
 }

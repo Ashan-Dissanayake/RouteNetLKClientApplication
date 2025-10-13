@@ -10,7 +10,7 @@ export class PrintService {
 
   async  generateStructuredPdf(
     title: string,
-    columns: { field: string; header: string }[] | undefined,
+    columns: { key: string; header: string }[] | undefined,
     data: any[],
     fileName = 'report.pdf'
   ): Promise<any> {
@@ -29,7 +29,7 @@ export class PrintService {
       autoTable(doc, {
         startY: 28,
         head: [columns.map(c => c.header)],
-        body: data.map(row => columns.map(c => row[c.field] ?? '')),
+        body: data.map(row => columns.map(c => row[c.key] ?? '')),
         theme: 'plain',
         headStyles: {fillColor: [22, 160, 133]},
         alternateRowStyles: {fillColor: [240, 240, 240]},
@@ -52,10 +52,8 @@ export class PrintService {
         }
       });
     }
-
-    // Save file
     doc.save(fileName);
-    return Promise.resolve(); // ensures async flow
+    return Promise.resolve();
   }
 
 }

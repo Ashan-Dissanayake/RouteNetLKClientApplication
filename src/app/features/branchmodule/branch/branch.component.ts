@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {FormbuilderService} from '../../../core/formbuilder.service';
 import {BranchFacadeService} from '../branchfacade.service';
@@ -23,10 +23,7 @@ import {TableCellDirective} from '../../../shared/component/data-table/table-cel
 import {MatIcon} from '@angular/material/icon';
 import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
 import {MatDivider} from '@angular/material/divider';
-import {PrintService} from '../../../core/print-service';
-import {result} from 'lodash';
-import {MatSnackBar} from '@angular/material/snack-bar';
-
+import {exportToExcel} from '../../../core/excel-export.util';
 
 @Component({
   selector: 'app-branch',
@@ -219,7 +216,7 @@ export class BranchComponent implements OnInit,OnDestroy {
   private actionHandlers: Record<string, () => void> = {
     'create': () => this.openBranchFormPopup(),
     'export-pdf': () => this.printTable(),
-    'export-excel': () => console.log('Export Excel called'),
+    'export-excel': () => this.onExportSelected(),
     'bulk-deactivate': () => this.deleteSelected(),
     'clear-search': () => this.branchSearchForm.reset()
   };
@@ -290,5 +287,14 @@ export class BranchComponent implements OnInit,OnDestroy {
   }
 
 
+  onExportSelected(): void {
+    const selectedArray = Array.from(this.selectedRows);
+    if (selectedArray.length === 0) {
+      this.dialogService.showWarning('Please select at least one record to export.');
+      return;
+    }
+
+    exportToExcel(selectedArray, this.printTableMeta, 'selected-branches.xlsx');
+  }
 }
 

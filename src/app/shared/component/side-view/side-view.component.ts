@@ -32,6 +32,4 @@ export class SideViewComponent {
     this.closed.emit();
   }
 
-
-
 }

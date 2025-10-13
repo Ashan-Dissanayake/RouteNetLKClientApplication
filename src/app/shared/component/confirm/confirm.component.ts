@@ -1,4 +1,4 @@
-import {Component, Inject} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogRef} from '@angular/material/dialog';
 import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
 import {MatButton} from '@angular/material/button';
@@ -19,7 +19,7 @@ import {NgForOf} from '@angular/common';
   standalone: true,
   styleUrl: './confirm.component.scss'
 })
-export class ConfirmComponent {
+export class ConfirmComponent implements OnInit{
 
   lines?: [];
 
