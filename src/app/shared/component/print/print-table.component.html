@@ -1,4 +1,4 @@
-<div #printSection class="print-container">
+<div class="print-container">
   <h2>{{ data.title }}</h2>
   <table class="print-table">
     <thead>
@@ -8,7 +8,7 @@
     </thead>
     <tbody>
     <tr *ngFor="let row of data.data">
-      <td *ngFor="let col of data.columns">{{ row[col.field] }}</td>
+      <td *ngFor="let col of data.columns">{{ row[col.key] }}</td>
     </tr>
     </tbody>
   </table>

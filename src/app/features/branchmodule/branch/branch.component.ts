@@ -50,30 +50,30 @@ import {exportToExcel} from '../../../core/excel-export.util';
 })
 export class BranchComponent implements OnInit,OnDestroy {
 
-  // --- Metadata ---
-  readonly tableColumnsMeta = TableMeta;
-  readonly dashboardStatsMeta = DashBoardMeta;
-  readonly actionPanelMeta = ActionPanelMeta;
-  readonly mainFormDefinition = FormMeta;
-  readonly filterFormDefinition = FilterMeta;
-  readonly printTableMeta = PrintTableMeta;
+  // ===== Metadata & Configurations =====
+  readonly tableColumns  = TableMeta;
+  readonly dashboardStats = DashBoardMeta;
+  readonly actionPanelConfig = ActionPanelMeta;
+  readonly branchFormMeta = FormMeta;
+  readonly branchFilterMeta = FilterMeta;
+  readonly printableColumns = PrintTableMeta;
 
-  // --- Forms ---
-  branchDataForm: FormGroup = new FormGroup({});
-  branchSearchForm: FormGroup = new FormGroup({});
+  // ===== Form Controls =====
+  branchForm: FormGroup = new FormGroup({});
+  branchFilterForm: FormGroup = new FormGroup({});
 
   // --- Data ---
-  branchList!: Branch[];
-  branchStatusList!: BranchStatus[];
-  branchTypeList!: BranchType[];
-  districtList!: District[];
-  provinceList!: Province[];
-  regexValidators!: any;
+  branches!: Branch[];
+  branchStatuses!: BranchStatus[];
+  branchTypes!: BranchType[];
+  districts!: District[];
+  provinces!: Province[];
+  regexRules!: any;
 
-  isInitialDataLoaded  = false;
-  selectedRows = new Set<any>();
+  dataInitialized   = false;
+  selectedRows = new Set<Branch>();
+  activeBranch: Branch | null = null;
 
-  selectedRow: any = null;
   @ViewChild('printSection', { static: false }) printSectionRef!: ElementRef;
 
   private destroy$ = new Subject<void>();
@@ -81,25 +81,22 @@ export class BranchComponent implements OnInit,OnDestroy {
   constructor(
     private formBuilder: FormbuilderService,
     private branchFacade: BranchFacadeService,
-    private dialogService: DialogService,
+    private dialogService: DialogService
   ) {}
 
+  // ===== Lifecycle =====
   ngOnInit() {
-    this.loadInitialMetaData();
-    this.actionPanelMeta.forEach(btn => {
-      if (btn.type === 'bulk-deactivate') {
-        btn.disabled = () => this.selectedRows.size === 0;
-      }
-    });
+    this.initializeMetadata();
+    this.configureActionPanel();
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  // Initialization & Data Loading
-  private loadInitialMetaData() {
+  // ===== Initialization =====
+  private initializeMetadata(): void {
     forkJoin({
       branchStatuses: this.branchFacade.loadBranchStatuses(),
       branchTypes: this.branchFacade.loadBranchTypes(),
@@ -107,175 +104,162 @@ export class BranchComponent implements OnInit,OnDestroy {
       provinces: this.branchFacade.loadProvinces(),
       regexes: this.branchFacade.loadRegexes()
     }).subscribe({
-      next: data => this.handleInitialMetaData(data),
-      error: err => this.dialogService.showMessage({
-        heading: 'Error',
-        message: `Failed to save branch. ${err.message || err}`
-      })
+      next: data => this.handleMetadataLoad(data),
+      error: (err) => this.dialogService.showError('Failed to load branch metadata.', err)
     });
   }
 
-  private handleInitialMetaData(data: any) {
-    this.branchStatusList = data.branchStatuses;
-    this.branchTypeList = data.branchTypes;
-    this.districtList = data.districts;
-    this.provinceList = data.provinces;
-    this.regexValidators = data.regexes;
+  private handleMetadataLoad(data: any):void {
+    this.branchStatuses = data.branchStatuses;
+    this.branchTypes = data.branchTypes;
+    this.districts = data.districts;
+    this.provinces = data.provinces;
+    this.regexRules = data.regexes;
 
-    this.buildForms();
-    this.isInitialDataLoaded = true;
-    this.loadBranchTableData();
-    this.subscribeToSearchFormChanges();
+    this.initializeForms();
+    this.dataInitialized = true;
+    this.loadBranchTable();
+    this.subscribeToFilterChanges();
   }
 
-  private buildForms() {
-    // Main Form
-    this.branchDataForm = this.formBuilder.build(this.mainFormDefinition, {
-      branchtype: this.branchTypeList,
-      branchstatus: this.branchStatusList,
-      branchcoverages: this.districtList,
-      regexes: this.regexValidators
+  private initializeForms(): void {
+    this.branchForm = this.formBuilder.build(this.branchFormMeta, {
+      branchtype: this.branchTypes,
+      branchstatus: this.branchStatuses,
+      branchcoverages: this.districts,
+      regexes: this.regexRules
     });
 
-    // Search Form
-    this.branchSearchForm = this.formBuilder.build(this.filterFormDefinition, {
-      ssbranchstatus: this.branchStatusList
+    this.branchFilterForm = this.formBuilder.build(this.branchFilterMeta, {
+      ssbranchstatus: this.branchStatuses
     });
   }
 
-  private loadBranchTableData() {
+  private configureActionPanel(): void {
+    this.actionPanelConfig.forEach(btn => {
+      if (btn.type === 'bulk-deactivate') {
+        btn.disabled = () => this.selectedRows.size === 0;
+      }
+    });
+  }
+
+  // ===== Data Loading =====
+  private loadBranchTable():void {
     this.branchFacade.loadBranches()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(data => this.branchList = data);
+      .subscribe(data => this.branches = data);
   }
 
-  // --- Search/Filter Logic ---
-  private subscribeToSearchFormChanges() {
-    this.branchSearchForm.valueChanges
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(searchData => {
-        this.branchFacade.searchBranches(searchData)
+  // ===== Filtering =====
+  private subscribeToFilterChanges(): void {
+    this.branchFilterForm.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(filters => {
+        this.branchFacade.searchBranches(filters)
           .pipe(takeUntil(this.destroy$))
-          .subscribe(branches => this.branchList = branches);
+          .subscribe(data => this.branches = data);
       });
   }
 
-  // Form Popup & Submit
-  openBranchFormPopup() {
+  // ===== CRUD =====
+  openBranchForm(): void {
     this.dialogService.showFormPopup({
-      heading: this.branchDataForm.value.id ? 'Edit Details' : 'Create New Branch',
-      form: this.branchDataForm,
-      meta: this.mainFormDefinition
-    }).subscribe(result => {
-      if (result) this.handleBranchFormSubmit(result);
-      else this.branchDataForm.reset();
+      heading: this.branchForm.value.id ? 'Edit Branch' : 'Create Branch',
+      form: this.branchForm,
+      meta: this.branchFormMeta
+    }).subscribe(formData  => {
+      if (formData ) this.saveBranch(formData );
+      else this.branchForm.reset();
     });
   }
 
-  private handleBranchFormSubmit(branchData: any) {
-    const obs$ = branchData.id
-      ? this.branchFacade.updateBranch(branchData)
-      : this.branchFacade.createBranch(branchData);
+  private saveBranch(formData: any): void {
+    const operation$ = formData.id
+      ? this.branchFacade.updateBranch(formData)
+      : this.branchFacade.createBranch(formData);
 
-    obs$?.pipe(takeUntil(this.destroy$)).subscribe({
+    operation$?.pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
-        this.dialogService.showMessage({ heading: 'Success', message: 'Branch saved successfully' });
-        this.loadBranchTableData();
-        this.branchDataForm.reset();
+        this.dialogService.showSuccess('Branch saved successfully.');
+        this.loadBranchTable();
+        this.branchForm.reset();
       },
-      error: err => this.dialogService.showMessage({
-        heading: 'Error',
-        message: err.message
-      })
+      error: (err) => this.dialogService.showError('Failed to save branch.', err)
     });
   }
 
-  prepareFormForEdit(row: Branch) {
-    this.branchDataForm.patchValue(row);
-    this.openBranchFormPopup();
+  editBranch(row: Branch): void {
+    this.branchForm.patchValue(row);
+    this.openBranchForm();
   }
 
-  // Table Row Actions
-  onRowDataClick(row: any): void {
-    this.selectedRow = row;
+  deactivateSelectedBranches() {
+    const toDeactivate  = Array.from(this.selectedRows);
+    this.dialogService.showConfirmation({
+      heading:"Deactivation",
+      message:"Are sure ?"
+    }).subscribe(confirmed=>{
+        if (!confirmed)return;
+      this.branchFacade.deleteBranches(toDeactivate)
+        ?.pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.dialogService.showSuccess('Selected branches deactivated.');
+            this.selectedRows.clear();
+            this.loadBranchTable();
+          },
+          error: (err) => this.dialogService.showError('Failed to deactivate branches.', err)
+        });
+      })
   }
 
-  closeSideView(): void {
-    this.selectedRow = null;
+// ===== Table Selection =====
+  onRowClick(row: any): void {
+    this.activeBranch = row;
   }
 
-  onRowActionExecuted(action: string, row: any) {
-    if (action === 'edit') this.prepareFormForEdit(row);
+  closeBranchDetails(): void {
+    this.activeBranch = null;
   }
 
-  // Action Panel Handlers
+  onRowAction(action: string, row: any) {
+    if (action === 'edit') this.editBranch(row);
+  }
+
+
+  // ===== Action Panel =====
   private actionHandlers: Record<string, () => void> = {
-    'create': () => this.openBranchFormPopup(),
-    'export-pdf': () => this.printTable(),
-    'export-excel': () => this.onExportSelected(),
-    'bulk-deactivate': () => this.deleteSelected(),
-    'clear-search': () => this.branchSearchForm.reset()
+    'create': () => this.openBranchForm(),
+    'export-pdf': () => this.exportSelectedToPdf(),
+    'export-excel': () => this.exportSelectedToExcel(),
+    'bulk-deactivate': () => this.deactivateSelectedBranches(),
+    'clear-search': () => this.branchFilterForm.reset()
   };
 
-  onActionPanelClick(event: ButtonClickEvent) {
+  onActionTriggered(event: ButtonClickEvent) {
     const handler = this.actionHandlers[event.type];
     if (handler) handler();
-    else console.warn(`No handler defined for action: ${event.type}`);
+    else this.dialogService.showError(`No handler defined for action: ${event.type}`);
   }
+
 
   onDropdownOnlyClick(event: ButtonClickEvent) {
     const dropdownTypes = ['export-pdf', 'export-excel'];
     if (dropdownTypes.includes(event.type)) {
-      console.log(`Dropdown action executed: ${event.type}`);
       this.actionHandlers[event.type]?.();
     } else {
-      console.warn(`Unhandled dropdown action: ${event.type}`);
+      this.dialogService.showWarning(`Unhandled dropdown action: ${event.type}`);
     }
   }
 
-  // Selection Handling
-  onRowCheckboxChanged(event: CheckboxEvent<any>) {
-    if (event.checked) this.selectedRows.add(event.row);
-    else this.selectedRows.delete(event.row);
-  }
-
-  onSelectAll(checked: boolean) {
-    this.selectedRows.clear();
-    if (checked) this.branchList.forEach(row => this.selectedRows.add(row));
-  }
-
-  deleteSelected() {
-    const toDelete = Array.from(this.selectedRows);
-    this.dialogService.showConfirmation({heading:"Deactivation",message:"Are sure ?"})
-      .subscribe(confirmed=>{
-        if (confirmed){
-          const obs$ = this.branchFacade.deleteBranches(toDelete);
-          obs$?.pipe(takeUntil(this.destroy$)).subscribe({
-            next: () => {
-              this.dialogService.showMessage({ heading: 'Success', message: 'Branch Deactivated successfully' });
-              this.selectedRows.clear();
-              this.loadBranchTableData();
-            },
-            error: err => this.dialogService.showMessage({
-              heading: 'Error',
-              message: `Failed to Deactivate branch. ${err.message || err}`
-            })
-          });
-        }
-      })
-  }
-
-  printTable() {
+  // ===== Export Operations =====
+  exportSelectedToPdf() {
     if (this.selectedRows.size > 0) {
       this.dialogService.showPrintDialog({
         title: 'Branch Details',
         mode: 'table',
         data: Array.from(this.selectedRows),
-        columns: this.printTableMeta
+        columns: this.printableColumns
       }).subscribe((result) => {
         if (result) {
           this.selectedRows = new Set<any>();
@@ -287,14 +271,26 @@ export class BranchComponent implements OnInit,OnDestroy {
   }
 
 
-  onExportSelected(): void {
+  exportSelectedToExcel(): void {
     const selectedArray = Array.from(this.selectedRows);
     if (selectedArray.length === 0) {
       this.dialogService.showWarning('Please select at least one record to export.');
       return;
     }
 
-    exportToExcel(selectedArray, this.printTableMeta, 'selected-branches.xlsx');
+    exportToExcel(selectedArray, this.printableColumns, 'selected-branches.xlsx');
+  }
+
+
+  // Selection Handling
+  onRowCheckboxChanged(event: CheckboxEvent<any>) {
+    if (event.checked) this.selectedRows.add(event.row);
+    else this.selectedRows.delete(event.row);
+  }
+
+  onSelectAll(checked: boolean) {
+    this.selectedRows.clear();
+    if (checked) this.branches.forEach(row => this.selectedRows.add(row));
   }
 }
 

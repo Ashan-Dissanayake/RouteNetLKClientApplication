@@ -1,50 +1,51 @@
 <div class="container">
   <h2>Branch Management</h2>
 </div>
-  <!-- Summary Cards with mat-grid-list -->
-  <app-stats-grid [stats]="dashboardStatsMeta"></app-stats-grid>
+<!-- ===== Dashboard Stats ===== -->
+<app-stats-grid [stats]="dashboardStats"></app-stats-grid>
 
-  <!-- Action Buttons -->
+<!-- ===== Action Panel ===== -->
 <app-button-panel
-  [buttons]="actionPanelMeta"
-  (actionClicked)="onActionPanelClick($event)"
+  [buttons]="actionPanelConfig"
+  (actionClicked)="onActionTriggered($event)"
   (dropdownClicked)="onDropdownOnlyClick($event)">
 </app-button-panel>
 
 
-<!-- Search Form -->
-<div *ngIf="branchSearchForm && isInitialDataLoaded " id="serverSearch">
-  <form [formGroup]="branchSearchForm">
+<!-- ===== Filter Section ===== -->
+<div *ngIf="branchFilterForm && dataInitialized" id="serverSearch">
+  <form [formGroup]="branchFilterForm">
     <dynamic-field
-      *ngFor="let field of filterFormDefinition"
-      [formInstance]="branchSearchForm"
+      *ngFor="let field of branchFilterMeta"
+      [formInstance]="branchFilterForm"
       [field]="field"
     >
     </dynamic-field>
   </form>
 </div>
 
-
+<!-- ===== Main Table with Side View ===== -->
 <app-side-view
-  [opened]="selectedRow !== null"
-  [data]="selectedRow"
+  [opened]="activeBranch !== null"
+  [data]="activeBranch"
   [title]="'Branch Details'"
   [viewTemplate]="branchDetailTemplate"
-  (closed)="closeSideView()"
+  (closed)="closeBranchDetails()"
 >
 
   <app-data-table
-    [data]="branchList"
-    [columns]="tableColumnsMeta"
+    [data]="branches"
+    [columns]="tableColumns"
     [sortable]="true"
     [paginatable]="true"
     [pageSizeOptions]="[5, 10]"
-    (rowClick)="onRowDataClick($event)"
-    (actionClick)="onRowActionExecuted($event.action, $event.row)"
+    (rowClick)="onRowClick($event)"
+    (actionClick)="onRowAction($event.action, $event.row)"
     (checkBoxClick)="onRowCheckboxChanged($event)"
     (selectAllClick)="onSelectAll($event)"
   >
 
+    <!-- Row Actions -->
     <ng-template tableCell="actions" let-row let-action="action">
       <button mat-button (click)="action('edit', row); $event.stopPropagation()">
         <mat-icon>mode_edit</mat-icon>

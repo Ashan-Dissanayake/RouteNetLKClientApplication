@@ -26,9 +26,4 @@ export class MessageComponent {
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {}
 
-
-
-  //ngOnInit(): void { this.dialogRef.addPanelClass('custom-dialog'); }
-
-  //onNoClick(): void { this.dialogRef.close(); }
 }

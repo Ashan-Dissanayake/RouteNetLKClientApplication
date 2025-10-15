@@ -3,6 +3,7 @@ import {MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogRef} from '@
 import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
 import {MatButton} from '@angular/material/button';
 import {NgForOf} from '@angular/common';
+import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-confirm',
@@ -21,17 +22,18 @@ import {NgForOf} from '@angular/common';
 })
 export class ConfirmComponent implements OnInit{
 
-  lines?: [];
+  safeMessage!: SafeHtml;
 
-  constructor(public dialogRef: MatDialogRef<ConfirmComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
-    this.lines = this.data.message.split('<br>').filter((line: string) => line !== '');
+  constructor(
+    public dialogRef: MatDialogRef<ConfirmComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private sanitizer: DomSanitizer
+  ) {
+    this.safeMessage = this.sanitizer.bypassSecurityTrustHtml(this.data.message);
   }
 
   ngOnInit(): void {
     this.dialogRef.addPanelClass('custom-dialog');
   }
 
-  onNoClick(): void {
-    this.dialogRef.close();
-  }
 }
