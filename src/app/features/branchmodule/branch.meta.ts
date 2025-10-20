@@ -1,12 +1,12 @@
 import {FormField} from '../../shared/models/formfieldata.model';
 import {ButtonAction} from '../../shared/component/button-panel/button-panel.component';
 
-export  const DashBoardMeta = [
-  { label: 'Total Branches', value: 1234 },
-  { label: 'Active Branches', value: 1000 },
-  { label: 'Head', value: 50 },
-  { label: 'Regular', value: 184 }
-];
+// export  const DashBoardMeta = [
+//   { label: 'Total Branches', value: 1234 },
+//   { label: 'Active Branches', value: 1000 },
+//   { label: 'Head', value: 50 },
+//   { label: 'Regular', value: 184 }
+// ];
 
 export const ActionPanelMeta: ButtonAction[] = [
   { label: 'Create', type: 'create', icon: 'add' },

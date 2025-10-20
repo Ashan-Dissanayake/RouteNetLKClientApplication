@@ -1,6 +1,7 @@
 .drawer-container {
   position: relative;
   height: 100%;
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 .side-view-drawer {
@@ -19,7 +20,7 @@
 .side-view-drawer.opened {
   position: fixed;
   top: 0;
-  right: 0;
+  //right: 0;
   z-index: 1001;
 }
 
@@ -27,7 +28,8 @@
 .side-overlay {
   position: fixed;
   top: 0; left: 0;
-  width: 100vw; height: 100vh;
+  width: 100vw;
+  height: 100vh;
   background: rgba(0, 0, 0, 0.3);
   z-index: 1000;
 }

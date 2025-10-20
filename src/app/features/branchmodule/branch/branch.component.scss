@@ -1,11 +1,5 @@
 .container {
   padding: 10px;
-  .filters app-search{
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-
 }
 
 
@@ -13,7 +7,7 @@
   ::ng-deep{
     .mat-mdc-form-field{
       width: unset!important;
-      padding-inline-start: 20px;
+      padding-inline-start:20px;
     }
   }
 }
@@ -71,7 +65,12 @@
   background: #d7f6df;
 }
 
-.status-chip.inactive {
+.status-chip.suspend {
+  color: #000000;
+  background: #f5d253;
+}
+
+.status-chip.close {
   color: #8b0000;
   background: #f9d9d9;
 }
@@ -172,21 +171,6 @@
     margin-left: 1rem;
   }
 
-  //snackbar-need to debug aslo
-  .snackbar-success {
-    background-color: #4caf50;
-    color: #fff;
-  }
-
-  .snackbar-warning {
-    background-color: #ff9800;
-    color: #fff;
-  }
-
-  .snackbar-error {
-    background-color: #f44336;
-    color: #fff;
-  }
 
   /* Responsive adjustments */
   @media (max-width: 1200px) {

@@ -2,7 +2,6 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogRef} from '@angular/material/dialog';
 import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
 import {MatButton} from '@angular/material/button';
-import {NgForOf} from '@angular/common';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
 @Component({
@@ -14,7 +13,6 @@ import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
     MatDialogActions,
     MatButton,
     MatDialogClose,
-    NgForOf
   ],
   templateUrl: './confirm.component.html',
   standalone: true,

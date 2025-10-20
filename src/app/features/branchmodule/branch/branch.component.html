@@ -2,27 +2,27 @@
   <h2>Branch Management</h2>
 </div>
 <!-- ===== Dashboard Stats ===== -->
-<app-stats-grid [stats]="dashboardStats"></app-stats-grid>
+<!--<app-stats-grid [stats]="dashboardStats"></app-stats-grid>-->
 
 <!-- ===== Action Panel ===== -->
-<app-button-panel
-  [buttons]="actionPanelConfig"
-  (actionClicked)="onActionTriggered($event)"
-  (dropdownClicked)="onDropdownOnlyClick($event)">
-</app-button-panel>
 
+  <app-button-panel
+    [buttons]="actionPanelConfig"
+    (actionClicked)="onActionTriggered($event)"
+    (dropdownClicked)="onDropdownOnlyClick($event)">
+  </app-button-panel>
 
-<!-- ===== Filter Section ===== -->
-<div *ngIf="branchFilterForm && dataInitialized" id="serverSearch">
-  <form [formGroup]="branchFilterForm">
-    <dynamic-field
-      *ngFor="let field of branchFilterMeta"
-      [formInstance]="branchFilterForm"
-      [field]="field"
-    >
-    </dynamic-field>
-  </form>
-</div>
+  <!-- ===== Filter Section ===== -->
+  <div *ngIf="branchFilterForm && dataInitialized" id="serverSearch">
+    <form [formGroup]="branchFilterForm">
+      <dynamic-field
+        *ngFor="let field of branchFilterMeta"
+        [formInstance]="branchFilterForm"
+        [field]="field"
+      >
+      </dynamic-field>
+    </form>
+  </div>
 
 <!-- ===== Main Table with Side View ===== -->
 <app-side-view
@@ -32,7 +32,6 @@
   [viewTemplate]="branchDetailTemplate"
   (closed)="closeBranchDetails()"
 >
-
   <app-data-table
     [data]="branches"
     [columns]="tableColumns"
@@ -44,7 +43,6 @@
     (checkBoxClick)="onRowCheckboxChanged($event)"
     (selectAllClick)="onSelectAll($event)"
   >
-
     <!-- Row Actions -->
     <ng-template tableCell="actions" let-row let-action="action">
       <button mat-button (click)="action('edit', row); $event.stopPropagation()">
@@ -69,9 +67,13 @@
 
       <span
         class="status-chip"
-        [ngClass]="row.branchstatus.name ? 'active' : 'inactive'">
-        {{ row.branchstatus.name ? 'ACTIVE' : 'INACTIVE' }}
-      </span>
+        [ngClass]="{
+    'active': row.branchstatus.name === 'Active',
+    'suspend': row.branchstatus.name === 'Suspended',
+    'close': row.branchstatus.name === 'Closed'
+  }">
+  {{ row.branchstatus.name }}
+</span>
     </div>
 
     <mat-divider></mat-divider>

@@ -1,4 +1,3 @@
-// form-utils.ts
 import {FormGroup} from '@angular/forms';
 
 export class FormUtils {
@@ -13,6 +12,11 @@ export class FormUtils {
       .reduce((acc, [key, control]) => ({
         ...acc, [key]:control.value }),
         {} );
+  }
+
+  static resetForm(form: FormGroup): void {
+    form.reset();
+    Object.values(form.controls).forEach(control => control.markAsPristine());
   }
 
   static formatLabel(field: string): string {

@@ -5,10 +5,10 @@ export function exportToExcel<T>(
   data: T[],
   columns: { key: string; header: string }[],
   fileName: string = 'export.xlsx'
-): void {
+): boolean {
+
   if (!data || !data.length) {
-    console.warn('No data to export.');
-    return;
+    return false;
   }
 
   // Prepare data
@@ -36,4 +36,5 @@ export function exportToExcel<T>(
   // Export file
   const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
   saveAs(new Blob([wbout], { type: 'application/octet-stream' }), fileName);
+  return true;
 }

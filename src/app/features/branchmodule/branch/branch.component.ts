@@ -8,7 +8,7 @@ import {BranchStatus} from '../model/branchstatus';
 import {BranchType} from '../model/branchtype';
 import {District} from '../model/district';
 import {Province} from '../model/province';
-import {ActionPanelMeta, DashBoardMeta, FilterMeta, FormMeta, PrintTableMeta, TableMeta} from '../branch.meta';
+import {ActionPanelMeta, FilterMeta, FormMeta, PrintTableMeta, TableMeta} from '../branch.meta';
 import {StatsGridComponent} from '../../../shared/component/stats-grid/stats-grid.component';
 import {
   ButtonClickEvent,
@@ -24,6 +24,7 @@ import {MatIcon} from '@angular/material/icon';
 import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
 import {MatDivider} from '@angular/material/divider';
 import {exportToExcel} from '../../../core/excel-export.util';
+import {FormUtils} from '../../../shared/component/form/form-util';
 
 @Component({
   selector: 'app-branch',
@@ -52,7 +53,7 @@ export class BranchComponent implements OnInit,OnDestroy {
 
   // ===== Metadata & Configurations =====
   readonly tableColumns  = TableMeta;
-  readonly dashboardStats = DashBoardMeta;
+  //readonly dashboardStats = DashBoardMeta;
   readonly actionPanelConfig = ActionPanelMeta;
   readonly branchFormMeta = FormMeta;
   readonly branchFilterMeta = FilterMeta;
@@ -169,7 +170,7 @@ export class BranchComponent implements OnInit,OnDestroy {
       meta: this.branchFormMeta
     }).subscribe(formData  => {
       if (formData ) this.saveBranch(formData );
-      else this.branchForm.reset();
+      else FormUtils.resetForm(this.branchForm);
     });
   }
 
@@ -182,9 +183,9 @@ export class BranchComponent implements OnInit,OnDestroy {
       next: () => {
         this.dialogService.showSuccess('Branch saved successfully.');
         this.loadBranchTable();
-        this.branchForm.reset();
+        FormUtils.resetForm(this.branchForm);
       },
-      error: (err) => this.dialogService.showError('Failed to save branch.', err)
+      error: (err) => this.dialogService.showError('Failed to save branch.', JSON.stringify(err))
     });
   }
 
@@ -262,7 +263,7 @@ export class BranchComponent implements OnInit,OnDestroy {
         columns: this.printableColumns
       }).subscribe((result) => {
         if (result) {
-          this.selectedRows = new Set<any>();
+          this.selectedRows = new Set<Branch>();
         }
       });
     } else {
@@ -273,17 +274,22 @@ export class BranchComponent implements OnInit,OnDestroy {
 
   exportSelectedToExcel(): void {
     const selectedArray = Array.from(this.selectedRows);
-    if (selectedArray.length === 0) {
-      this.dialogService.showWarning('Please select at least one record to export.');
-      return;
-    }
 
-    exportToExcel(selectedArray, this.printableColumns, 'selected-branches.xlsx');
+    let isExported = exportToExcel(
+      selectedArray,
+      this.printableColumns,
+      'selected-branches.xlsx'
+    );
+
+    if(!isExported) {
+      this.dialogService.showWarning('Please select at least one record to export.');
+      return
+    }
   }
 
 
   // Selection Handling
-  onRowCheckboxChanged(event: CheckboxEvent<any>) {
+ onRowCheckboxChanged(event: CheckboxEvent<any>) {
     if (event.checked) this.selectedRows.add(event.row);
     else this.selectedRows.delete(event.row);
   }
@@ -292,5 +298,8 @@ export class BranchComponent implements OnInit,OnDestroy {
     this.selectedRows.clear();
     if (checked) this.branches.forEach(row => this.selectedRows.add(row));
   }
+
+
+
 }
 

@@ -23,21 +23,6 @@ import {NgForOf, NgIf, NgTemplateOutlet} from '@angular/common';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {FormsModule} from '@angular/forms';
 
-export interface ActionEvent<T = any> {
-  action: string;
-  row: T;
-}
-
-export interface CheckboxEvent<T = any> {
-  row: T;
-  checked: boolean;
-}
-
-export interface ColumnDef {
-  key: string;
-  label: string;
-  cellTemplate?: any; // TemplateRef<any> (any to avoid import in expressions)
-}
 
 @Component({
   selector: 'app-data-table',
@@ -165,5 +150,20 @@ export class DataTableComponent<T = any> implements OnChanges, AfterViewInit {
     this.cdr.markForCheck();
   }
 
+}
 
+export interface ActionEvent<T = any> {
+  action: string;
+  row: T;
+}
+
+export interface CheckboxEvent<T = any> {
+  row: T;
+  checked: boolean;
+}
+
+export interface ColumnDef {
+  key: string;
+  label: string;
+  cellTemplate?: any;
 }
