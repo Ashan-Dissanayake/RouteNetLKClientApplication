@@ -31,7 +31,6 @@ import {FormUtils} from '../../../shared/component/form/form-util';
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    StatsGridComponent,
     ButtonPanelComponent,
     NgForOf,
     DynamicFieldComponent,
