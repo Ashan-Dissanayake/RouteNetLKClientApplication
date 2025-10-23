@@ -13,7 +13,7 @@ import {Employee} from './model/employee';
   ) {}
 
   // Load data
-  loadBranches(): Observable<Employee[]> {
+  loadEmployees(): Observable<Employee[]> {
     return this.getEmployees();
   }
 

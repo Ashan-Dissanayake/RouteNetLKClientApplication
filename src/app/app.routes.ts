@@ -4,7 +4,12 @@ export const routes: Routes = [
   {
     path: 'admin',
     children: [
-      { path: 'branch', loadComponent: () => import('./features/branchmodule/branch/branch.component').then(m => m.BranchComponent) },
+      { path: 'branch', loadComponent: () => import('./features/branchmodule/branch/branch.component').
+        then(m => m.BranchComponent)
+      },
+      { path: 'employee', loadComponent: () => import('./features/employeemodule/employee/employee.component').
+        then(m => m.EmployeeComponent)
+      },
     ]
   },
 ];

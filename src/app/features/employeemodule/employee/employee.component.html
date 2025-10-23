@@ -1,0 +1,36 @@
+<div class="container">
+  <h2>Employee Management</h2>
+</div>
+
+<!-- ===== Main Table with Side View ===== -->
+<app-side-view
+  [opened]="activeEmployee !== null"
+  [data]="activeEmployee"
+  [title]="'Employee Details'"
+  [viewTemplate]="branchDetailTemplate"
+  (closed)="closeBranchDetails()"
+>
+  <app-data-table
+    [data]="employees"
+    [columns]="tableColumns"
+    [sortable]="true"
+    [paginatable]="true"
+    [pageSizeOptions]="[5, 10]"
+    (rowClick)="onRowClick($event)"
+    (actionClick)="onRowAction($event.action, $event.row)"
+    (checkBoxClick)="onRowCheckboxChanged($event)"
+    (selectAllClick)="onSelectAll($event)"
+  >
+    <!-- Row Actions -->
+    <ng-template tableCell="actions" let-row let-action="action">
+      <button mat-button (click)="action('edit', row); $event.stopPropagation()">
+        <mat-icon>mode_edit</mat-icon>
+      </button>
+    </ng-template>
+  </app-data-table>
+</app-side-view>
+
+
+<!--Template for detail view -->
+<ng-template #branchDetailTemplate let-row> </ng-template>
+
