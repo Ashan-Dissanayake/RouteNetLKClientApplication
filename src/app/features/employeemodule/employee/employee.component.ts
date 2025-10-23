@@ -1,5 +1,4 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {TableMeta} from '../../branchmodule/branch.meta';
 import {Employee} from '../model/employee';
 import { Subject, takeUntil} from 'rxjs';
 import {EmployeefacadeService} from '../employeefacade.service';
@@ -8,6 +7,7 @@ import {MatButton} from '@angular/material/button';
 import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
 import {MatIcon} from '@angular/material/icon';
+import {EmployeeTableMeta} from '../employee.meta';
 
 @Component({
   selector: 'app-employee',
@@ -25,7 +25,7 @@ import {MatIcon} from '@angular/material/icon';
 export class EmployeeComponent implements OnInit, OnDestroy {
 
   // ===== Metadata & Configurations =====
-  readonly tableColumns  = TableMeta;
+  readonly tableColumns  = EmployeeTableMeta;
 
   // --- Data ---
   employees!: Employee[];

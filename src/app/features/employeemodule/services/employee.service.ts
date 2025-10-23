@@ -15,7 +15,7 @@ export class EmployeeService extends BaseHttpService <Employee>{
   }
 
   get(params?:any):Observable<ApiResponse<Employee>>{
-    return  this.getAll(ApiEndpoints.branches,params);
+    return  this.getAll(ApiEndpoints.employees,params);
   }
 
 }
