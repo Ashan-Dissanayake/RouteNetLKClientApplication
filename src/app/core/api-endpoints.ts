@@ -6,6 +6,8 @@
 const baseUrl = 'http://localhost:8080';
 
 export const ApiEndpoints = {
+
+    //Branch
     branchstatuses:`${baseUrl}/branchstatuses/list`,
     branchtypes:`${baseUrl}/branchtypes/list`,
     districts:`${baseUrl}/districts/list`,
@@ -13,4 +15,13 @@ export const ApiEndpoints = {
     branches: `${baseUrl}/branches`,
     branchesdeactivate: `${baseUrl}/branches/deactivate`,
     provinces:`${baseUrl}/provinces/list`,
+
+    //Employee
+    genders:`${baseUrl}/genders/list`,
+    departments:`${baseUrl}/departments/list`,
+    designations:`${baseUrl}/designations/list`,
+    employeetypes:`${baseUrl}/employeetypes/list`,
+    employeestatuses:`${baseUrl}/employeestatuses/list`,
+    employees:`${baseUrl}/employees`,
+
 } as const;
