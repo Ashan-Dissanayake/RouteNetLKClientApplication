@@ -5,16 +5,17 @@ import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../core/api-endpoints';
 import {Employee} from '../model/employee';
+import {Branch} from '../../branchmodule/model/branch';
 
 @Injectable({ providedIn: 'root' })
-export class EmployeesService extends BaseHttpService <Employee>{
+export class EmployeeService extends BaseHttpService <Employee>{
 
   constructor(protected override http: HttpClient) {
     super(http);
   }
 
-  get():Observable<ApiResponse<Employee>>{
-    return  this.getAll(ApiEndpoints.employees);
+  get(params?:any):Observable<ApiResponse<Employee>>{
+    return  this.getAll(ApiEndpoints.branches,params);
   }
 
 }
