@@ -3,7 +3,7 @@
 }
 
 //Sideview
-.branch-detail-container {
+.employee-detail-container {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -24,17 +24,17 @@
   gap: 0.75rem;
 }
 
-.branch-icon {
+.employee-icon {
   font-size: 40px;
 }
 
-.branch-title {
+.employee-title {
   font-size: 1.4rem;
   font-weight: 600;
   margin: 0;
 }
 
-.branch-subtitle {
+.employee-subtitle {
   font-size: 0.9rem;
   color: #666;
   margin: 0;
@@ -59,7 +59,12 @@
   background: #f5d253;
 }
 
-.status-chip.close {
+.status-chip.Onleave {
+  color: #ffffff;
+  background: #10a695;
+}
+
+.status-chip.resigned {
   color: #8b0000;
   background: #f9d9d9;
 }
@@ -90,77 +95,6 @@
 }
 
 
-//Coverage section
-.coverage-section {
-  margin-top: 1rem;
-
-  .section-title {
-    display: flex;
-    align-items: center;
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: #333;
-    margin-bottom: 0.75rem;
-  }
-
-  .section-icon {
-    margin-right: 0.5rem;
-    font-size: 22px;
-  }
-
-  /* 4x6 grid for coverage areas */
-  .coverage-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    background: #f8f8f8;
-    border-radius: 8px;
-    padding: 10px;
-  }
-
-  .coverage-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    padding: 12px 8px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-    text-align: center;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    }
-
-    mat-icon {
-      font-size: 20px;
-      margin-bottom: 6px;
-    }
-
-    .district-name {
-      font-weight: 600;
-      color: #222;
-      font-size: 0.95rem;
-    }
-
-    .district-id {
-      font-size: 0.8rem;
-      color: #777;
-    }
-  }
-
-  .no-coverage {
-    font-size: 0.9rem;
-    color: #999;
-    font-style: italic;
-    margin-left: 1rem;
-  }
-
-
   /* Responsive adjustments */
   @media (max-width: 1200px) {
     .coverage-grid {
@@ -179,4 +113,4 @@
       grid-template-columns: 1fr;
     }
   }
-}
+

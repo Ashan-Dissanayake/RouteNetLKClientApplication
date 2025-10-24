@@ -7,7 +7,7 @@
   [opened]="activeEmployee !== null"
   [data]="activeEmployee"
   [title]="'Employee Details'"
-  [viewTemplate]="branchDetailTemplate"
+  [viewTemplate]="employeeDetailTemplate"
   (closed)="closeBranchDetails()"
 >
   <app-data-table
@@ -32,5 +32,81 @@
 
 
 <!--Template for detail view -->
-<ng-template #branchDetailTemplate let-row> </ng-template>
+<ng-template #employeeDetailTemplate let-row>
+  <div #printSection  class="employee-detail-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="title-section">
+        <mat-icon color="primary" class="employee-icon">{{row.image}}</mat-icon>
+        <div>
+          <h2 class="employee-title">{{ row.fullname }}</h2>
+          <p class="employee-subtitle">Number: {{ row.number }}</p>
+        </div>
+      </div>
+
+      <span
+        class="status-chip"
+        [ngClass]="{
+    'active': row.employeestatus.name === 'Active',
+    'suspend': row.employeestatus.name === 'Suspend',
+    'resigned': row.employeestatus.name === 'Resigned',
+    'Onleave': row.employeestatus.name === 'On leave'
+  }">
+  {{ row.employeestatus.name }}
+</span>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- General Info -->
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="label">NIC</span>
+        <span class="value">{{ row.nic || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Gender</span>
+        <span class="value">{{ row.gender.name || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Mobile</span>
+        <span class="value">{{ row.mobile || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Email</span>
+        <span class="value">{{ row.email || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Address</span>
+        <span class="value">{{ row.address || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Emergency Contact</span>
+        <span class="value">{{ row.emergencycontact || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Branch</span>
+        <span class="value">{{ row.branch.name || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Department</span>
+        <span class="value">{{ row.department.name || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Designation</span>
+        <span class="value">{{ row.designation.name || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Type</span>
+        <span class="value">{{ row.employeetype.name || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Date of Joined</span>
+        <span class="value">{{ row.doj | date: 'mediumDate' }}</span>
+      </div>
+
+    </div>
+    <mat-divider></mat-divider>
+  </div>
+</ng-template>
 
