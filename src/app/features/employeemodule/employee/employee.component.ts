@@ -8,7 +8,7 @@ import {SideViewComponent} from '../../../shared/component/side-view/side-view.c
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
 import {MatIcon} from '@angular/material/icon';
 import {EmployeeTableMeta} from '../employee.meta';
-import {DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
+import {DatePipe, NgClass} from '@angular/common';
 import {MatDivider} from '@angular/material/divider';
 
 @Component({
@@ -76,7 +76,6 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   }
 
   onRowAction(action: string, row: any) { }
-
 
   // Selection Handling
   onRowCheckboxChanged(event: CheckboxEvent<any>) {
