@@ -2,6 +2,25 @@
   <h2>Employee Management</h2>
 </div>
 
+<!-- ===== Action Panel ===== -->
+<app-button-panel
+  [buttons]="actionPanelConfig"
+  (actionClicked)="onActionTriggered($event)"
+  (dropdownClicked)="onDropdownOnlyClick($event)">
+</app-button-panel>
+
+<!-- ===== Filter Section ===== -->
+<div *ngIf="employeeFilterForm && dataInitialized" id="serverSearch">
+  <form [formGroup]="employeeFilterForm">
+    <dynamic-field
+      *ngFor="let field of employeeFilterMeta"
+      [formInstance]="employeeFilterForm"
+      [field]="field"
+    >
+    </dynamic-field>
+  </form>
+</div>
+
 <!-- ===== Main Table with Side View ===== -->
 <app-side-view
   [opened]="activeEmployee !== null"

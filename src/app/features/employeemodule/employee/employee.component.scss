@@ -2,6 +2,16 @@
   padding: 10px;
 }
 
+#serverSearch{
+  ::ng-deep{
+    .mat-mdc-form-field{
+      width: unset!important;
+      padding-inline-start:20px;
+    }
+  }
+}
+
+
 //Sideview
 .employee-detail-container {
   display: flex;
