@@ -7,7 +7,7 @@ import {MatButton} from '@angular/material/button';
 import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
 import {MatIcon} from '@angular/material/icon';
-import {EmployeeActionPanelMeta, EmployeeFilterMeta, EmployeeTableMeta} from '../employee.meta';
+import {EmployeeActionPanelMeta, EmployeeFilterMeta, EmployeeFormMeta, EmployeeTableMeta} from '../employee.meta';
 import {DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {MatDivider} from '@angular/material/divider';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -16,6 +16,12 @@ import {FormbuilderService} from '../../../core/formbuilder.service';
 import {DialogService} from '../../../core/dialog.service';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
 import {ButtonClickEvent, ButtonPanelComponent} from '../../../shared/component/button-panel/button-panel.component';
+import {Designation} from '../model/designation';
+import {Employeestatus} from '../model/employeestatus';
+import {Employeetype} from '../model/employeetype';
+import {Gender} from '../model/gender';
+import {Branch} from '../../branchmodule/model/branch';
+import {FormUtils} from '../../../shared/component/form/form-util';
 
 @Component({
   selector: 'app-employee',
@@ -42,18 +48,26 @@ import {ButtonClickEvent, ButtonPanelComponent} from '../../../shared/component/
 export class EmployeeComponent implements OnInit, OnDestroy {
 
   // ===== Metadata & Configurations =====
-  readonly tableColumns  = EmployeeTableMeta;
+  readonly tableColumns = EmployeeTableMeta;
   readonly employeeFilterMeta = EmployeeFilterMeta;
   readonly actionPanelConfig = EmployeeActionPanelMeta;
+  readonly employeeFormMeta = EmployeeFormMeta;
 
   // ===== Form Controls =====
   employeeFilterForm: FormGroup = new FormGroup({});
+  employeeForm: FormGroup = new FormGroup({});
 
   // --- Data ---
   employees!: Employee[];
-  departments!:Department[];
+  departments!: Department[];
+  designations!: Designation[];
+  employeeStatuses!: Employeestatus[];
+  employeeTypes!: Employeetype[];
+  genders!: Gender[];
+  branches!: Branch[];
+  regexRules!: any;
 
-  dataInitialized   = false;
+  dataInitialized = false;
 
   private destroy$ = new Subject<void>();
 
@@ -64,7 +78,8 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     private formBuilder: FormbuilderService,
     private employeefacadeService: EmployeefacadeService,
     private dialogService: DialogService
-  ) {}
+  ) {
+  }
 
   // ===== Lifecycle =====
   ngOnInit(): void {
@@ -81,6 +96,12 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   private initialize(): void {
     forkJoin({
       departments: this.employeefacadeService.loadDepartments(),
+      designations: this.employeefacadeService.loadDesignations(),
+      employeeTypes: this.employeefacadeService.loadEmployeeType(),
+      employeeStatuses: this.employeefacadeService.loadEmployeestatus(),
+      genders: this.employeefacadeService.loadGender(),
+      branches: this.employeefacadeService.loadBranches(),
+      regexes:this.employeefacadeService.loadRegexes()
     }).subscribe({
       next: data => this.handleMetadataLoad(data),
       error: (err) => this.dialogService.showError('Failed to load employee metadata.', err)
@@ -88,8 +109,15 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     this.loadEmployeeTable();
   }
 
-  private handleMetadataLoad(data: any):void {
+  private handleMetadataLoad(data: any): void {
     this.departments = data.departments;
+    this.designations = data.designations;
+    this.employeeTypes = data.employeeTypes;
+    this.employeeStatuses = data.employeeStatuses;
+    this.genders = data.genders;
+    this.branches = data.branches;
+    this.regexRules = data.regexes;
+
     this.dataInitialized = true;
 
     this.initializeForms();
@@ -99,6 +127,16 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   private initializeForms(): void {
     this.employeeFilterForm = this.formBuilder.build(this.employeeFilterMeta, {
       ssdepartment: this.departments
+    });
+
+    this.employeeForm = this.formBuilder.build(this.employeeFormMeta, {
+      gender: this.genders,
+      branch: this.branches,
+      department: this.departments,
+      designation: this.designations,
+      employeetype: this.employeeTypes,
+      employeestatus: this.employeeStatuses,
+      regexes: this.regexRules
     });
   }
 
@@ -111,7 +149,7 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   }
 
   // ===== Data Loading =====
-  private loadEmployeeTable():void {
+  private loadEmployeeTable(): void {
     this.employeefacadeService.loadEmployees()
       .pipe(takeUntil(this.destroy$))
       .subscribe(data => this.employees = data);
@@ -128,9 +166,35 @@ export class EmployeeComponent implements OnInit, OnDestroy {
       });
   }
 
+  // ===== CRUD =====
+  openEmployeeForm(): void {
+    this.dialogService.showFormPopup({
+      heading: this.employeeForm.value.id ? 'Edit Employee' : 'Create Employee',
+      form: this.employeeForm,
+      meta: this.employeeFormMeta
+    }).subscribe(formData => {
+      if (formData) this.saveEmployee(formData);
+      else FormUtils.resetForm(this.employeeForm);
+    });
+  }
+
+  private saveEmployee(formData: any): void {
+    const operation$ = this.employeefacadeService.createEmployee(formData);
+
+    operation$?.pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.dialogService.showSuccess('Branch saved successfully.');
+        this.loadEmployeeTable();
+        FormUtils.resetForm(this.employeeForm);
+      },
+      error: (err) => this.dialogService.showError('Failed to save employee.', JSON.stringify(err))
+    });
+  }
+
   // ===== Action Panel =====
   private actionHandlers: Record<string, () => void> = {
-    'clear-search': () => this.employeeFilterForm.reset()
+    'clear-search': () => this.employeeFilterForm.reset(),
+    'create': () => this.openEmployeeForm(),
   };
 
   onActionTriggered(event: ButtonClickEvent) {
@@ -158,7 +222,8 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     this.activeEmployee = null;
   }
 
-  onRowAction(action: string, row: any) { }
+  onRowAction(action: string, row: any) {
+  }
 
   // Selection Handling
   onRowCheckboxChanged(event: CheckboxEvent<any>) {

@@ -13,6 +13,7 @@ export const ApiEndpoints = {
     districts:`${baseUrl}/districts/list`,
     regexes: `${baseUrl}/regexes`,
     branches: `${baseUrl}/branches`,
+    brancheslist: `${baseUrl}/branches/list`,
     branchesdeactivate: `${baseUrl}/branches/deactivate`,
     provinces:`${baseUrl}/provinces/list`,
 

@@ -48,10 +48,10 @@ import {FormUtils} from '../../../shared/component/form/form-util';
   templateUrl: './branch.component.html',
   styleUrls: ['./branch.component.scss'],
 })
-export class BranchComponent implements OnInit,OnDestroy {
+export class BranchComponent implements OnInit, OnDestroy {
 
   // ===== Metadata & Configurations =====
-  readonly tableColumns  = TableMeta;
+  readonly tableColumns = TableMeta;
   //readonly dashboardStats = DashBoardMeta;
   readonly actionPanelConfig = ActionPanelMeta;
   readonly branchFormMeta = FormMeta;
@@ -70,11 +70,11 @@ export class BranchComponent implements OnInit,OnDestroy {
   provinces!: Province[];
   regexRules!: any;
 
-  dataInitialized   = false;
+  dataInitialized = false;
   selectedRows = new Set<Branch>();
   activeBranch: Branch | null = null;
 
-  @ViewChild('printSection', { static: false }) printSectionRef!: ElementRef;
+  @ViewChild('printSection', {static: false}) printSectionRef!: ElementRef;
 
   private destroy$ = new Subject<void>();
 
@@ -82,7 +82,8 @@ export class BranchComponent implements OnInit,OnDestroy {
     private formBuilder: FormbuilderService,
     private branchFacade: BranchFacadeService,
     private dialogService: DialogService
-  ) {}
+  ) {
+  }
 
   // ===== Lifecycle =====
   ngOnInit() {
@@ -109,7 +110,7 @@ export class BranchComponent implements OnInit,OnDestroy {
     });
   }
 
-  private handleMetadataLoad(data: any):void {
+  private handleMetadataLoad(data: any): void {
     this.branchStatuses = data.branchStatuses;
     this.branchTypes = data.branchTypes;
     this.districts = data.districts;
@@ -144,7 +145,7 @@ export class BranchComponent implements OnInit,OnDestroy {
   }
 
   // ===== Data Loading =====
-  private loadBranchTable():void {
+  private loadBranchTable(): void {
     this.branchFacade.loadBranches()
       .pipe(takeUntil(this.destroy$))
       .subscribe(data => this.branches = data);
@@ -167,8 +168,8 @@ export class BranchComponent implements OnInit,OnDestroy {
       heading: this.branchForm.value.id ? 'Edit Branch' : 'Create Branch',
       form: this.branchForm,
       meta: this.branchFormMeta
-    }).subscribe(formData  => {
-      if (formData ) this.saveBranch(formData );
+    }).subscribe(formData => {
+      if (formData) this.saveBranch(formData);
       else FormUtils.resetForm(this.branchForm);
     });
   }
@@ -194,12 +195,12 @@ export class BranchComponent implements OnInit,OnDestroy {
   }
 
   deactivateSelectedBranches() {
-    const toDeactivate  = Array.from(this.selectedRows);
+    const toDeactivate = Array.from(this.selectedRows);
     this.dialogService.showConfirmation({
-      heading:"Deactivation",
-      message:"Are sure ?"
-    }).subscribe(confirmed=>{
-        if (!confirmed)return;
+      heading: "Deactivation",
+      message: "Are sure ?"
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
       this.branchFacade.deleteBranches(toDeactivate)
         ?.pipe(takeUntil(this.destroy$))
         .subscribe({
@@ -210,7 +211,7 @@ export class BranchComponent implements OnInit,OnDestroy {
           },
           error: (err) => this.dialogService.showError('Failed to deactivate branches.', err)
         });
-      })
+    })
   }
 
 // ===== Table Selection =====
@@ -280,7 +281,7 @@ export class BranchComponent implements OnInit,OnDestroy {
       'selected-branches.xlsx'
     );
 
-    if(!isExported) {
+    if (!isExported) {
       this.dialogService.showWarning('Please select at least one record to export.');
       return
     }
@@ -288,7 +289,7 @@ export class BranchComponent implements OnInit,OnDestroy {
 
 
   // Selection Handling
- onRowCheckboxChanged(event: CheckboxEvent<any>) {
+  onRowCheckboxChanged(event: CheckboxEvent<any>) {
     if (event.checked) this.selectedRows.add(event.row);
     else this.selectedRows.delete(event.row);
   }
@@ -297,7 +298,6 @@ export class BranchComponent implements OnInit,OnDestroy {
     this.selectedRows.clear();
     if (checked) this.branches.forEach(row => this.selectedRows.add(row));
   }
-
 
 
 }

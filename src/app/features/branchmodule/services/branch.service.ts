@@ -18,6 +18,10 @@ export class BranchService extends BaseHttpService <Branch>{
    return  this.getAll(ApiEndpoints.branches,params);
   }
 
+  getSummary():Observable<ApiResponse<Branch>>{
+   return  this.getAll(ApiEndpoints.brancheslist);
+  }
+
   save(branch:Branch):Observable<Branch>{
     return this.post(ApiEndpoints.branches,branch);
   }

@@ -2,39 +2,58 @@
 import {FormField} from '../../shared/models/formfieldata.model';
 import {ButtonAction} from '../../shared/component/button-panel/button-panel.component';
 
-export const EmployeeTableMeta= [
-  { key: 'number', label: 'Number' },
-  { key: 'fullname', label: 'Full Name' },
-  { key: 'nic', label: 'NIC' },
-  { key: 'mobile', label: 'Mobile' },
-  { key: 'email', label: 'Email' },
-  { key: 'address', label: 'Address' },
-  { key: 'branch.name', label: 'Branch' },
-  { key: 'designation.name', label: 'Designation' },
-  { key: 'department.name', label: 'Department' },
-  { key: 'employeestatus.name', label: 'Status' },
-  { key: 'actions', label: 'Actions' } // provide a template for this column below
+export const EmployeeTableMeta = [
+  {key: 'number', label: 'Number'},
+  {key: 'fullname', label: 'Full Name'},
+  {key: 'nic', label: 'NIC'},
+  {key: 'mobile', label: 'Mobile'},
+  {key: 'email', label: 'Email'},
+  {key: 'address', label: 'Address'},
+  {key: 'branch.name', label: 'Branch'},
+  {key: 'designation.name', label: 'Designation'},
+  {key: 'department.name', label: 'Department'},
+  {key: 'employeestatus.name', label: 'Status'},
+  {key: 'actions', label: 'Actions'} // provide a template for this column below
 ];
 
 export const EmployeeFilterMeta: FormField[] = [
-  { name: 'ssname', type: 'text', label: 'Full Name', required: false, mode:"none" },
-  { name: 'ssnumber', type: 'text', label: 'Number', required: false, mode: 'none' },
-  { name: 'ssdepartment', type: 'select', label: 'Department', required: false, mode: 'options' },
+  {name: 'ssname', type: 'text', label: 'Full Name', required: false, mode: "none"},
+  {name: 'ssnumber', type: 'text', label: 'Number', required: false, mode: 'none'},
+  {name: 'ssdepartment', type: 'select', label: 'Department', required: false, mode: 'options'},
 ] as FormField[];
 
 
 export const EmployeeActionPanelMeta: ButtonAction[] = [
-  { label: 'Create', type: 'create', icon: 'add' },
+  {label: 'Create', type: 'create', icon: 'add'},
   {
     label: 'Export',
     type: 'export',
     icon: 'download',
     dropdown: [
-      { label: 'pdf', type: 'export-pdf' },
-      { label: 'Excel', type: 'export-excel' }
+      {label: 'pdf', type: 'export-pdf'},
+      {label: 'Excel', type: 'export-excel'}
     ]
   },
-  { label: 'Deactivate', type: 'bulk-deactivate', icon: 'delete', disabled: false },
-  { label: 'Clear Search', type: 'clear-search', icon: 'cancel' }
+  {label: 'Deactivate', type: 'bulk-deactivate', icon: 'delete', disabled: false},
+  {label: 'Clear Search', type: 'clear-search', icon: 'cancel'}
 ];
+
+export const EmployeeFormMeta: FormField[] = [
+  {name: 'id', type: 'hidden', label: 'Employee id', required: false, mode: 'none'},
+  {name: 'number', type: 'text', label: 'Employee Number', required: true, mode: 'regex'},
+  {name: 'fullname', type: 'text', label: 'Full Name', required: true, mode: 'regex'},
+  {name: 'nic', type: 'text', label: 'NIC', required: true, mode: 'regex'},
+  {name: 'gender', type: 'select', label: 'Gender', required: true, mode: 'options'},
+  {name: 'mobile', type: 'tel', label: 'Mobile', required: true, mode: 'regex'},
+  {name: 'email', type: 'email', label: 'Email Address', required: true, mode: 'none'},
+  {name: 'address', type: 'text', label: 'Address', required: true, mode: 'regex'},
+  {name: 'emergencycontact', type: 'tel', label: 'Emergency Contact', required: true, mode: 'regex'},
+  {name: 'image', type: 'file', label: 'Image', required: false, mode: 'none'},
+  {name: 'branch', type: 'select', label: 'Branch', required: true, mode: 'options'},
+  {name: 'doj', type: 'date', label: 'Date of joined', required: true, mode: 'date'},
+  {name: 'department', type: 'select', label: 'Department', required: true, mode: 'options'},
+  {name: 'designation', type: 'select', label: 'Designation', required: true, mode: 'options'},
+  {name: 'employeetype', type: 'select', label: 'Employee Type', required: true, mode: 'options'},
+  {name: 'employeestatus', type: 'select', label: 'Employee Status', required: true, mode: 'options'},
+] as FormField[];
 

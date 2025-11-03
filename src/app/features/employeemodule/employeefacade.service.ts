@@ -1,19 +1,39 @@
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
+import {Observable, throwError} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {EmployeeService} from './services/employee.service';
 import {Employee} from './model/employee';
 import {Department} from './model/department';
 import {DepartmentService} from './services/department.service';
+import {Designation} from './model/designation';
+import {DesignationService} from './services/designation.service';
+import {Employeetype} from './model/employeetype';
+import {EmployeetypeService} from './services/employeetype.service';
+import {EmployeestatusService} from './services/employeestatus.service';
+import {Employeestatus} from './model/employeestatus';
+import {GenderService} from './services/gender.service';
+import {Gender} from './model/gender';
+import {Branch} from '../branchmodule/model/branch';
+import {BranchService} from '../branchmodule/services/branch.service';
+import {Regex} from '../../shared/models/regex.model';
+import {RegexService} from '../../core/regex.service';
 
 @Injectable({
   providedIn: 'root',
-})export class EmployeefacadeService{
+})
+export class EmployeefacadeService {
 
   constructor(
-   private employeeService:EmployeeService,
-   private departmentService:DepartmentService
-  ) {}
+    private employeeService: EmployeeService,
+    private departmentService: DepartmentService,
+    private designationService: DesignationService,
+    private employeetypeService: EmployeetypeService,
+    private employeestatusService: EmployeestatusService,
+    private genderService: GenderService,
+    private branchService: BranchService,
+    private regexService:RegexService
+  ) {
+  }
 
   // Load data
   loadEmployees(): Observable<Employee[]> {
@@ -24,10 +44,42 @@ import {DepartmentService} from './services/department.service';
     return this.departmentService.get().pipe(map(res => res.data));
   }
 
+  loadDesignations(): Observable<Designation[]> {
+    return this.designationService.get().pipe(map(res => res.data));
+  }
+
+  loadEmployeeType(): Observable<Employeetype[]> {
+    return this.employeetypeService.get().pipe(map(res => res.data));
+  }
+
+  loadEmployeestatus(): Observable<Employeestatus[]> {
+    return this.employeestatusService.get().pipe(map(res => res.data));
+  }
+
+  loadGender(): Observable<Gender[]> {
+    return this.genderService.get().pipe(map(res => res.data));
+  }
+
+  loadBranches(): Observable<Branch[]> {
+    return this.branchService.getSummary().pipe(map(res => res.data));
+  }
+
+  loadRegexes(): Observable<Regex> {
+    return this.regexService.getRegexes('employees').pipe(map(res => res.data));
+  }
+
   searchEmployees(criteria: any): Observable<Employee[]> {
     const normalized = this.normalizeSearchCriteria(criteria);
     console.log(criteria)
     return this.getEmployees(normalized);
+  }
+
+  createEmployee(employeeData: any): Observable<Employee> {
+    const status = employeeData.employeestatus?.name?.toLowerCase();
+    if (status === 'active') {
+      return this.employeeService.save(employeeData);
+    }
+    return throwError(() => new Error('Employee should be active'));
   }
 
   // Private helpers
