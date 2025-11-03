@@ -5,7 +5,6 @@ import {EmployeeService} from './services/employee.service';
 import {Employee} from './model/employee';
 import {Department} from './model/department';
 import {DepartmentService} from './services/department.service';
-import {Branch} from '../branchmodule/model/branch';
 
 @Injectable({
   providedIn: 'root',
@@ -27,6 +26,7 @@ import {Branch} from '../branchmodule/model/branch';
 
   searchEmployees(criteria: any): Observable<Employee[]> {
     const normalized = this.normalizeSearchCriteria(criteria);
+    console.log(criteria)
     return this.getEmployees(normalized);
   }
 
