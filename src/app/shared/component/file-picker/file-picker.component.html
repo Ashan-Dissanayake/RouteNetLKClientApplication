@@ -1,0 +1,87 @@
+<mat-card class="img-upload-panel"
+          [attr.id]="id"
+          [attr.aria-describedby]="describedBy"
+          [class.mat-form-field-disabled]="disabled">
+
+  <div class="img-preview-container"
+       (click)="onContainerClick($event)">
+    <div class="img-placeholder"
+         [class.has-image]="imageURL || isPDF"
+         [class.has-pdf]="isPDF">
+
+      <!-- Regular Image -->
+      @if (imageURL && !isPDF) {
+        <img [src]="imageURL" class="preview-image" alt="Selected file">
+      }
+
+      <!-- PDF Icon Display -->
+      @if (isPDF) {
+        <div class="pdf-placeholder">
+          <mat-icon class="pdf-icon">picture_as_pdf</mat-icon>
+          <span class="pdf-text">PDF Document</span>
+        </div>
+      }
+
+      <!-- Empty State -->
+      @if (!imageURL && !isPDF) {
+        <div class="placeholder-content">
+          <mat-icon class="placeholder-icon">cloud_upload</mat-icon>
+          <span class="placeholder-text">
+            {{ placeholder || 'No file selected' }}
+          </span>
+        </div>
+      }
+
+      <!-- PDF View Link Overlay -->
+      @if (viewPdf && showPdfDetails && isPDF) {
+        <div class="pdf-overlay">
+          <a [href]="pdfUrl" target="_blank" class="pdf-link">
+            <mat-icon>visibility</mat-icon>
+            <span>View PDF</span>
+          </a>
+        </div>
+      }
+    </div>
+
+    <!-- Hidden File Input -->
+    <input #fileInput
+           type="file"
+           class="file-input"
+           (change)="selectImage($event)"
+           [disabled]="disabled"
+           [attr.id]="id + '-input'"
+           [attr.aria-describedby]="describedBy"
+           accept="image/*,.pdf">
+  </div>
+
+  <!-- File Name Display -->
+  @if (isPDF && showPdfDetails) {
+    <div class="file-info">
+      <mat-icon class="file-icon">description</mat-icon>
+      <span class="file-name">{{ pdfFileName }}</span>
+    </div>
+  }
+
+  <!-- Action Buttons -->
+  <div class="action-buttons">
+    <button mat-raised-button
+            color="primary"
+            class="select-btn"
+            type="button"
+            (click)="fileInput.click()"
+            [disabled]="disabled">
+      <mat-icon>folder_open</mat-icon>
+      Select
+    </button>
+
+    <button mat-raised-button
+            color="warn"
+            class="clear-btn"
+            type="button"
+            (click)="clearImage()"
+            [disabled]="disabled || (!imageURL && !isPDF)">
+      <mat-icon>clear</mat-icon>
+      Clear
+    </button>
+  </div>
+</mat-card>

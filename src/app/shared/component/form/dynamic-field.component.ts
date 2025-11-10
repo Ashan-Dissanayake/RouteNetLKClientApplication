@@ -13,6 +13,7 @@ import {
 import {MatDualListboxComponent} from '../dual-list-box/mat-dual-listbox.component';
 import {MatOption, MatSelect} from '@angular/material/select';
 import {MatNativeDateModule} from '@angular/material/core';
+import {FilePickerComponent} from '../file-picker/file-picker.component';
 
 @Component({
   selector: 'dynamic-field',
@@ -32,6 +33,12 @@ import {MatNativeDateModule} from '@angular/material/core';
             <ng-container *ngIf="formInstance.get(field.name)?.hasError('required')">This field is required.</ng-container>
             <ng-container *ngIf="formInstance.get(field.name)?.hasError('pattern')">Invalid format.</ng-container>
           </mat-error>
+        </mat-form-field>
+
+        <!-- Text -->
+        <mat-form-field *ngSwitchCase="'file'" appearance="outline">
+          <mat-label>{{ field.label || field.name }}</mat-label>
+          <app-file-picker></app-file-picker>
         </mat-form-field>
 
         <!-- Select -->
@@ -99,6 +106,7 @@ import {MatNativeDateModule} from '@angular/material/core';
     NgForOf,
     MatOption,
     FormsModule,
+    FilePickerComponent,
   ]
 
 })
