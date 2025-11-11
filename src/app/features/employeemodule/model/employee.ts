@@ -10,6 +10,7 @@ export class Employee{
   id!:number;
   number!: string;
   fullname!:string;
+  callingname!:string;
   nic!:string;
   gender!:Gender;
   mobile!:string;

@@ -56,7 +56,7 @@ export class DataTableComponent<T = any> implements OnChanges, AfterViewInit {
   @Input() columns: ColumnDef[] = [];
   @Input() sortable = false;
   @Input() paginatable = false;
-  @Input() pageSizeOptions: number[] = [5, 10, 25];
+  @Input() pageSizeOptions: number[] = [10, 20, 30];
 
   @Output() rowClick = new EventEmitter<T>();
   @Output() actionClick = new EventEmitter<ActionEvent<T>>();

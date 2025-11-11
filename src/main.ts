@@ -1,6 +1,6 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app/app.component';
-import {provideHttpClient} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 import {provideAnimations} from '@angular/platform-browser/animations';
 import {importProvidersFrom} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
@@ -13,14 +13,15 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatButtonModule} from '@angular/material/button';
 import {provideRouter} from '@angular/router';
 import {routes} from './app/app.routes';
+import {ErrorInterceptor} from './app/core/ErrorInterceptor';
 
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(routes),
     provideAnimations(),
-    provideHttpClient(),
-    provideAnimations(),
+    provideHttpClient(withInterceptorsFromDi()),
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     importProvidersFrom(
       ReactiveFormsModule,
       MatFormFieldModule,
@@ -33,3 +34,4 @@ bootstrapApplication(AppComponent, {
     )
   ]
 });
+

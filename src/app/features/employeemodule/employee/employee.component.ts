@@ -183,11 +183,14 @@ export class EmployeeComponent implements OnInit, OnDestroy {
 
     operation$?.pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
-        this.dialogService.showSuccess('Branch saved successfully.');
+        this.dialogService.showSuccess('Employee saved successfully.');
         this.loadEmployeeTable();
         FormUtils.resetForm(this.employeeForm);
       },
-      error: (err) => this.dialogService.showError('Failed to save employee.', JSON.stringify(err))
+      error: (err) =>{
+        console.log(err)
+        this.dialogService.showMessage({heading:'Failed to save employee.', message:err.errorMessage})
+      }
     });
   }
 

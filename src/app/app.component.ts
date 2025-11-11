@@ -32,7 +32,9 @@ const formats: MatDateFormats = {
 @Component({
   selector: 'app-root',
   standalone: true,
-  providers: [provideNativeDateAdapter(formats)],
+  providers: [
+    provideNativeDateAdapter(formats),
+  ],
   imports: [
     MatSidenavModule,
     MatToolbarModule,
