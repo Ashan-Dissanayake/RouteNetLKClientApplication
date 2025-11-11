@@ -1,91 +1,72 @@
 <mat-card class="img-upload-panel"
+          [class.mat-form-field-disabled]="disabled"
           [attr.id]="id"
-          [attr.aria-describedby]="describedBy"
-          [class.mat-form-field-disabled]="disabled">
+          [attr.aria-describedby]="describedBy">
 
-  <div class="img-preview-container"
-       (click)="onContainerClick()">
-    <div class="img-placeholder"
-         [class.has-image]="imageURL || isPDF"
-         [class.has-pdf]="isPDF">
+  <div class="img-preview-container" (click)="onContainerClick()">
 
-      <!-- Image Preview -->
-      <ng-container *ngIf="imageURL && !isPDF">
-        <img [src]="imageURL" class="preview-image" alt="Selected image">
-      </ng-container>
+    <!-- 🖼️ Image Preview -->
+    <div *ngIf="imageURL && !isPDF" class="img-placeholder has-image">
+      <img [src]="imageURL" alt="Selected Image" class="preview-image" />
+    </div>
 
-      <!-- PDF Placeholder -->
-      <ng-container *ngIf="isPDF">
-        <div class="pdf-placeholder">
-          <mat-icon class="pdf-icon">picture_as_pdf</mat-icon>
-          <span class="pdf-text">PDF Document</span>
-        </div>
-      </ng-container>
+    <!-- 📄 PDF Preview -->
+    <div *ngIf="isPDF" class="img-placeholder has-pdf">
+      <div class="pdf-placeholder">
+        <mat-icon class="pdf-icon">picture_as_pdf</mat-icon>
+        <span class="pdf-text">PDF Document</span>
+      </div>
 
-      <!-- Empty State -->
-      <ng-container *ngIf="!imageURL && !isPDF">
-        <div class="placeholder-content">
-          <mat-icon class="placeholder-icon">cloud_upload</mat-icon>
-          <span class="placeholder-text">
-            {{ placeholder || 'No file selected' }}
-          </span>
-        </div>
-      </ng-container>
+      <div *ngIf="viewPdf && showPdfDetails" class="pdf-overlay">
+        <a [href]="pdfUrl" target="_blank" class="pdf-link">
+          <mat-icon>visibility</mat-icon>
+          <span>View PDF</span>
+        </a>
+      </div>
+    </div>
 
-      <!-- PDF View Link Overlay -->
-      <ng-container *ngIf="viewPdf && showPdfDetails && isPDF">
-        <div class="pdf-overlay">
-          <a [href]="pdfUrl" target="_blank" class="pdf-link">
-            <mat-icon>visibility</mat-icon>
-            <span>View PDF</span>
-          </a>
-        </div>
-      </ng-container>
+    <!-- 📥 Empty State -->
+    <div *ngIf="!imageURL && !isPDF" class="img-placeholder">
+      <div class="placeholder-content">
+        <mat-icon class="placeholder-icon">cloud_upload</mat-icon>
+        <span class="placeholder-text">{{ placeholder }}</span>
+      </div>
     </div>
 
     <!-- Hidden File Input -->
-    <input
-      #fileInput
-      type="file"
-      class="file-input"
-      (change)="selectImage($event)"
-      [disabled]="disabled"
-      [attr.id]="id + '-input'"
-      [attr.aria-describedby]="describedBy"
-      accept="image/*,.pdf"
-      style="display:none" />
+    <input #fileInput
+           type="file"
+           accept="image/*,.pdf"
+           class="file-input"
+           style="display:none"
+           [disabled]="disabled"
+           (change)="selectImage($event)" />
   </div>
 
-  <!-- PDF File Name Display -->
-  <ng-container *ngIf="isPDF && showPdfDetails">
-    <div class="file-info">
-      <mat-icon class="file-icon">description</mat-icon>
-      <span class="file-name">{{ pdfFileName }}</span>
-    </div>
-  </ng-container>
+  <!-- File Info -->
+  <div *ngIf="isPDF && showPdfDetails" class="file-info">
+    <mat-icon class="file-icon">description</mat-icon>
+    <span class="file-name">{{ pdfFileName }}</span>
+  </div>
 
   <!-- Action Buttons -->
   <div class="action-buttons">
     <button
       mat-raised-button
-      color="primary"
-      class="select-btn"
-      type="button"
+      color="primary" type="button"
       (click)="onContainerClick(); $event.stopPropagation()"
-      [disabled]="disabled">
+      [disabled]="disabled"
+    >
       <mat-icon>folder_open</mat-icon>
       Select
     </button>
 
-    <button
-      mat-raised-button
-      color="warn"
-      class="clear-btn"
-      type="button"
-      (click)="clearImage()"
-      [disabled]="disabled || (!imageURL && !isPDF)">
+    <button mat-raised-button color="warn" type="button"
+            (click)="clearImage()" [disabled]="disabled || (!imageURL && !isPDF)">
       <mat-icon>clear</mat-icon>
       Clear
     </button>
   </div>
+  <mat-error *ngIf="errorMessage">{{ errorMessage }}</mat-error>
+
 </mat-card>

@@ -1,15 +1,6 @@
-import {
-  Component,
-  Input,
-  OnDestroy,
-  OnInit,
-  Optional,
-  Self,
-  ElementRef,
-  DoCheck, ViewChild
-} from '@angular/core';
+import {Component, DoCheck, ElementRef, Input, OnDestroy, OnInit, Optional, Self, ViewChild} from '@angular/core';
 import {ControlValueAccessor, NgControl} from '@angular/forms';
-import {MatFormFieldControl} from '@angular/material/form-field';
+import {MatError, MatFormFieldControl} from '@angular/material/form-field';
 import {FocusMonitor} from '@angular/cdk/a11y';
 import {Subject} from 'rxjs';
 import {MatCard} from '@angular/material/card';
@@ -22,81 +13,69 @@ import {NgIf} from '@angular/common';
   templateUrl: './file-picker.component.html',
   styleUrls: ['./file-picker.component.scss'],
   standalone: true,
-  imports: [MatCard, MatIcon, MatButton, NgIf],
+  imports: [MatCard, MatIcon, MatButton, NgIf, MatError],
   providers: [
     { provide: MatFormFieldControl, useExisting: FilePickerComponent }
   ]
 })
 export class FilePickerComponent
-  implements
-    ControlValueAccessor,
-    MatFormFieldControl<any>,
-    OnInit,
-    DoCheck,
-    OnDestroy {
+  implements ControlValueAccessor, MatFormFieldControl<any>, OnInit, DoCheck, OnDestroy {
 
-  /** Angular Material form control state */
+  /** Angular Material form field props */
   static nextId = 0;
   stateChanges = new Subject<void>();
-  focused = false;
   controlType = 'app-file-picker';
   id = `app-file-picker-${FilePickerComponent.nextId++}`;
   describedBy = '';
-
-  /** Required new Material props */
+  focused = false;
   errorState = false;
-  autofilled?: boolean;
-  userAriaDescribedBy?: string;
   disableAutomaticLabeling = false;
+  errorMessage: string | null = null;
+
 
   /** Inputs */
-  @Input() placeholder: string = '';
+  @Input() placeholder = 'Select a file';
   @Input() required = false;
   @Input() disabled = false;
-  @Input() defaultImage: any;
-  @Input() showPdfDetails!: boolean;
+  @Input() defaultImage?: string;
+  @Input() showPdfDetails = false;
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
+  /** File state */
+  imageURL?: string;
+  pdfUrl?: string;
+  pdfFileName = '';
+  isPDF = false;
+  viewPdf = false;
 
-  /** File handling */
-  imageURL: any;
-  pdfFileName: string = '';
-  isPDF: boolean = false;
-  viewPdf: boolean = false;
-  private convertValue: string = '';
-  private decodeValue!: any;
-  public pdfUrl!: any;
+  /** Form value */
+  private _value = '';
+  private readonly MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 
-  /** Max file size of 10MB */
-  private readonly MAX_FILE_SIZE = 10 * 1024 * 1024;
-
-  private onChange: any = () => {};
-  private onTouched: any = () => {};
+  private onChange: (value: any) => void = () => {};
+  private onTouched: () => void = () => {};
 
   constructor(
     private fm: FocusMonitor,
     private elementRef: ElementRef<HTMLElement>,
     @Optional() @Self() public ngControl: NgControl
   ) {
-    if (this.ngControl != null) {
-      this.ngControl.valueAccessor = this;
-    }
-
+    if (this.ngControl) this.ngControl.valueAccessor = this;
     this.fm.monitor(this.elementRef, true).subscribe(origin => {
       this.focused = !!origin;
       this.stateChanges.next();
     });
   }
 
-  // MatFormFieldControl interface implementation
+  // ========== Material Control ==========
   get value(): any {
-    return this.convertValue;
+    return this._value;
   }
 
   set value(val: any) {
-    if (val !== this.convertValue) {
-      this.convertValue = val;
+    if (val !== this._value) {
+      this._value = val;
       this.onChange(val);
       this.stateChanges.next();
     }
@@ -116,22 +95,18 @@ export class FilePickerComponent
 
   onContainerClick(): void {
     if (this.disabled) return;
-
-    // Reset so same file can be chosen again
-    this.fileInput.nativeElement.value = '';
-
-    // Trigger file chooser (one-click guaranteed)
+    this.fileInput.nativeElement.value = ''; // ensure same file triggers change
     this.fileInput.nativeElement.click();
   }
 
-
-  ngOnInit() {}
+  // ========== Lifecycle ==========
+  ngOnInit(): void {
+    if (this.defaultImage) this.imageURL = this.defaultImage;
+  }
 
   ngDoCheck(): void {
-    if (this.ngControl) {
-      const control = this.ngControl.control;
-      this.errorState = !!(control && control.invalid && (control.dirty));
-    }
+    const control = this.ngControl?.control;
+    this.errorState = !!(control && control.invalid && control.dirty);
     this.stateChanges.next();
   }
 
@@ -141,43 +116,34 @@ export class FilePickerComponent
     this.fm.stopMonitoring(this.elementRef);
   }
 
-  // ControlValueAccessor interface implementation
+  // ========== ControlValueAccessor ==========
   writeValue(value: any): void {
     if (!value) {
-      this.imageURL = this.defaultImage;
-    } else {
-      try {
-        this.decodeValue = atob(value);
-
-        const byteCharacters = new Uint8Array(this.decodeValue.length);
-        for (let i = 0; i < this.decodeValue.length; i++) {
-          byteCharacters[i] = this.decodeValue.charCodeAt(i);
-        }
-
-        const pdfSignature = byteCharacters.slice(0, 4);
-        const isPDF =
-          pdfSignature[0] === 0x25 &&
-          pdfSignature[1] === 0x50 &&
-          pdfSignature[2] === 0x44 &&
-          pdfSignature[3] === 0x46;
-
-        if (isPDF) {
-          const blob = new Blob([byteCharacters], { type: 'application/pdf' });
-          this.pdfUrl = URL.createObjectURL(blob);
-          this.isPDF = true;
-          this.showPdfDetails = true;
-          this.viewPdf = true;
-          this.pdfFileName = '';
-        } else {
-          this.isPDF = false;
-          this.showPdfDetails = false;
-          this.imageURL = this.decodeValue;
-        }
-      } catch (error) {
-        console.error('Error decoding Base64 value or handling file:', error);
-        this.imageURL = this.defaultImage;
-      }
+      this.resetToDefault();
+      return;
     }
+
+    try {
+      const decoded = atob(value);
+      const bytes = new Uint8Array(decoded.length);
+      for (let i = 0; i < decoded.length; i++) {
+        bytes[i] = decoded.charCodeAt(i);
+      }
+
+      // check if PDF by magic number
+      const isPdf = bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46;
+
+      if (isPdf) {
+        this.loadPdfFromBytes(bytes);
+      } else {
+        this.imageURL = 'data:image/png;base64,' + value;
+        this.isPDF = false;
+        this.viewPdf = false;
+      }
+    } catch {
+      this.resetToDefault();
+    }
+
     this.stateChanges.next();
   }
 
@@ -194,48 +160,74 @@ export class FilePickerComponent
     this.stateChanges.next();
   }
 
-  // File Selection Logic
+  // ========== File Handling ==========
   selectImage(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
 
-    // File size validation
+    // Reset errors and previous file state
+    this.errorMessage = null;
+    this.errorState = false;
+    this.stateChanges.next();
+
+    // ✅ Validate file size
     if (file.size > this.MAX_FILE_SIZE) {
-      alert('File size exceeds the 10MB limit.');
+      this.errorMessage = 'File size exceeds the 10MB limit.';
+      this.errorState = true;
+      this.stateChanges.next();
       return;
     }
 
     const reader = new FileReader();
 
     if (file.type === 'application/pdf') {
-      // --- Handle PDF ---
       if (this.pdfUrl) URL.revokeObjectURL(this.pdfUrl);
-
-      this.isPDF = true;
-      this.showPdfDetails = true;
       this.pdfFileName = file.name;
 
       reader.onload = (e: ProgressEvent<FileReader>) => {
-        const binaryString = e.target?.result as string;
-        this.convertValue = btoa(binaryString);
-        this.onChange(this.convertValue);
+        try {
+          const binaryString = e.target?.result as string;
+          this.value = btoa(binaryString);
+          const blob = new Blob([binaryString], { type: 'application/pdf' });
+          this.pdfUrl = URL.createObjectURL(blob);
+          this.isPDF = true;
+          this.showPdfDetails = true;
+          this.viewPdf = true;
+          this.imageURL = undefined;
+        } catch {
+          this.errorMessage = 'Error processing PDF file.';
+          this.errorState = true;
+        }
+        this.stateChanges.next();
+      };
 
-        const blob = new Blob([binaryString], { type: 'application/pdf' });
-        this.pdfUrl = URL.createObjectURL(blob);
-        this.viewPdf = true;
+      reader.onerror = () => {
+        this.errorMessage = 'Error reading PDF file.';
+        this.errorState = true;
+        this.stateChanges.next();
       };
 
       reader.readAsBinaryString(file);
     } else {
-      // --- Handle Image ---
       reader.onload = (e: ProgressEvent<FileReader>) => {
-        const dataUrl = e.target?.result as string;
-        this.imageURL = dataUrl;
-        this.convertValue = dataUrl.split(',')[1]; // Store only base64
-        this.onChange(this.convertValue);
-        this.isPDF = false;
-        this.viewPdf = false;
+        try {
+          const dataUrl = e.target?.result as string;
+          this.imageURL = dataUrl;
+          this.value = dataUrl.split(',')[1]; // base64 only
+          this.isPDF = false;
+          this.viewPdf = false;
+        } catch {
+          this.errorMessage = 'Error processing image file.';
+          this.errorState = true;
+        }
+        this.stateChanges.next();
+      };
+
+      reader.onerror = () => {
+        this.errorMessage = 'Error reading image file.';
+        this.errorState = true;
+        this.stateChanges.next();
       };
 
       reader.readAsDataURL(file);
@@ -244,10 +236,27 @@ export class FilePickerComponent
 
 
   clearImage(): void {
-    this.imageURL = this.defaultImage;
+    this.resetToDefault();
+    this.onChange('');
+  }
+
+  private resetToDefault(): void {
+    this.imageURL = this.defaultImage || '';
     this.isPDF = false;
     this.viewPdf = false;
-    this.onChange(btoa(this.imageURL));
-    this.stateChanges.next();
+    this.pdfFileName = '';
+    if (this.pdfUrl) URL.revokeObjectURL(this.pdfUrl);
+    this.pdfUrl = undefined;
   }
+
+  private loadPdfFromBytes(bytes: any): void {
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    this.pdfUrl = URL.createObjectURL(blob);
+    this.isPDF = true;
+    this.showPdfDetails = true;
+    this.viewPdf = true;
+    this.imageURL = undefined;
+  }
+
+  protected readonly event = event;
 }

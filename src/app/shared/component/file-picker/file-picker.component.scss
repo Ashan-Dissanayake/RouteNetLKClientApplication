@@ -1,3 +1,42 @@
+:host {
+  display: block;
+
+  // Override Angular Material button colors safely inside the component
+  ::ng-deep .mat-mdc-raised-button.mat-primary {
+    background-color: #ea7d38 !important;
+    color: #ffffff !important;
+    border-color: #dc5619 !important;
+  }
+
+  ::ng-deep .mat-mdc-raised-button.mat-primary:hover:not([disabled]) {
+    background-color: #dc5619 !important;
+    border-color: #c44d19 !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.18);
+    transform: translateY(-1px);
+  }
+
+  ::ng-deep .mat-mdc-raised-button.mat-warn {
+    background-color: #f1f5f9 !important;
+    color: #475569 !important;
+    border: 1px solid #e2e8f0 !important;
+  }
+
+  ::ng-deep .mat-mdc-raised-button.mat-warn:hover:not([disabled]) {
+    background-color: #e2e8f0 !important;
+    border-color: #cbd5e1 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  ::ng-deep .mat-mdc-raised-button.mat-warn:disabled {
+    background-color: #f8fafc !important;
+    color: #cbd5e1 !important;
+    border-color: #e2e8f0 !important;
+    cursor: not-allowed;
+  }
+}
+
+/* -------- Panel Container -------- */
 .img-upload-panel {
   width: 200px;
   padding: 24px;
@@ -17,6 +56,7 @@
 .img-preview-container {
   position: relative;
   margin-bottom: 20px;
+  cursor: pointer;
 }
 
 .img-placeholder {
@@ -28,7 +68,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
 
@@ -37,7 +76,8 @@
     background: #f1f5f9;
   }
 
-  &.has-image, &.has-pdf {
+  &.has-image,
+  &.has-pdf {
     border: 1px solid #e2e8f0;
     background: #ffffff;
   }
@@ -54,6 +94,7 @@
   border-radius: 6px;
 }
 
+/* -------- Empty Placeholder -------- */
 .placeholder-content {
   display: flex;
   flex-direction: column;
@@ -61,9 +102,7 @@
   color: #94a3b8;
 
   .placeholder-icon {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
+    font-size: 18px;
     margin-bottom: 8px;
     opacity: 0.7;
   }
@@ -74,7 +113,7 @@
   }
 }
 
-/* -------- PDF Styles -------- */
+/* -------- PDF Preview -------- */
 .pdf-placeholder {
   display: flex;
   flex-direction: column;
@@ -83,10 +122,8 @@
 
   .pdf-icon {
     font-size: 64px;
-    width: 64px;
-    height: 64px;
     margin-bottom: 12px;
-    color: #ea7d38; // themed orange for PDF icon
+    color: #ea7d38;
     opacity: 0.9;
   }
 
@@ -125,17 +162,11 @@
 
     mat-icon {
       font-size: 20px;
-      width: 20px;
-      height: 20px;
     }
   }
 }
 
 /* -------- File Info -------- */
-.file-input {
-  display: none;
-}
-
 .file-info {
   display: flex;
   align-items: center;
@@ -149,8 +180,6 @@
   .file-icon {
     color: #ea7d38;
     font-size: 20px;
-    width: 20px;
-    height: 20px;
   }
 
   .file-name {
@@ -172,8 +201,6 @@
     font-weight: 600;
     font-size: 14px;
     border-radius: 6px;
-    transition: all 0.3s ease;
-    border: 1px solid transparent;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -181,57 +208,11 @@
     mat-icon {
       margin-right: 8px;
       font-size: 18px;
-      width: 18px;
-      height: 18px;
-    }
-  }
-
-  /* Themed Select Button (Orange) */
-  .select-btn {
-    background: #ea7d38 !important;
-    color: #ffffff !important;
-    border-color: #dc5619 !important;
-
-    &:hover:not([disabled]) {
-      background: #dc5619 !important;
-      border-color: #c44d19 !important;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.18);
-      transform: translateY(-1px);
-    }
-
-    &:active {
-      transform: translateY(0);
-    }
-  }
-
-  /* Clear Button (Subtle Gray) */
-  .clear-btn {
-    background: #f1f5f9;
-    color: #475569;
-    border-color: #e2e8f0;
-
-    &:hover:not([disabled]) {
-      background: #e2e8f0;
-      border-color: #cbd5e1;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-    }
-
-    &:disabled {
-      background: #f8fafc;
-      color: #cbd5e1;
-      border-color: #e2e8f0;
-      cursor: not-allowed;
-      box-shadow: none;
-      transform: none;
-    }
-
-    &:active:not([disabled]) {
-      transform: translateY(0);
     }
   }
 }
 
+/* -------- Animation -------- */
 @keyframes pulse {
   0%, 100% {
     opacity: 1;
@@ -243,10 +224,11 @@
   }
 }
 
+/* -------- Responsive -------- */
 @media (max-width: 768px) {
   .img-upload-panel {
     width: 100%;
-    max-width: 320px; // or adjust
+    max-width: 320px;
     padding: 16px;
   }
 
