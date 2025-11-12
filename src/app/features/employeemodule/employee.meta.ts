@@ -51,7 +51,7 @@ export const EmployeeFormMeta: FormField[] = [
   {name: 'emergencycontact', type: 'text', label: 'Emergency Contact', required: true, mode: 'regex'},
   {name: 'image', type: 'file', label: 'Image', required: false, mode: 'none'},
   {name: 'branch', type: 'select', label: 'Branch', required: true, mode: 'options'},
-  {name: 'doj', type: 'date', label: 'Date of joined', required: true, mode: 'date'},
+  {name: 'doj', type: 'date', label: 'Date of joined', required: true, mode: 'date',dateConfig:{maxDate:new Date(),minDate:new Date(1958, 0, 1)}},
   {name: 'department', type: 'select', label: 'Department', required: true, mode: 'options'},
   {name: 'designation', type: 'select', label: 'Designation', required: true, mode: 'options'},
   {name: 'employeetype', type: 'select', label: 'Employee Type', required: true, mode: 'options'},
