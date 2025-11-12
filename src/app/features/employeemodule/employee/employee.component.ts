@@ -122,6 +122,7 @@ export class EmployeeComponent implements OnInit, OnDestroy {
 
     this.initializeForms();
     this.subscribeToFilterChanges();
+
   }
 
   private initializeForms(): void {
@@ -138,6 +139,9 @@ export class EmployeeComponent implements OnInit, OnDestroy {
       employeestatus: this.employeeStatuses,
       regexes: this.regexRules
     });
+
+    this.setGender();
+    this.setEmail();
   }
 
   private configureActionPanel(): void {
@@ -194,6 +198,35 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     });
   }
 
+  setGender(){
+    this.employeeForm.controls['nic'].valueChanges.subscribe((nic) => {
+      const nicControl = this.employeeForm.get('nic');
+      if (nicControl?.valid) {
+        const gender = this.employeefacadeService.extractGenderFromNIC(nic);
+        if (gender) {
+          let bindedGender = this.genders.find((gen)=> gen.name.toLowerCase() == gender.toLowerCase());
+          this.employeeForm.controls['gender'].setValue(bindedGender);
+        }
+      }
+    });
+  }
+
+  setEmail(){
+
+
+   this.employeeForm.controls['callingname'].valueChanges.subscribe(()=>{
+     const callingName = this.employeeForm.controls['callingname'].getRawValue();
+     const employeeNumber = this.employeeForm.controls['number'].getRawValue();
+     const callingnameControl = this.employeeForm.get('callingname');
+     if (callingnameControl?.valid){
+       const email = this.employeefacadeService.generateEmail(callingName,employeeNumber);
+       if (email){
+         this.employeeForm.controls['email'].setValue(email);
+       }
+     }
+   });
+  }
+
   // ===== Action Panel =====
   private actionHandlers: Record<string, () => void> = {
     'clear-search': () => this.employeeFilterForm.reset(),
@@ -205,7 +238,6 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     if (handler) handler();
     else this.dialogService.showWarning(`No handler defined for action: ${event.type}`);
   }
-
 
   onDropdownOnlyClick(event: ButtonClickEvent) {
     const dropdownTypes = ['export-pdf', 'export-excel'];

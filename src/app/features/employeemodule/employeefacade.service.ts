@@ -82,6 +82,33 @@ export class EmployeefacadeService {
     return throwError(() => new Error('Employee should be active'));
   }
 
+  extractGenderFromNIC(nic: string): 'Male' | 'Female' | null {
+    if (!nic) return null;
+
+    nic = nic.trim().toUpperCase();
+
+    if (/^\d{12}$/.test(nic)) {
+      const dayCode = parseInt(nic.substring(4, 7), 10);
+      return dayCode > 500 ? 'Female' : 'Male';
+    }
+
+    if (/^\d{9}[Vv]$/.test(nic)) {
+      const dayCode = parseInt(nic.substring(2, 5), 10);
+      return dayCode > 500 ? 'Female' : 'Male';
+    }
+
+    return null;
+  }
+
+  generateEmail(callingName: string, employeeNumber: string): string | null {
+    if (!callingName || !employeeNumber) return null;
+
+    const cleanName = callingName.trim().toLowerCase().replace(/\s+/g, '.'); // handle spaces
+    const cleanEmpNo = employeeNumber.trim().toUpperCase();
+
+    return `${cleanName}.${cleanEmpNo}@sltb.lk`;
+  }
+
   // Private helpers
   private getEmployees(params?: any): Observable<Employee[]> {
     return this.employeeService.get(params).pipe(map(res => res.data));
@@ -96,5 +123,7 @@ export class EmployeefacadeService {
       })
     );
   }
+
+
 
 }
