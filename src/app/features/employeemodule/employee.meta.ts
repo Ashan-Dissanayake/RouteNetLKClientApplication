@@ -40,6 +40,7 @@ export const EmployeeActionPanelMeta: ButtonAction[] = [
 
 export const EmployeeFormMeta: FormField[] = [
   {name: 'id', type: 'hidden', label: 'Employee id', required: false, mode: 'none'},
+  {name: 'branch', type: 'select', label: 'Branch', required: true, mode: 'options'},
   {name: 'number', type: 'text', label: 'Employee Number', required: true, mode: 'regex'},
   {name: 'fullname', type: 'text', label: 'Full Name', required: true, mode: 'regex'},
   {name: 'callingname', type: 'text', label: 'Calling Name', required: true, mode: 'regex'},
@@ -50,8 +51,12 @@ export const EmployeeFormMeta: FormField[] = [
   {name: 'address', type: 'text', label: 'Address', required: true, mode: 'regex'},
   {name: 'emergencycontact', type: 'text', label: 'Emergency Contact', required: true, mode: 'regex'},
   {name: 'image', type: 'file', label: 'Image', required: false, mode: 'none'},
-  {name: 'branch', type: 'select', label: 'Branch', required: true, mode: 'options'},
-  {name: 'doj', type: 'date', label: 'Date of joined', required: true, mode: 'date',dateConfig:{maxDate:new Date(),minDate:new Date(1958, 0, 1)}},
+  {name: 'doj', type: 'date', label: 'Date of joined', required: true, mode: 'date',
+    dateConfig:{
+    maxDate:new Date(),
+      minDate:new Date(1958, 0, 1)
+    }
+  },
   {name: 'department', type: 'select', label: 'Department', required: true, mode: 'options'},
   {name: 'designation', type: 'select', label: 'Designation', required: true, mode: 'options'},
   {name: 'employeetype', type: 'select', label: 'Employee Type', required: true, mode: 'options'},

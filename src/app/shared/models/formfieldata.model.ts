@@ -17,7 +17,6 @@ export interface FormField {
 
 type OptionsField = {id:number,name:string}
 
-
 export  type FieldType =
   | 'text' | 'number' | 'date' | 'file' | 'checkbox' | 'radio'
   | 'select' | 'autocomplete' | 'textarea' | 'password' | 'email'
