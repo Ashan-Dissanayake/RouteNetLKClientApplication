@@ -198,6 +198,12 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     });
   }
 
+  editEmployee(row: Employee): void {
+    this.disableControllerOnEdit();
+    this.employeeForm.patchValue(row);
+    this.openEmployeeForm();
+  }
+
   setGender(){
     this.employeeForm.controls['nic'].valueChanges.subscribe((nic) => {
       const nicControl = this.employeeForm.get('nic');
@@ -212,8 +218,6 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   }
 
   setEmail(){
-
-
    this.employeeForm.controls['callingname'].valueChanges.subscribe(()=>{
      const callingName = this.employeeForm.controls['callingname'].getRawValue();
      const employeeNumber = this.employeeForm.controls['number'].getRawValue();
@@ -225,6 +229,19 @@ export class EmployeeComponent implements OnInit, OnDestroy {
        }
      }
    });
+  }
+
+  disableControllerOnEdit(){
+    this.disableNumber();
+    this.disableDatePicker();
+  }
+
+  disableDatePicker(){
+    this.employeeForm.controls['doj'].disable({onlySelf:true})
+  }
+
+  disableNumber(){
+    this.employeeForm.controls['number'].disable({onlySelf:true})
   }
 
   // ===== Action Panel =====
@@ -258,6 +275,7 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   }
 
   onRowAction(action: string, row: any) {
+    if (action === 'edit') this.editEmployee(row);
   }
 
   // Selection Handling
