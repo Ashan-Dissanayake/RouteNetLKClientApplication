@@ -1,5 +1,4 @@
 import {Injectable} from '@angular/core';
-import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -29,7 +28,9 @@ export class PrintService {
       autoTable(doc, {
         startY: 28,
         head: [columns.map(c => c.header)],
-        body: data.map(row => columns.map(c => row[c.key] ?? '')),
+        body: data.map(row =>
+          columns.map(c => this.getValueByPath(row, c.key))
+        ),
         theme: 'plain',
         headStyles: {fillColor: [22, 160, 133]},
         alternateRowStyles: {fillColor: [240, 240, 240]},
@@ -56,4 +57,10 @@ export class PrintService {
     return Promise.resolve();
   }
 
+  // Helper: Get deep value using dot notation
+  private getValueByPath(obj: any, path: string): any {
+    return path.split('.').reduce((acc, part) => {
+      return acc && acc[part] !== undefined ? acc[part] : '';
+    }, obj);
+  }
 }

@@ -7,7 +7,13 @@ import {MatButton} from '@angular/material/button';
 import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
 import {MatIcon} from '@angular/material/icon';
-import {EmployeeActionPanelMeta, EmployeeFilterMeta, EmployeeFormMeta, EmployeeTableMeta} from '../employee.meta';
+import {
+  EmployeeActionPanelMeta,
+  EmployeeExportMeta,
+  EmployeeFilterMeta,
+  EmployeeFormMeta,
+  EmployeeTableMeta
+} from '../employee.meta';
 import {DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {MatDivider} from '@angular/material/divider';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -22,6 +28,8 @@ import {Employeetype} from '../model/employeetype';
 import {Gender} from '../model/gender';
 import {Branch} from '../../branchmodule/model/branch';
 import {FormUtils} from '../../../shared/component/form/form-util';
+import {PrintTableMeta} from '../../branchmodule/branch.meta';
+import {exportToExcel} from '../../../core/excel-export.util';
 
 @Component({
   selector: 'app-employee',
@@ -52,6 +60,8 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   readonly employeeFilterMeta = EmployeeFilterMeta;
   readonly actionPanelConfig = EmployeeActionPanelMeta;
   readonly employeeFormMeta = EmployeeFormMeta;
+  readonly employeeExportMeta = EmployeeExportMeta;
+
 
   // ===== Form Controls =====
   employeeFilterForm: FormGroup = new FormGroup({});
@@ -228,7 +238,6 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     })
   }
 
-
   setGender(){
     this.employeeForm.controls['nic'].valueChanges.subscribe((nic) => {
       const nicControl = this.employeeForm.get('nic');
@@ -270,11 +279,48 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   }
 
 
+  // ===== Export Operations =====
+  exportSelectedToPdf() {
+    if (this.selectedRows.size > 0) {
+      this.dialogService.showPrintDialog({
+        width:'1500px',
+        height:'650px',
+        title: 'Employee Details',
+        mode: 'table',
+        data: Array.from(this.selectedRows),
+        columns: this.employeeExportMeta
+      }).subscribe((result) => {
+        if (result) {
+          this.selectedRows = new Set<Employee>();
+        }
+      });
+    } else {
+      this.dialogService.showWarning('Please select at least one record to print.');
+    }
+  }
+
+  exportSelectedToExcel(): void {
+    const selectedArray = Array.from(this.selectedRows);
+
+    let isExported = exportToExcel(
+      selectedArray,
+      this.employeeExportMeta,
+      'selected-employees.xlsx'
+    );
+
+    if (!isExported) {
+      this.dialogService.showWarning('Please select at least one record to export.');
+      return
+    }
+  }
+
   // ===== Action Panel =====
   private actionHandlers: Record<string, () => void> = {
     'clear-search': () => this.employeeFilterForm.reset(),
     'create': () => this.openEmployeeForm(),
     'bulk-deactivate': () => this.deactivateSelectedEmployees(),
+    'export-pdf': () => this.exportSelectedToPdf(),
+    'export-excel': () => this.exportSelectedToExcel()
   };
 
   onActionTriggered(event: ButtonClickEvent) {
@@ -315,7 +361,6 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     this.selectedRows.clear();
     if (checked) this.employees.forEach(row => this.selectedRows.add(row));
   }
-
 
 
 }

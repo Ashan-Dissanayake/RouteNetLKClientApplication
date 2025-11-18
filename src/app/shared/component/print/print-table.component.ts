@@ -52,6 +52,12 @@ export class PrintTableComponent {
     }
   }
 
+  getValueByPath(obj: any, path: string): any {
+    return path.split('.').reduce((acc, part) => {
+      return acc && acc[part] !== undefined ? acc[part] : '';
+    }, obj);
+  }
+
 }
 
 

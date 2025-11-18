@@ -8,7 +8,8 @@
     </thead>
     <tbody>
     <tr *ngFor="let row of data.data">
-      <td *ngFor="let col of data.columns">{{ row[col.key] }}</td>
+      <td *ngFor="let col of data.columns">{{ getValueByPath(row, col.key) }}
+      </td>
     </tr>
     </tbody>
   </table>

@@ -1,6 +1,23 @@
-.print-container { padding: 16px; background: #fff; color: #000; }
-.print-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-.print-table th, .print-table td {
-  border: 1px solid #ddd; padding: 8px; text-align: left;
+.print-container {
+  padding: 16px;
+  background: #fff;
+  color: #000;
+  min-width: 600px;
+  max-height: 800px;
 }
-.print-actions { margin-top: 16px; text-align: right; }
+
+.print-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.print-table th, .print-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+.print-actions {
+  margin-top: 16px;
+  text-align: left;
+}

@@ -22,7 +22,6 @@ export const EmployeeFilterMeta: FormField[] = [
   {name: 'ssdepartment', type: 'select', label: 'Department', required: false, mode: 'options'},
 ] as FormField[];
 
-
 export const EmployeeActionPanelMeta: ButtonAction[] = [
   {label: 'Create', type: 'create', icon: 'add'},
   {
@@ -63,3 +62,13 @@ export const EmployeeFormMeta: FormField[] = [
   {name: 'employeestatus', type: 'select', label: 'Employee Status', required: true, mode: 'options'},
 ] as FormField[];
 
+export const EmployeeExportMeta = [
+  { key: 'number', header: 'Number' },
+  { key: 'fullname', header: 'FullName' },
+  { key: 'email', header: 'District' },
+  {key: 'branch.name', header: 'Branch'},
+  {key: 'designation.name', header: 'Designation'},
+  {key: 'department.name', header: 'Department'},
+  {key: 'employeestatus.name', header: 'Status'},
+
+]

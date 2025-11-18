@@ -34,8 +34,8 @@ export class DialogService {
 
   showPrintDialog(options: PrintDialogOptions): Observable<boolean> {
       const dialogRef = this.dialog.open(PrintTableComponent, {
-        width: options.width || '900px',
-        minHeight:'600px',
+        maxHeight:options.height,
+        maxWidth:options.width,
         data: {
           title: options.title,
           data: options.data,
@@ -103,4 +103,5 @@ export interface PrintDialogOptions {
   data: any;
   columns?: { key: string; header: string }[];
   width?: string;
+  height?: string;
 }
