@@ -86,6 +86,22 @@ export class EmployeefacadeService {
   }
 
 
+  deleteEmployees(employees: Employee[]): Observable<number[]> {
+    if (!employees || employees.length === 0) {
+      return throwError(() => new Error('No branches selected'));
+    }
+    // Collect only closed branch IDs
+    const employeeIds = employees
+      .filter(e => (e.employeestatus?.name ?? '').toLowerCase() === 'resigned')
+      .map(e => e.id)
+      .filter(id => id != null);
+    if (employeeIds.length === 0) {
+      return throwError(() => new Error('Selected employees cannot be deactivated because they are not Resigned'));
+    }
+    return this.employeeService.deactivate(employeeIds);
+  }
+
+
 
   extractGenderFromNIC(nic: string): 'Male' | 'Female' | null {
     if (!nic) return null;

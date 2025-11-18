@@ -26,6 +26,10 @@ export class EmployeeService extends BaseHttpService <Employee>{
     return this.put(ApiEndpoints.employees,employee);
   }
 
-
+  deactivate(ids: number[] | number): Observable<number[]> {
+    // Ensure we always send an array to the backend
+    const payload = Array.isArray(ids) ? ids : [ids];
+    return this.http.post<number[]>(ApiEndpoints.employeesdeactivate,ids);
+  }
 
 }

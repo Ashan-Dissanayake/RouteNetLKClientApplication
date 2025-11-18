@@ -208,6 +208,25 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     this.openEmployeeForm();
   }
 
+  deactivateSelectedEmployees() {
+    const toDeactivate = Array.from(this.selectedRows);
+    this.dialogService.showConfirmation({
+      heading: "Deactivation",
+      message: "Are sure ?"
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
+      this.employeefacadeService.deleteEmployees(toDeactivate)
+        ?.pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.dialogService.showSuccess('Selected employees deactivated.');
+            this.selectedRows.clear();
+            this.loadEmployeeTable();
+          },
+          error: (err) => this.dialogService.showError('Failed to deactivate employees.', err)
+        });
+    })
+  }
 
 
   setGender(){
@@ -255,6 +274,7 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   private actionHandlers: Record<string, () => void> = {
     'clear-search': () => this.employeeFilterForm.reset(),
     'create': () => this.openEmployeeForm(),
+    'bulk-deactivate': () => this.deactivateSelectedEmployees(),
   };
 
   onActionTriggered(event: ButtonClickEvent) {
