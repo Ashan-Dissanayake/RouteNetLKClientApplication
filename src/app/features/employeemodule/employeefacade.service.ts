@@ -70,7 +70,6 @@ export class EmployeefacadeService {
 
   searchEmployees(criteria: any): Observable<Employee[]> {
     const normalized = this.normalizeSearchCriteria(criteria);
-    console.log(criteria)
     return this.getEmployees(normalized);
   }
 
@@ -81,6 +80,12 @@ export class EmployeefacadeService {
     }
     return throwError(() => new Error('Employee should be active'));
   }
+
+  updateEmployee(employeeData: any): Observable<Employee> {
+    return this.employeeService.update(employeeData);
+  }
+
+
 
   extractGenderFromNIC(nic: string): 'Male' | 'Female' | null {
     if (!nic) return null;
@@ -123,7 +128,5 @@ export class EmployeefacadeService {
       })
     );
   }
-
-
 
 }

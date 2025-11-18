@@ -136,6 +136,7 @@ export class FilePickerComponent
       if (isPdf) {
         this.loadPdfFromBytes(bytes);
       } else {
+        console.log(value);
         this.imageURL = 'data:image/png;base64,' + value;
         this.isPDF = false;
         this.viewPdf = false;

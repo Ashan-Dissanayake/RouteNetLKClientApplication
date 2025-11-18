@@ -25,4 +25,5 @@ export const ApiEndpoints = {
     employeestatuses:`${baseUrl}/employeestatuses/list`,
     employees:`${baseUrl}/employees`,
 
+
 } as const;

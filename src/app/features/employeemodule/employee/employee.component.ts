@@ -183,7 +183,9 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   }
 
   private saveEmployee(formData: any): void {
-    const operation$ = this.employeefacadeService.createEmployee(formData);
+    const operation$ = formData.id
+      ? this.employeefacadeService.updateEmployee(formData)
+      : this.employeefacadeService.createEmployee(formData);
 
     operation$?.pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
@@ -199,10 +201,14 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   }
 
   editEmployee(row: Employee): void {
+    console.log(this.employeeForm)
+
     this.disableControllerOnEdit();
     this.employeeForm.patchValue(row);
     this.openEmployeeForm();
   }
+
+
 
   setGender(){
     this.employeeForm.controls['nic'].valueChanges.subscribe((nic) => {
@@ -243,6 +249,7 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   disableNumber(){
     this.employeeForm.controls['number'].disable({onlySelf:true})
   }
+
 
   // ===== Action Panel =====
   private actionHandlers: Record<string, () => void> = {
@@ -288,6 +295,7 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     this.selectedRows.clear();
     if (checked) this.employees.forEach(row => this.selectedRows.add(row));
   }
+
 
 
 }

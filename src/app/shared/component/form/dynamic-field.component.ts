@@ -38,7 +38,10 @@ import {FilePickerComponent} from '../file-picker/file-picker.component';
         <!-- Text -->
         <mat-form-field *ngSwitchCase="'file'" appearance="outline">
           <mat-label>{{ field.label || field.name }}</mat-label>
-          <app-file-picker></app-file-picker>
+          <app-file-picker [formControlName]="field.name"></app-file-picker>
+          <mat-error *ngIf="formInstance.get(field.name)?.invalid && (formInstance.get(field.name)?.dirty || formInstance.get(field.name)?.touched)">
+            <ng-container *ngIf="formInstance.get(field.name)?.hasError('required')">This field is required.</ng-container>
+          </mat-error>
         </mat-form-field>
 
         <!-- Select -->

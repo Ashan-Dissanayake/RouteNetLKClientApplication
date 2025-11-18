@@ -22,4 +22,10 @@ export class EmployeeService extends BaseHttpService <Employee>{
     return this.post(ApiEndpoints.employees,employee);
   }
 
+  update(employee:Employee):Observable<Employee>{
+    return this.put(ApiEndpoints.employees,employee);
+  }
+
+
+
 }
