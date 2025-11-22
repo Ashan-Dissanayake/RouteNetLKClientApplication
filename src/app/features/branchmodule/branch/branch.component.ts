@@ -154,8 +154,12 @@ export class BranchComponent implements OnInit, OnDestroy {
   // ===== Filtering =====
   private subscribeToFilterChanges(): void {
     this.branchFilterForm.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(filters => {
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((filters: Record<string, any>) => {
         this.branchFacade.searchBranches(filters)
           .pipe(takeUntil(this.destroy$))
           .subscribe(data => this.branches = data);

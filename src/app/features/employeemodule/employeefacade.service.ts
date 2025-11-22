@@ -17,6 +17,7 @@ import {Branch} from '../branchmodule/model/branch';
 import {BranchService} from '../branchmodule/services/branch.service';
 import {Regex} from '../../shared/models/regex.model';
 import {RegexService} from '../../core/regex.service';
+import {normalizeSearchCriteria} from '../../core/search-criteria-normalizer';
 
 @Injectable({
   providedIn: 'root',
@@ -68,8 +69,8 @@ export class EmployeefacadeService {
     return this.regexService.getRegexes('employees').pipe(map(res => res.data));
   }
 
-  searchEmployees(criteria: any): Observable<Employee[]> {
-    const normalized = this.normalizeSearchCriteria(criteria);
+  searchEmployees(criteria: Record<string, any>): Observable<Employee[]> {
+    const normalized = normalizeSearchCriteria(criteria);
     return this.getEmployees(normalized);
   }
 
@@ -102,7 +103,6 @@ export class EmployeefacadeService {
   }
 
 
-
   extractGenderFromNIC(nic: string): 'Male' | 'Female' | null {
     if (!nic) return null;
 
@@ -133,16 +133,6 @@ export class EmployeefacadeService {
   // Private helpers
   private getEmployees(params?: any): Observable<Employee[]> {
     return this.employeeService.get(params).pipe(map(res => res.data));
-  }
-
-  private normalizeSearchCriteria(criteria: any): any {
-    return Object.fromEntries(
-      Object.entries(criteria).map(([key, value]) => {
-        if (typeof value === 'string') return [key, value.trim().toLowerCase()];
-        if (value && typeof value === 'object' && 'id' in value) return [key, value.id];
-        return [key, value];
-      })
-    );
   }
 
 }

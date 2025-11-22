@@ -28,7 +28,6 @@ import {Employeetype} from '../model/employeetype';
 import {Gender} from '../model/gender';
 import {Branch} from '../../branchmodule/model/branch';
 import {FormUtils} from '../../../shared/component/form/form-util';
-import {PrintTableMeta} from '../../branchmodule/branch.meta';
 import {exportToExcel} from '../../../core/excel-export.util';
 
 @Component({
@@ -172,13 +171,18 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   // ===== Filtering =====
   private subscribeToFilterChanges(): void {
     this.employeeFilterForm.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(filters => {
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((filters: Record<string, any>) => {
         this.employeefacadeService.searchEmployees(filters)
           .pipe(takeUntil(this.destroy$))
-          .subscribe(data => this.employees = data);
+          .subscribe(data => (this.employees = data));
       });
   }
+
 
   // ===== CRUD =====
   openEmployeeForm(): void {

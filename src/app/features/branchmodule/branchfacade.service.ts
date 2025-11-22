@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {EMPTY, Observable, throwError} from 'rxjs';
+import {Observable, throwError} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {BranchtypeService} from './services/branchtype.service';
 import {BranchstatusService} from './services/branchstatus.service';
@@ -13,6 +13,7 @@ import {Branch} from './model/branch';
 import {BranchService} from './services/branch.service';
 import {Province} from './model/province';
 import {ProvinceService} from './services/province.service';
+import {normalizeSearchCriteria} from '../../core/search-criteria-normalizer';
 
 @Injectable({
   providedIn: 'root',
@@ -52,8 +53,8 @@ import {ProvinceService} from './services/province.service';
     return this.getBranches();
   }
 
-  searchBranches(criteria: any): Observable<Branch[]> {
-    const normalized = this.normalizeSearchCriteria(criteria);
+  searchBranches(criteria: Record<string, any>): Observable<Branch[]> {
+    const normalized = normalizeSearchCriteria(criteria);
     return this.getBranches(normalized);
   }
 
@@ -90,16 +91,6 @@ import {ProvinceService} from './services/province.service';
   // Private helpers
   private getBranches(params?: any): Observable<Branch[]> {
     return this.branchService.get(params).pipe(map(res => res.data));
-  }
-
-  private normalizeSearchCriteria(criteria: any): any {
-    return Object.fromEntries(
-      Object.entries(criteria).map(([key, value]) => {
-        if (typeof value === 'string') return [key, value.trim().toLowerCase()];
-        if (value && typeof value === 'object' && 'id' in value) return [key, value.id];
-        return [key, value];
-      })
-    );
   }
 
   private normalizeBranchData(branchData: any): any {
