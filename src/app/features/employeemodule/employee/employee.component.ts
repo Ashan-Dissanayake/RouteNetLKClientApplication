@@ -282,7 +282,6 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     this.employeeForm.controls['number'].disable({onlySelf:true})
   }
 
-
   // ===== Export Operations =====
   exportSelectedToPdf() {
     if (this.selectedRows.size > 0) {

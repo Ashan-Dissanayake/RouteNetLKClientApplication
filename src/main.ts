@@ -13,7 +13,7 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatButtonModule} from '@angular/material/button';
 import {provideRouter} from '@angular/router';
 import {routes} from './app/app.routes';
-import {ErrorInterceptor} from './app/core/ErrorInterceptor';
+import {ErrorInterceptor} from './app/core/errorInterceptor';
 
 
 bootstrapApplication(AppComponent, {
