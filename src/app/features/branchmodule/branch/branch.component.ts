@@ -9,11 +9,7 @@ import {BranchType} from '../model/branchtype';
 import {District} from '../model/district';
 import {Province} from '../model/province';
 import {ActionPanelMeta, FilterMeta, FormMeta, PrintTableMeta, TableMeta} from '../branch.meta';
-import {StatsGridComponent} from '../../../shared/component/stats-grid/stats-grid.component';
-import {
-  ButtonClickEvent,
-  ButtonPanelComponent
-} from '../../../shared/component/button-panel/button-panel.component';
+import {ButtonClickEvent, ButtonPanelComponent } from '../../../shared/component/button-panel/button-panel.component';
 import {DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
 import {DialogService} from '../../../core/dialog.service';
@@ -23,8 +19,9 @@ import {TableCellDirective} from '../../../shared/component/data-table/table-cel
 import {MatIcon} from '@angular/material/icon';
 import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
 import {MatDivider} from '@angular/material/divider';
-import {exportToExcel} from '../../../core/excel-export.util';
+import {exportToExcel} from '../../../shared/component/export/excel-export.util';
 import {FormUtils} from '../../../shared/component/form/form-util';
+import {ExportService} from '../../../shared/component/export/export.service';
 
 @Component({
   selector: 'app-branch',
@@ -278,7 +275,6 @@ export class BranchComponent implements OnInit, OnDestroy {
 
   exportSelectedToExcel(): void {
     const selectedArray = Array.from(this.selectedRows);
-
     let isExported = exportToExcel(
       selectedArray,
       this.printableColumns,

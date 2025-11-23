@@ -6,7 +6,7 @@ import {Observable} from 'rxjs';
 import {FormGroup} from '@angular/forms';
 import {FormField} from '../shared/models/formfieldata.model';
 import {FormpopupComponent} from '../shared/component/form/formpopup/formpopup.component';
-import {PrintTableComponent} from '../shared/component/print/print-table.component';
+import {PrintTableComponent} from '../shared/component/export/print/print-table.component';
 import {MatSnackBar} from '@angular/material/snack-bar';
 
 

@@ -28,7 +28,7 @@ import {Employeetype} from '../model/employeetype';
 import {Gender} from '../model/gender';
 import {Branch} from '../../branchmodule/model/branch';
 import {FormUtils} from '../../../shared/component/form/form-util';
-import {exportToExcel} from '../../../core/excel-export.util';
+import {exportToExcel} from '../../../shared/component/export/excel-export.util';
 
 @Component({
   selector: 'app-employee',
