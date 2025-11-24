@@ -3,14 +3,12 @@ import {VehicleTableMeta} from '../vehicle.meta';
 import {Vehicle} from '../model/vehicle';
 import {VehiclefacadeService} from '../vehiclefacade.service';
 import {Subject, takeUntil} from 'rxjs';
-import {EmployeeTableMeta} from '../../employeemodule/employee.meta';
 import {CheckboxEvent, DataTableComponent} from '../../../shared/component/data-table/data-table.component';
 import {MatButton} from '@angular/material/button';
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
 import {MatIcon} from '@angular/material/icon';
-import {Employee} from '../../employeemodule/model/employee';
 import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
-import {NgClass, NgForOf, NgIf} from '@angular/common';
+import {NgClass} from '@angular/common';
 import {MatDivider} from '@angular/material/divider';
 
 @Component({
@@ -39,8 +37,6 @@ export class VehicleComponent implements OnInit{
 
   selectedRows = new Set<Vehicle>();
   activeVehicle: Vehicle | null = null;
-
-
 
   constructor(
     private vehicleFacadeService:VehiclefacadeService
@@ -86,6 +82,4 @@ export class VehicleComponent implements OnInit{
     if (checked) this.vehicles.forEach(row => this.selectedRows.add(row));
   }
 
-
-  protected readonly document = document;
 }
