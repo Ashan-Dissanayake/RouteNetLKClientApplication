@@ -1,6 +1,6 @@
 button {
-  //background-color: #1e0f8c !important;
-  background-color: #ea7d38 !important;
+  background-color: #048f98 !important;
+  //background-color: #ea7d38 !important;
   color: white !important;
   border-radius: 4px;
   cursor: pointer;
@@ -10,7 +10,8 @@ button {
   align-items: center;
 
   &:hover:not(.mat-disabled) {
-    background-color: #dc5619 !important;
+    //background-color: #dc5619 !important;
+    background-color: #004649 !important;
     box-shadow: 0 4px 8px rgba(0,0,0,0.18);
   }
 
@@ -18,7 +19,7 @@ button {
 
 /* Disabled state */
 button:disabled {
-  background-color: #b0bec5 !important;
+  background-color: rgba(125, 136, 141, 0.69) !important;
   color: white !important;
   cursor: not-allowed;
 }

@@ -1,9 +1,12 @@
 mat-dialog-actions{
   max-height: 68px;
+  background-color:#FAFAFA!important;
+
 }
 
 mat-dialog-content{
   ::ng-deep{
+    background-color:#FAFAFA!important;
     form{
         padding-left: 20px
     }

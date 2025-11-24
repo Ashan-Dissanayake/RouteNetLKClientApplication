@@ -3,14 +3,12 @@
 
   // Override Angular Material button colors safely inside the component
   ::ng-deep .mat-mdc-raised-button.mat-primary {
-    background-color: #ea7d38 !important;
+    background-color: #048f98 !important;
     color: #ffffff !important;
-    border-color: #dc5619 !important;
   }
 
   ::ng-deep .mat-mdc-raised-button.mat-primary:hover:not([disabled]) {
-    background-color: #dc5619 !important;
-    border-color: #c44d19 !important;
+    background-color: #004649 !important;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.18);
     transform: translateY(-1px);
   }

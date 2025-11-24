@@ -5,7 +5,8 @@ mat-sidenav-container {
 
 /* === Toolbar === */
 mat-toolbar {
-  background: linear-gradient(90deg, #140648 0%, #1e0f8c 100%);
+  //background: linear-gradient(90deg, #140648 0%, #1e0f8c 100%);
+  background: linear-gradient(180deg, #006A71 0%, #004649 100%);
   color: #fff;
   font-weight: 600;
   font-size: 15px;
@@ -28,8 +29,8 @@ mat-toolbar {
 mat-sidenav {
   border-radius: unset;
   width: 250px;
-  background: linear-gradient(180deg, #140648 0%, #1e0f8c 100%);
-  //background-color: #140648;
+  //background: linear-gradient(180deg, #140648 0%, #1e0f8c 100%);
+  background: linear-gradient(180deg, #006A71 0%, #004649 100%);
   color: #fff;
   font-size: 13px;
   padding: 24px 12px;
@@ -104,15 +105,10 @@ mat-sidenav {
 /* === Main Content === */
 mat-sidenav-content {
   padding: 0 20px 0 20px;
-  background-color: #ffffff;
+  background-color:#F5F5F5;
   min-height: 100vh;
 }
 
-/* === Content Wrapper === */
-.content {
-  //max-width: 1280px;
-  //margin: 0 auto;
-}
 
 /* === Responsive === */
 @media (max-width: 800px) {
@@ -131,3 +127,5 @@ mat-sidenav-content {
     padding: 12px;
   }
 }
+
+

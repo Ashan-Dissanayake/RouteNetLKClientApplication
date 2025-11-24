@@ -10,6 +10,9 @@ export const routes: Routes = [
       { path: 'employee', loadComponent: () => import('./features/employeemodule/employee/employee.component').
         then(m => m.EmployeeComponent)
       },
+      { path: 'vehicle', loadComponent: () => import('./features/vehiclemodule/vehicle/vehicle.component').
+        then(m => m.VehicleComponent)
+      },
     ]
   },
 ];

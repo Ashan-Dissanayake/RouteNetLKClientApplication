@@ -1,0 +1,108 @@
+<div class="container">
+  <h2>Vehicle Details Management</h2>
+</div>
+<app-side-view
+  [opened]="activeVehicle !== null"
+  [data]="activeVehicle"
+  [title]="'Vehicle Details'"
+  (closed)="closeDetails()"
+  [viewTemplate]="vehicleDetailTemplate"
+>
+<app-data-table
+  [data]="vehicles"
+  [columns]="tableColumns"
+  [sortable]="true"
+  [paginatable]="true"
+  [pageSizeOptions]="[10, 20]"
+  (rowClick)="onRowClick($event)"
+  (actionClick)="onRowAction($event.action, $event.row)"
+  (checkBoxClick)="onRowCheckboxChanged($event)"
+  (selectAllClick)="onSelectAll($event)"
+>
+  <!-- Row Actions -->
+  <ng-template tableCell="actions" let-row let-action="action">
+    <button mat-button (click)="action('edit', row); $event.stopPropagation()">
+      <mat-icon>mode_edit</mat-icon>
+    </button>
+  </ng-template>
+</app-data-table>
+</app-side-view>
+
+<ng-template #vehicleDetailTemplate let-row>
+  <div  class="vehicle-detail-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="title-section">
+        <mat-icon color="primary" class="vehicle-icon">directions_bus</mat-icon>
+        <div>
+          <h2 class="vehicle-title">{{ row.make.name }}</h2>
+          <p class="vehicle-subtitle">Number: {{ row.number }}</p>
+          <p class="vehicle-subtitle">Branch: {{ row.branch.name }}</p>
+        </div>
+      </div>
+
+      <span
+        class="status-chip"
+        [ngClass]="{
+        'available': row.vehiclestatus.name === 'Available',
+        'in-service': row.vehiclestatus.name === 'In Service',
+        'under-maintenance': row.vehiclestatus.name === 'Under Maintenance',
+        'out-of-service': row.vehiclestatus.name === 'Out of Service',
+        'decommissioned': row.vehiclestatus.name === 'Decommissioned',
+        'reserved': row.vehiclestatus.name === 'Reserved',
+      }">
+      {{ row.vehiclestatus.name }}
+      </span>
+    </div>
+
+    <mat-divider></mat-divider>
+    <!-- General Info -->
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="label">Code</span>
+        <span class="value">{{ row.code || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Seating Capacity</span>
+        <span class="value">{{ row.seatingcapacity || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Year of Made</span>
+        <span class="value">{{ row.yom || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Date of Buy</span>
+        <span class="value">{{ row.dob || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Mileage (KM)</span>
+        <span class="value">{{ row.mileage || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Condition Rate</span>
+        <span class="value">{{ row.conditionrate.name || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Chasis Number</span>
+        <span class="value">{{ row.chasisnumber || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Engine Number</span>
+        <span class="value">{{ row.enginenumber || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Fuel Type</span>
+        <span class="value">{{ row.fueltype.name || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Service Type</span>
+        <span class="value">{{ row.servicetype.name || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Remarks</span>
+        <span class="value">{{ row.remarks || '-' }}</span>
+      </div>
+    </div>
+    <mat-divider></mat-divider>
+  </div>
+</ng-template>

@@ -1,0 +1,129 @@
+.container {
+  padding: 10px;
+}
+
+//Sideview
+.vehicle-detail-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1rem;
+  color: #333;
+  font-family: Roboto, 'Segoe UI', sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.vehicle-icon {
+  font-size: 40px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+}
+
+.vehicle-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.vehicle-subtitle {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+}
+
+.status-chip {
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-chip.available {
+  color: #28a745;
+  background: #d4edda; // light green
+}
+
+.status-chip.in-service {
+  color: #000000;
+  background: #cce5ff; // light blue
+}
+
+.status-chip.under-maintenance {
+  color: #fd7e14;
+  background: #ffe5cc; // light orange
+}
+
+.status-chip.out-of-service {
+  color: #dc3545;
+  background: #f8d7da; // light red
+}
+
+.status-chip.decommissioned {
+  color: #6c757d;
+  background: #e2e3e5; // light grey
+}
+
+.status-chip.reserved {
+  color: #ffc107;
+  background: #fff3cd; // light yellow
+}
+
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 24px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 0.8rem;
+  color: #777;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+}
+
+.value {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #222;
+  word-break: break-word;
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .document-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 800px) {
+  .document-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .document-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

@@ -1,11 +1,9 @@
-export class Gender{
-
+export class Servicetype{
   id!:number;
-  name!: string;
+  name!:string
 
   constructor(id: number, name: string) {
     this.id = id;
     this.name = name;
   }
-
 }

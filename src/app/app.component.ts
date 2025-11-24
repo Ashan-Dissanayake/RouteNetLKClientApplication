@@ -61,7 +61,8 @@ export class AppComponent {
       children: [
         { icon: 'people', label: 'Employee', route: '/admin/employee' },
         { icon: 'person', label: 'User', route: '/admin/user' },
-        { icon: 'apartment', label: 'Branch', route: '/admin/branch' }
+        { icon: 'apartment', label: 'Branch', route: '/admin/branch' },
+        { icon: 'directions_bus', label: 'Vehicle', route: '/admin/vehicle' }
       ],
       expanded: false
     },

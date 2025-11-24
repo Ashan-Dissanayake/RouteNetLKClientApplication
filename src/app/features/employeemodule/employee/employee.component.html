@@ -52,7 +52,7 @@
 
 <!--Template for detail view -->
 <ng-template #employeeDetailTemplate let-row>
-  <div #printSection  class="employee-detail-container">
+  <div  class="employee-detail-container">
     <!-- Header -->
     <div class="header">
       <div class="title-section">
@@ -63,16 +63,16 @@
         </div>
       </div>
 
-      <span
-        class="status-chip"
-        [ngClass]="{
-    'active': row.employeestatus.name === 'Active',
-    'suspend': row.employeestatus.name === 'Suspend',
-    'resigned': row.employeestatus.name === 'Resigned',
-    'Onleave': row.employeestatus.name === 'On leave'
-  }">
-  {{ row.employeestatus.name }}
-</span>
+          <span
+            class="status-chip"
+            [ngClass]="{
+        'active': row.employeestatus.name === 'Active',
+        'suspend': row.employeestatus.name === 'Suspend',
+        'resigned': row.employeestatus.name === 'Resigned',
+        'Onleave': row.employeestatus.name === 'On leave'
+      }">
+      {{ row.employeestatus.name }}
+      </span>
     </div>
 
     <mat-divider></mat-divider>
