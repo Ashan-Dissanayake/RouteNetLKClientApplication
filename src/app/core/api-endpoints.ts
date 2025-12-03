@@ -27,7 +27,9 @@ export const ApiEndpoints = {
     employeesdeactivate: `${baseUrl}/employees/deactivate`,
 
   //Vehicle
-  vehicles:`${baseUrl}/vehicles`
+  vehicles:`${baseUrl}/vehicles`,
+  servicetype:`${baseUrl}/servicetypes/list`,
+  conditionrate:`${baseUrl}/conditionrates/list`
 
 
 } as const;

@@ -1,6 +1,25 @@
 <div class="container">
   <h2>Vehicle Details Management</h2>
 </div>
+<!-- ===== Action Panel ===== -->
+<app-button-panel
+  [buttons]="actionPanelConfig"
+  (actionClicked)="onActionTriggered($event)"
+  (dropdownClicked)="onDropdownOnlyClick($event)">
+</app-button-panel>
+
+<!-- ===== Filter Section ===== -->
+<div *ngIf="vehicleFilterForm && dataInitialized" id="serverSearch">
+  <form [formGroup]="vehicleFilterForm">
+    <dynamic-field
+      *ngFor="let field of vehicleFilterMeta"
+      [formInstance]="vehicleFilterForm"
+      [field]="field"
+    >
+    </dynamic-field>
+  </form>
+</div>
+
 <app-side-view
   [opened]="activeVehicle !== null"
   [data]="activeVehicle"
