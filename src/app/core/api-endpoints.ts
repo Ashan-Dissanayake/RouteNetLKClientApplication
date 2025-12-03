@@ -29,7 +29,11 @@ export const ApiEndpoints = {
   //Vehicle
   vehicles:`${baseUrl}/vehicles`,
   servicetype:`${baseUrl}/servicetypes/list`,
-  conditionrate:`${baseUrl}/conditionrates/list`
+  conditionrate:`${baseUrl}/conditionrates/list`,
+  fueltype:`${baseUrl}/fueltypes/list`,
+  vehiclestatus:`${baseUrl}/vehiclestatuses/list`,
+  make:`${baseUrl}/makes/list`,
+  seatingcapacity:`${baseUrl}/seatingcapacities/list`,
 
 
 } as const;

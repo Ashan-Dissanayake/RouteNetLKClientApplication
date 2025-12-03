@@ -77,7 +77,6 @@ export class VehicleComponent implements OnInit,OnDestroy{
     this.destroy$.complete();
   }
 
-
   // ===== Initialization =====
   private initialize(): void {
     forkJoin({
