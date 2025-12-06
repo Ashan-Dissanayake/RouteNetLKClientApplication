@@ -24,6 +24,7 @@ export const ApiEndpoints = {
     employeetypes:`${baseUrl}/employeetypes/list`,
     employeestatuses:`${baseUrl}/employeestatuses/list`,
     employees:`${baseUrl}/employees`,
+    employeesList:`${baseUrl}/employees/list`,
     employeesdeactivate: `${baseUrl}/employees/deactivate`,
 
   //Vehicle

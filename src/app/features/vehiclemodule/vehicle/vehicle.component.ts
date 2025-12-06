@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {VehicleActionPanelMeta, VehicleFilterMeta, VehicleTableMeta} from '../vehicle.meta';
+import {VehicleActionPanelMeta, VehicleFilterMeta, VehicleFormMeta, VehicleTableMeta} from '../vehicle.meta';
 import {Vehicle} from '../model/vehicle';
 import {VehiclefacadeService} from '../vehiclefacade.service';
 import {debounceTime, distinctUntilChanged, forkJoin, Subject, takeUntil} from 'rxjs';
@@ -17,6 +17,14 @@ import {FormbuilderService} from '../../../core/formbuilder.service';
 import {DialogService} from '../../../core/dialog.service';
 import {ButtonClickEvent, ButtonPanelComponent} from '../../../shared/component/button-panel/button-panel.component';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
+import {EmployeeFormMeta} from '../../employeemodule/employee.meta';
+import {Vehiclestatus} from '../model/vehiclestatus';
+import {Make} from '../model/make';
+import {Fueltype} from '../model/fueltype';
+import {Seatingcapacity} from '../model/seatingcapacity';
+import {Employee} from '../../employeemodule/model/employee';
+import {Branch} from '../../branchmodule/model/branch';
+import {FormUtils} from '../../../shared/component/form/form-util';
 
 @Component({
   selector: 'app-vehicle',
@@ -44,14 +52,23 @@ export class VehicleComponent implements OnInit,OnDestroy{
   readonly tableColumns = VehicleTableMeta;
   readonly vehicleFilterMeta = VehicleFilterMeta;
   readonly actionPanelConfig = VehicleActionPanelMeta;
+  readonly vehicleFormMeta = VehicleFormMeta;
 
   // ===== Form Controls =====
   vehicleFilterForm: FormGroup = new FormGroup({});
+  vehicleForm: FormGroup = new FormGroup({});
 
   // --- Data ---
   vehicles!: Vehicle[];
   servicetypes!: Servicetype[];
+  vehiclestatuses!: Vehiclestatus[];
+  makes!: Make[];
+  fueltypes!: Fueltype[];
   conditionrates!: Conditionrate[];
+  seatingcapacities!: Seatingcapacity[];
+  employees!: Employee[];
+  branches!: Branch[];
+  regexRules!: any;
 
   dataInitialized = false;
 
@@ -81,7 +98,14 @@ export class VehicleComponent implements OnInit,OnDestroy{
   private initialize(): void {
     forkJoin({
       servicetypes: this.vehicleFacadeService.loadServicetypes(),
+      vehiclestatuses: this.vehicleFacadeService.loadVehiclesatuses(),
       conditionrates: this.vehicleFacadeService.loadConditionrates(),
+      makes:this.vehicleFacadeService.loadMakes(),
+      fueltypes:this.vehicleFacadeService.loadFueltypes(),
+      seatingcapacities:this.vehicleFacadeService.laodSeatingcapacities(),
+      employees:this.vehicleFacadeService.loadEmployees(),
+      branches:this.vehicleFacadeService.loadBranches(),
+      regexes:this.vehicleFacadeService.loadStaticRegexes()
     }).subscribe({
       next: data => this.handleMetadataLoad(data),
       error: (err) => this.dialogService.showError('Failed to load vehicle metadata.', err)
@@ -91,7 +115,14 @@ export class VehicleComponent implements OnInit,OnDestroy{
 
   private handleMetadataLoad(data: any): void {
     this.servicetypes = data.servicetypes;
+    this.vehiclestatuses = data.vehiclestatuses;
+    this.makes = data.makes;
+    this.fueltypes = data.fueltypes;
     this.conditionrates = data.conditionrates;
+    this.seatingcapacities = data.seatingcapacities;
+    this.employees = data.employees;
+    this.branches = data.branches;
+    this.regexRules = data.regexes;
 
     this.dataInitialized = true;
 
@@ -103,6 +134,17 @@ export class VehicleComponent implements OnInit,OnDestroy{
     this.vehicleFilterForm = this.formBuilder.build(this.vehicleFilterMeta, {
       sservicetype: this.servicetypes,
       ssconditionrate:this.conditionrates
+    });
+
+    this.vehicleForm = this.formBuilder.build(this.vehicleFormMeta, {
+      servicetype: this.servicetypes,
+      vehiclestatus:this.vehiclestatuses,
+      make:this.makes,
+      fueltype:this.fueltypes,
+      conditionrate:this.conditionrates,
+      seatingcapacity:this.seatingcapacities,
+      employee:this.employees,
+      branch:this.branches,
     });
   }
 
@@ -136,6 +178,34 @@ export class VehicleComponent implements OnInit,OnDestroy{
       });
   }
 
+  // ===== CRUD =====
+  openVehicleForm(): void {
+    this.dialogService.showFormPopup({
+      heading: this.vehicleForm.value.id ? 'Edit Vehicle' : 'Create Vehicle',
+      form: this.vehicleForm,
+      meta: this.vehicleFormMeta
+    }).subscribe(formData => {
+      if (formData) this.saveVehicle(formData);
+      else FormUtils.resetForm(this.vehicleForm);
+    });
+  }
+
+  private saveVehicle(formData: any): void {
+    const operation$ = this.vehicleFacadeService.createVehicle(formData);
+
+    operation$?.pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.dialogService.showSuccess('Vehicle saved successfully.');
+        this.loadVehicleTable();
+        FormUtils.resetForm(this.vehicleForm);
+      },
+      error: (err) =>{
+        console.log(err)
+        this.dialogService.showMessage({heading:'Failed to save Vehicle.', message:err.errorMessage})
+      }
+    });
+  }
+
   // ===== Table Selection =====
   onRowClick(row: any): void {
     this.activeVehicle = row;
@@ -162,6 +232,7 @@ export class VehicleComponent implements OnInit,OnDestroy{
   // ===== Action Panel =====
   private actionHandlers: Record<string, () => void> = {
     'clear-search': () => this.vehicleFilterForm.reset(),
+    'create': () => this.openVehicleForm(),
   };
 
   onActionTriggered(event: ButtonClickEvent) {

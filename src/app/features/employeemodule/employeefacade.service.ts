@@ -65,8 +65,8 @@ export class EmployeefacadeService {
     return this.branchService.getSummary().pipe(map(res => res.data));
   }
 
-  loadRegexes(): Observable<Regex> {
-    return this.regexService.getRegexes('employees').pipe(map(res => res.data));
+  loadStaticRegexes(): Observable<Regex> {
+    return this.regexService.getStaticRegexes('employees').pipe(map(res => res.data));
   }
 
   searchEmployees(criteria: Record<string, any>): Observable<Employee[]> {
@@ -86,7 +86,6 @@ export class EmployeefacadeService {
     return this.employeeService.update(employeeData);
   }
 
-
   deleteEmployees(employees: Employee[]): Observable<number[]> {
     if (!employees || employees.length === 0) {
       return throwError(() => new Error('No branches selected'));
@@ -101,7 +100,6 @@ export class EmployeefacadeService {
     }
     return this.employeeService.deactivate(employeeIds);
   }
-
 
   extractGenderFromNIC(nic: string): 'Male' | 'Female' | null {
     if (!nic) return null;

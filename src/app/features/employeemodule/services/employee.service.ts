@@ -18,6 +18,10 @@ export class EmployeeService extends BaseHttpService <Employee>{
     return  this.getAll(ApiEndpoints.employees,params);
   }
 
+  getSummary():Observable<ApiResponse<Employee>>{
+    return  this.getAll(ApiEndpoints.employeesList);
+  }
+
   save(employee:Employee):Observable<Employee>{
     return this.post(ApiEndpoints.employees,employee);
   }

@@ -34,3 +34,22 @@ export const VehicleActionPanelMeta: ButtonAction[] = [
   {label: 'Deactivate', type: 'bulk-deactivate', icon: 'delete', disabled: false},
   {label: 'Clear Search', type: 'clear-search', icon: 'cancel'}
 ];
+
+export const VehicleFormMeta: FormField[] = [
+  {name: 'id', type: 'hidden', label: 'Vehicle id', required: false, mode: 'none'},
+  {name: 'make', type: 'select', label: 'Make/Model', required: true, mode: 'options'},
+  {name: 'code', type: 'text', label: 'Vehicle Code', required: true, mode: 'regex'},
+  {name: 'Number', type: 'text', label: 'Number Plate', required: true, mode: 'regex'},
+  {name: 'yom', type: 'date', label: 'Year of Made', required: true, mode: 'none'},
+  {name: 'dob', type: 'date', label: 'Date of Buy', required: true, mode: 'none'},
+  {name: 'chasisnumber', type: 'text', label: 'Chassis Number', required: true, mode: 'regex'},
+  {name: 'enginenumber', type: 'text', label: 'Engine Number', required: true, mode: 'regex'},
+  {name: 'fueltype', type: 'select', label: 'Fuel Type', required: true, mode: 'options'},
+  {name: 'mileage', type: 'text', label: 'Mileage', required: true, mode: 'none'},
+  {name: 'seatingcapacity', type: 'select', label: 'Seating Capacity', required: true, mode: 'options',optionLabelKey: 'amount'},
+  {name: 'conditionrate', type: 'select', label: 'Condition Rate', required: true, mode: 'options'},
+  {name: 'servicetype', type: 'select', label: 'Service Type', required: true, mode: 'options'},
+  {name: 'vehiclestatus', type: 'select', label: 'Status', required: true, mode: 'options'},
+  {name: 'employee', type: 'select', label: 'Employee', required: true, mode: 'options',optionLabelKey: 'callingname',},
+  {name: 'branch', type: 'select', label: 'Branch', required: true, mode: 'options'}
+] as FormField[];

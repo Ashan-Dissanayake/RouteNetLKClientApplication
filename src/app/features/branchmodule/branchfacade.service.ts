@@ -45,8 +45,8 @@ import {normalizeSearchCriteria} from '../../core/search-criteria-normalizer';
     return this.provinceService.get().pipe(map(res=>res.data));
   }
 
-  loadRegexes(): Observable<Regex> {
-    return this.regexService.getRegexes('branches').pipe(map(res => res.data));
+  loadStaticRegexes(): Observable<Regex> {
+    return this.regexService.getStaticRegexes('branches').pipe(map(res => res.data));
   }
 
   loadBranches(): Observable<Branch[]> {

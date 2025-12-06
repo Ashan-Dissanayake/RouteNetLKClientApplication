@@ -21,7 +21,7 @@ export class Vehicle{
   conditionrate!:Conditionrate;
   remarks!:string;
   servicetype!:Servicetype;
-  vhiclestatus!:Vehiclestatus;
+  vehiclestatus!:Vehiclestatus;
   employee!:Employee;
   branch!:Branch;
 }

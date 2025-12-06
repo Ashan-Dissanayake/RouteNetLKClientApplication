@@ -49,7 +49,7 @@ import {FilePickerComponent} from '../file-picker/file-picker.component';
           <mat-label>{{ field.label || field.name }}</mat-label>
           <mat-select [formControlName]="field.name" [compareWith]="compareFn">
             <mat-option *ngFor="let opt of field.options" [value]="opt">
-              {{ opt.name }}
+              {{ opt[field.optionLabelKey || 'name']}}
             </mat-option>
           </mat-select>
           <mat-error *ngIf="formInstance.get(field.name)?.invalid && (formInstance.get(field.name)?.dirty || formInstance.get(field.name)?.touched)">
@@ -124,5 +124,7 @@ export class DynamicFieldComponent {
     }
     return o1.id === o2.id;
   }
+
+
 }
 

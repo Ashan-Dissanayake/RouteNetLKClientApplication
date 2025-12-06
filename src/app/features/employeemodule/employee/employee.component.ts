@@ -110,7 +110,7 @@ export class EmployeeComponent implements OnInit, OnDestroy {
       employeeStatuses: this.employeefacadeService.loadEmployeestatus(),
       genders: this.employeefacadeService.loadGender(),
       branches: this.employeefacadeService.loadBranches(),
-      regexes:this.employeefacadeService.loadRegexes()
+      regexes:this.employeefacadeService.loadStaticRegexes()
     }).subscribe({
       next: data => this.handleMetadataLoad(data),
       error: (err) => this.dialogService.showError('Failed to load employee metadata.', err)
@@ -131,7 +131,6 @@ export class EmployeeComponent implements OnInit, OnDestroy {
 
     this.initializeForms();
     this.subscribeToFilterChanges();
-
   }
 
   private initializeForms(): void {
@@ -182,7 +181,6 @@ export class EmployeeComponent implements OnInit, OnDestroy {
           .subscribe(data => (this.employees = data));
       });
   }
-
 
   // ===== CRUD =====
   openEmployeeForm(): void {
@@ -242,7 +240,7 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     })
   }
 
-  setGender(){
+  private setGender(){
     this.employeeForm.controls['nic'].valueChanges.subscribe((nic) => {
       const nicControl = this.employeeForm.get('nic');
       if (nicControl?.valid) {
@@ -255,7 +253,7 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     });
   }
 
-  setEmail(){
+  private setEmail(){
    this.employeeForm.controls['callingname'].valueChanges.subscribe(()=>{
      const callingName = this.employeeForm.controls['callingname'].getRawValue();
      const employeeNumber = this.employeeForm.controls['number'].getRawValue();

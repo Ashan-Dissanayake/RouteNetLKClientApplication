@@ -100,7 +100,7 @@ export class BranchComponent implements OnInit, OnDestroy {
       branchTypes: this.branchFacade.loadBranchTypes(),
       districts: this.branchFacade.loadDistricts(),
       provinces: this.branchFacade.loadProvinces(),
-      regexes: this.branchFacade.loadRegexes()
+      regexes: this.branchFacade.loadStaticRegexes()
     }).subscribe({
       next: data => this.handleMetadataLoad(data),
       error: (err) => this.dialogService.showError('Failed to load branch metadata.', err)

@@ -6,22 +6,37 @@ export interface FormField {
   placeholder?: string;
   disabled?: boolean;
   options?:OptionsField[];
+  optionLabelKey?: string;
   mode:FieldMode;
   dateConfig?: {
     minDate?: Date;
     maxDate?: Date;
   };
   defaultValue:any;
+  referenceName:any;
   referencePath?:string[];
 }
 
-type OptionsField = {id:number,name:string}
+// export type OptionsField = {
+//   id: number;
+//   name: string;
+// };
+
+
+// export type OptionsField<T = any> = {
+//   id: number;
+//   [key: string]: T;
+// };
+
+export type OptionsField<T = any> = {
+  id: number;
+} & Record<string, T>;
+
 
 export  type FieldType =
   | 'text' | 'number' | 'date' | 'file' | 'checkbox' | 'radio'
   | 'select' | 'autocomplete' | 'textarea' | 'password' | 'email'
   | 'tel' | 'currency' | 'toggle'
   | 'chips'|'dualist';
-
 
 type FieldMode = 'regex' | 'options' | 'none'|'date';
