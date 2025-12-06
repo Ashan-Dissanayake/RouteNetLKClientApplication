@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {VehicleActionPanelMeta, VehicleFilterMeta, VehicleFormMeta, VehicleTableMeta} from '../vehicle.meta';
 import {Vehicle} from '../model/vehicle';
 import {VehiclefacadeService} from '../vehiclefacade.service';
-import {debounceTime, distinctUntilChanged, forkJoin, Subject, takeUntil} from 'rxjs';
+import {debounceTime, distinctUntilChanged, filter, forkJoin, Subject, switchMap, takeUntil} from 'rxjs';
 import {CheckboxEvent, DataTableComponent} from '../../../shared/component/data-table/data-table.component';
 import {MatButton} from '@angular/material/button';
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
@@ -10,7 +10,7 @@ import {MatIcon} from '@angular/material/icon';
 import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
 import {NgClass, NgForOf, NgIf} from '@angular/common';
 import {MatDivider} from '@angular/material/divider';
-import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Servicetype} from '../model/servicetype';
 import {Conditionrate} from '../model/conditionrate';
 import {FormbuilderService} from '../../../core/formbuilder.service';
@@ -146,6 +146,7 @@ export class VehicleComponent implements OnInit,OnDestroy{
       employee:this.employees,
       branch:this.branches,
     });
+    this.bindChassisAndEngineRegex();
   }
 
   private configureActionPanel(): void {
@@ -204,6 +205,24 @@ export class VehicleComponent implements OnInit,OnDestroy{
         this.dialogService.showMessage({heading:'Failed to save Vehicle.', message:err.errorMessage})
       }
     });
+  }
+
+  bindChassisAndEngineRegex(){
+    this.vehicleForm.controls['make'].valueChanges.pipe(
+      takeUntil(this.destroy$),
+      filter(make => !!make?.name),
+      switchMap(make => this.vehicleFacadeService.loadDynamicRegexes(make.name))
+    ).subscribe(data => {
+      const chassis = this.vehicleForm.get('chasisnumber');
+      const engine = this.vehicleForm.get('enginenumber');
+
+      chassis?.setValidators([Validators.pattern(data['chasisnumber'].regex)]);
+      chassis?.updateValueAndValidity({ emitEvent: false });
+
+      engine?.setValidators([Validators.pattern(data['enginenumber'].regex)]);
+      engine?.updateValueAndValidity({ emitEvent: false });
+    });
+
   }
 
   // ===== Table Selection =====
