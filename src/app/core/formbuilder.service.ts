@@ -14,27 +14,13 @@ export class FormbuilderService {
 
     fields.forEach((field) => {
       const validators: ValidatorFn[] = [];
-      if (field.required) validators.push(Validators.required);
 
-      // Options dropdown
-      // if (field.mode === 'options' && dataMap[field.name]) {
-      //   const optionsData: any[] = dataMap[field.name];
-      //   field.options = optionsData.map(o => ({...o}));
-      //   if (field.name=="seatingcapacity"){
-      //     console.log(field.options)
-      //   }
-      // }
+      if (field.required) validators.push(Validators.required);
 
       if (field.mode === 'options' && dataMap[field.name]) {
         const optionsData: any[] = dataMap[field.name];
         field.options = optionsData.map(o => ({ id: o.id, ...o }));
-
-        if (field.name=="seatingcapacity"){
-              console.log(field.options)
-        }
       }
-
-
 
       // Regex fields
       if (field.mode === 'regex') {

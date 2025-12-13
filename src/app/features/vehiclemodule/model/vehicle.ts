@@ -1,21 +1,20 @@
-import {Make} from './make';
 import {Fueltype} from './fueltype';
 import {Conditionrate} from './conditionrate';
 import {Servicetype} from './servicetype';
 import {Vehiclestatus} from './vehiclestatus';
 import {Branch} from '../../branchmodule/model/branch';
 import {Employee} from '../../employeemodule/model/employee';
+import {Seatingcapacity} from './seatingcapacity';
 
 export class Vehicle{
   id!:number;
-  make!:Make;
   code!:string;
   number!:string;
-  seatingcapacity!:number;
+  seatingcapacity!:Seatingcapacity;
   yom!:string;
   dob!:string;
   mileage!:number;
-  chassisnumber!:string;
+  chasisnumber!:string;
   enginenumber!:string;
   fueltype!:Fueltype;
   conditionrate!:Conditionrate;

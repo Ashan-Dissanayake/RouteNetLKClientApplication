@@ -94,7 +94,9 @@ export class VehiclefacadeService {
 
   createVehicle(vehicleData: Vehicle): Observable<Vehicle> {
     const status = vehicleData.vehiclestatus?.name?.toLowerCase();
-    if (status === 'available') {
+    const conditionrate = vehicleData.conditionrate?.name?.toLowerCase();
+
+    if (status === 'available' && conditionrate !="poor" && conditionrate !="critical") {
       return this.vehicleService.save(vehicleData);
     }
     return throwError(() => new Error('Vehicle should be Available'));

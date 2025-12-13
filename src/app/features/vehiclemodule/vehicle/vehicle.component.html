@@ -54,7 +54,7 @@
       <div class="title-section">
         <mat-icon color="primary" class="vehicle-icon">directions_bus</mat-icon>
         <div>
-          <h2 class="vehicle-title">{{ row.make.name }}</h2>
+          <h2 class="vehicle-title">{{ row.seatingcapacity.make.name }}</h2>
           <p class="vehicle-subtitle">Number: {{ row.number }}</p>
           <p class="vehicle-subtitle">Branch: {{ row.branch.name }}</p>
         </div>
@@ -83,7 +83,7 @@
       </div>
       <div class="info-item">
         <span class="label">Seating Capacity</span>
-        <span class="value">{{ row.seatingcapacity || '-' }}</span>
+        <span class="value">{{ row.seatingcapacity.amount || '-' }}</span>
       </div>
       <div class="info-item">
         <span class="label">Year of Made</span>

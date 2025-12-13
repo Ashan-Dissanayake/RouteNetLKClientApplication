@@ -36,7 +36,7 @@ export type OptionsField<T = any> = {
 export  type FieldType =
   | 'text' | 'number' | 'date' | 'file' | 'checkbox' | 'radio'
   | 'select' | 'autocomplete' | 'textarea' | 'password' | 'email'
-  | 'tel' | 'currency' | 'toggle'
+  | 'tel' | 'currency' | 'toggle'|'year'
   | 'chips'|'dualist';
 
 type FieldMode = 'regex' | 'options' | 'none'|'date';

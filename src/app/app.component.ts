@@ -9,6 +9,7 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import {NgClass, NgIf} from '@angular/common';
 import {MatDateFormats, provideNativeDateAdapter} from "@angular/material/core";
 
+
 interface MenuItem {
   icon: string;
   label: string;
@@ -29,12 +30,13 @@ const formats: MatDateFormats = {
   },
 };
 
+// ---------------------------------------//
+
+
 @Component({
   selector: 'app-root',
   standalone: true,
-  providers: [
-    provideNativeDateAdapter(formats),
-  ],
+  providers: [ provideNativeDateAdapter(formats)],
   imports: [
     MatSidenavModule,
     MatToolbarModule,

@@ -145,6 +145,7 @@ export class VehicleComponent implements OnInit,OnDestroy{
       seatingcapacity:this.seatingcapacities,
       employee:this.employees,
       branch:this.branches,
+      regexes: this.regexRules
     });
     this.bindChassisAndEngineRegex();
   }
@@ -222,7 +223,6 @@ export class VehicleComponent implements OnInit,OnDestroy{
       engine?.setValidators([Validators.pattern(data['enginenumber'].regex)]);
       engine?.updateValueAndValidity({ emitEvent: false });
     });
-
   }
 
   // ===== Table Selection =====

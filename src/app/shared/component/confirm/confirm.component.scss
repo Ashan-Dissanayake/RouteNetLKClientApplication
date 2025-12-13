@@ -1,6 +1,6 @@
 mat-card {
   padding: 20px;
-  background-color: #263238;
+  background-color: #048f98 !important;
   //background-color: #ffe0cc!important;
 }
 
@@ -17,8 +17,8 @@ mat-card-content {
 }
 
 button {
-  background-color: #ff7b00 !important;
-  color: white !important;
+  background-color: #ffffff !important;
+  color: #101010 !important;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
@@ -27,7 +27,8 @@ button {
   align-items: center;
 
   &:hover:not(.mat-disabled) {
-    background-color: #de5d00 !important;
+    background-color: #046269 !important;
+    color: white !important;
   }
 
 }

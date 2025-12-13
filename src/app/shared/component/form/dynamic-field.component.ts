@@ -35,7 +35,7 @@ import {FilePickerComponent} from '../file-picker/file-picker.component';
           </mat-error>
         </mat-form-field>
 
-        <!-- Text -->
+        <!-- File -->
         <mat-form-field *ngSwitchCase="'file'" appearance="outline">
           <mat-label>{{ field.label || field.name }}</mat-label>
           <app-file-picker [formControlName]="field.name"></app-file-picker>
@@ -43,6 +43,26 @@ import {FilePickerComponent} from '../file-picker/file-picker.component';
             <ng-container *ngIf="formInstance.get(field.name)?.hasError('required')">This field is required.</ng-container>
           </mat-error>
         </mat-form-field>
+
+        <!-- Number -->
+        <mat-form-field *ngSwitchCase="'number'" appearance="outline">
+          <mat-label>{{ field.label || field.name }}</mat-label>
+          <input matInput
+                 type="number"
+                 [min]="1900"
+                 [max]="currentYear"
+                 step="1"
+                 [formControlName]="field.name"  />
+          <mat-error *ngIf="formInstance.get(field.name)?.invalid && (formInstance.get(field.name)?.dirty || formInstance.get(field.name)?.touched)">
+            <ng-container *ngIf="formInstance.get(field.name)?.hasError('required')">
+              This field is required.
+            </ng-container>
+            <ng-container *ngIf="formInstance.get(field.name)?.hasError('min') || formInstance.get(field.name)?.hasError('max')">
+              Enter a valid year between 1900 and {{ currentYear }}.
+            </ng-container>
+          </mat-error>
+        </mat-form-field>
+
 
         <!-- Select -->
         <mat-form-field *ngSwitchCase="'select'" appearance="outline">
@@ -111,7 +131,6 @@ import {FilePickerComponent} from '../file-picker/file-picker.component';
     FormsModule,
     FilePickerComponent,
   ]
-
 })
 export class DynamicFieldComponent {
 
@@ -124,6 +143,8 @@ export class DynamicFieldComponent {
     }
     return o1.id === o2.id;
   }
+
+  currentYear = new Date().getFullYear();
 
 
 }
