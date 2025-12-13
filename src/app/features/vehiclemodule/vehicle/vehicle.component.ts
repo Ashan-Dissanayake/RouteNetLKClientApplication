@@ -193,7 +193,9 @@ export class VehicleComponent implements OnInit,OnDestroy{
   }
 
   private saveVehicle(formData: any): void {
-    const operation$ = this.vehicleFacadeService.createVehicle(formData);
+    const operation$ = formData.id
+      ? this.vehicleFacadeService.updateVehicle(formData)
+      : this.vehicleFacadeService.createVehicle(formData);
 
     operation$?.pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
@@ -208,7 +210,17 @@ export class VehicleComponent implements OnInit,OnDestroy{
     });
   }
 
-  bindChassisAndEngineRegex(){
+  editVehicle(row: Vehicle): void {
+    this.disableControllerOnEdit();
+    const normalizedRow = FormUtils.normalizeObject(row,  [
+      { from: 'seatingcapacity.make', to: 'make', remove: true }
+    ]);
+    this.vehicleForm.patchValue(normalizedRow);
+    this.openVehicleForm();
+  }
+
+
+  private bindChassisAndEngineRegex(){
     this.vehicleForm.controls['make'].valueChanges.pipe(
       takeUntil(this.destroy$),
       filter(make => !!make?.name),
@@ -225,6 +237,24 @@ export class VehicleComponent implements OnInit,OnDestroy{
     });
   }
 
+  private disableControllerOnEdit(){
+    const disableControls = [
+      'make',
+      'code',
+      'number',
+      'yom',
+      'dob',
+      'chasisnumber',
+      'enginenumber',
+      'mileage',
+      'seatingcapacity',
+      'employee',
+      'branch'
+    ];
+
+    disableControls.forEach(control => this.vehicleForm.get(control)?.disable());
+  }
+
   // ===== Table Selection =====
   onRowClick(row: any): void {
     this.activeVehicle = row;
@@ -235,6 +265,7 @@ export class VehicleComponent implements OnInit,OnDestroy{
   }
 
   onRowAction(action: string, row: any) {
+    if (action === 'edit') this.editVehicle(row);
   }
 
   // Selection Handling

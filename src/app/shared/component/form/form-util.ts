@@ -26,4 +26,38 @@ export class FormUtils {
       .replace(/\b\w/g, c => c.toUpperCase());
   }
 
+
+
+  static normalizeObject(obj: any, rules: NormalizationRule[]) {
+    const result = { ...obj };
+
+    rules.forEach(rule => {
+      const fromKeys = rule.from.split('.');
+      let value = result;
+
+      // Traverse to get the value
+      for (const key of fromKeys) {
+        value = value?.[key];
+        if (value === undefined) break;
+      }
+
+      // Assign to new key
+      result[rule.to] = value ?? null;
+
+      // Remove original top-level key if requested
+      if (rule.remove) {
+        delete result[fromKeys[0]];
+      }
+    });
+
+    return result;
+  }
+
+
 }
+
+type NormalizationRule = {
+  from: string; // path to extract, e.g., 'seatingcapacity.make'
+  to: string;   // new key, e.g., 'make'
+  remove?: boolean; // whether to remove the original key
+};

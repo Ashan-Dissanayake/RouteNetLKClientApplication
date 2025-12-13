@@ -65,6 +65,18 @@ import {FilePickerComponent} from '../file-picker/file-picker.component';
 
 
         <!-- Select -->
+<!--        <mat-form-field *ngSwitchCase="'select'" appearance="outline">-->
+<!--          <mat-label>{{ field.label || field.name }}</mat-label>-->
+<!--          <mat-select [formControlName]="field.name" [compareWith]="compareFn(field.referenceName)">-->
+<!--            <mat-option *ngFor="let opt of field.options" [value]="opt">-->
+<!--              {{ opt[field.optionLabelKey || 'name']}}-->
+<!--            </mat-option>-->
+<!--          </mat-select>-->
+<!--          <mat-error *ngIf="formInstance.get(field.name)?.invalid && (formInstance.get(field.name)?.dirty || formInstance.get(field.name)?.touched)">-->
+<!--            <ng-container *ngIf="formInstance.get(field.name)?.hasError('required')">This field is required.</ng-container>-->
+<!--          </mat-error>-->
+<!--        </mat-form-field>-->
+
         <mat-form-field *ngSwitchCase="'select'" appearance="outline">
           <mat-label>{{ field.label || field.name }}</mat-label>
           <mat-select [formControlName]="field.name" [compareWith]="compareFn">
@@ -143,6 +155,8 @@ export class DynamicFieldComponent {
     }
     return o1.id === o2.id;
   }
+
+
 
   currentYear = new Date().getFullYear();
 

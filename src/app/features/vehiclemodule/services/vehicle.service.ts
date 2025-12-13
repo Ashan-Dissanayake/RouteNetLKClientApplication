@@ -22,4 +22,8 @@ export class VehicleService extends BaseHttpService <Vehicle>{
     return this.post(ApiEndpoints.vehicles,vehicle);
   }
 
+  update(vehicle:Vehicle):Observable<Vehicle>{
+    return this.put(ApiEndpoints.vehicles,vehicle);
+  }
+
 }

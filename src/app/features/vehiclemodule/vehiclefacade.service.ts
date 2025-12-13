@@ -22,6 +22,7 @@ import {BranchService} from '../branchmodule/services/branch.service';
 import {Branch} from '../branchmodule/model/branch';
 import {Regex} from '../../shared/models/regex.model';
 import {RegexService} from '../../core/regex.service';
+import {buildServePath} from '@angular-devkit/build-angular/src/tools/webpack/configs';
 
 @Injectable({
   providedIn: 'root',
@@ -100,6 +101,10 @@ export class VehiclefacadeService {
       return this.vehicleService.save(vehicleData);
     }
     return throwError(() => new Error('Vehicle should be Available'));
+  }
+
+  updateVehicle(vehicleData: any): Observable<Vehicle> {
+    return this.vehicleService.update(vehicleData);
   }
 
   // Private helpers

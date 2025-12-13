@@ -213,8 +213,6 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   }
 
   editEmployee(row: Employee): void {
-    console.log(this.employeeForm)
-
     this.disableControllerOnEdit();
     this.employeeForm.patchValue(row);
     this.openEmployeeForm();
