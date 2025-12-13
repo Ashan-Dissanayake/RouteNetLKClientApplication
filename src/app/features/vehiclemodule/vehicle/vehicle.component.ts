@@ -1,5 +1,11 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {VehicleActionPanelMeta, VehicleFilterMeta, VehicleFormMeta, VehicleTableMeta} from '../vehicle.meta';
+import {
+  VehicleActionPanelMeta,
+  VehicleExportMeta,
+  VehicleFilterMeta,
+  VehicleFormMeta,
+  VehicleTableMeta
+} from '../vehicle.meta';
 import {Vehicle} from '../model/vehicle';
 import {VehiclefacadeService} from '../vehiclefacade.service';
 import {debounceTime, distinctUntilChanged, filter, forkJoin, Subject, switchMap, takeUntil} from 'rxjs';
@@ -24,6 +30,8 @@ import {Seatingcapacity} from '../model/seatingcapacity';
 import {Employee} from '../../employeemodule/model/employee';
 import {Branch} from '../../branchmodule/model/branch';
 import {FormUtils} from '../../../shared/component/form/form-util';
+import {EmployeeExportMeta} from '../../employeemodule/employee.meta';
+import {exportToExcel} from '../../../shared/component/export/excel-export.util';
 
 @Component({
   selector: 'app-vehicle',
@@ -52,6 +60,8 @@ export class VehicleComponent implements OnInit,OnDestroy{
   readonly vehicleFilterMeta = VehicleFilterMeta;
   readonly actionPanelConfig = VehicleActionPanelMeta;
   readonly vehicleFormMeta = VehicleFormMeta;
+  readonly vehicleExportMeta = VehicleExportMeta;
+
 
   // ===== Form Controls =====
   vehicleFilterForm: FormGroup = new FormGroup({});
@@ -300,11 +310,48 @@ export class VehicleComponent implements OnInit,OnDestroy{
     if (checked) this.vehicles.forEach(row => this.selectedRows.add(row));
   }
 
+  // ===== Export Operations =====
+  exportSelectedToPdf() {
+    if (this.selectedRows.size > 0) {
+      this.dialogService.showPrintDialog({
+        width:'1500px',
+        height:'650px',
+        title: 'Vehicle Details',
+        mode: 'table',
+        data: Array.from(this.selectedRows),
+        columns: this.vehicleExportMeta
+      }).subscribe((result) => {
+        if (result) {
+          this.selectedRows = new Set<Vehicle>();
+        }
+      });
+    } else {
+      this.dialogService.showWarning('Please select at least one record to print.');
+    }
+  }
+
+  exportSelectedToExcel(): void {
+    const selectedArray = Array.from(this.selectedRows);
+
+    let isExported = exportToExcel(
+      selectedArray,
+      this.vehicleExportMeta,
+      'selected-vehicles.xlsx'
+    );
+
+    if (!isExported) {
+      this.dialogService.showWarning('Please select at least one record to export.');
+      return
+    }
+  }
+
   // ===== Action Panel =====
   private actionHandlers: Record<string, () => void> = {
     'clear-search': () => this.vehicleFilterForm.reset(),
     'create': () => this.openVehicleForm(),
     'bulk-deactivate': () => this.deactivateSelectedVehicles(),
+    'export-pdf': () => this.exportSelectedToPdf(),
+    'export-excel': () => this.exportSelectedToExcel()
   };
 
   onActionTriggered(event: ButtonClickEvent) {

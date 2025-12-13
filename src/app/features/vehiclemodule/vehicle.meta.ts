@@ -59,3 +59,12 @@ export const VehicleFormMeta: FormField[] = [
   {name: 'employee', type: 'select', label: 'Employee', required: true, mode: 'options',optionLabelKey: 'callingname',},
   {name: 'branch', type: 'select', label: 'Branch', required: true, mode: 'options'}
 ] as FormField[];
+
+export const VehicleExportMeta = [
+  { key: 'code', header: 'Code' },
+  { key: 'number', header: 'Number' },
+  { key: 'mileage', header: 'Mileage' },
+  {key: 'seatingcapacity.amount', header: 'Seating Capacity'},
+  {key: 'conditionrate.name', header: 'Condition'},
+  {key: 'vehiclestatus.name', header: 'Status'},
+]

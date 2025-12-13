@@ -70,5 +70,4 @@ export const EmployeeExportMeta = [
   {key: 'designation.name', header: 'Designation'},
   {key: 'department.name', header: 'Department'},
   {key: 'employeestatus.name', header: 'Status'},
-
 ]
