@@ -53,6 +53,18 @@ export class FormUtils {
     return result;
   }
 
+  static setFormControlsState(
+    form: FormGroup,
+    controls: string[],
+    disabled: boolean
+  ) {
+    controls.forEach(control => {
+      const ctrl = form.get(control);
+      if (ctrl) {
+        disabled ? ctrl.disable() : ctrl.enable();
+      }
+    });
+  }
 
 }
 

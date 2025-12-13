@@ -17,7 +17,6 @@ import {FormbuilderService} from '../../../core/formbuilder.service';
 import {DialogService} from '../../../core/dialog.service';
 import {ButtonClickEvent, ButtonPanelComponent} from '../../../shared/component/button-panel/button-panel.component';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
-import {EmployeeFormMeta} from '../../employeemodule/employee.meta';
 import {Vehiclestatus} from '../model/vehiclestatus';
 import {Make} from '../model/make';
 import {Fueltype} from '../model/fueltype';
@@ -188,7 +187,9 @@ export class VehicleComponent implements OnInit,OnDestroy{
       meta: this.vehicleFormMeta
     }).subscribe(formData => {
       if (formData) this.saveVehicle(formData);
-      else FormUtils.resetForm(this.vehicleForm);
+      else{
+        FormUtils.resetForm(this.vehicleForm);
+      }
     });
   }
 
@@ -202,6 +203,7 @@ export class VehicleComponent implements OnInit,OnDestroy{
         this.dialogService.showSuccess('Vehicle saved successfully.');
         this.loadVehicleTable();
         FormUtils.resetForm(this.vehicleForm);
+        this.setFormControlsStateOnCreate();
       },
       error: (err) =>{
         console.log(err)
@@ -211,14 +213,15 @@ export class VehicleComponent implements OnInit,OnDestroy{
   }
 
   editVehicle(row: Vehicle): void {
-    this.disableControllerOnEdit();
+    this.setFormControlsStateOnEdit();
+
     const normalizedRow = FormUtils.normalizeObject(row,  [
-      { from: 'seatingcapacity.make', to: 'make', remove: true }
+      { from: 'seatingcapacity.make', to: 'make', remove: false }
     ]);
+
     this.vehicleForm.patchValue(normalizedRow);
     this.openVehicleForm();
   }
-
 
   private bindChassisAndEngineRegex(){
     this.vehicleForm.controls['make'].valueChanges.pipe(
@@ -237,22 +240,20 @@ export class VehicleComponent implements OnInit,OnDestroy{
     });
   }
 
-  private disableControllerOnEdit(){
-    const disableControls = [
-      'make',
-      'code',
-      'number',
-      'yom',
-      'dob',
-      'chasisnumber',
-      'enginenumber',
-      'mileage',
-      'seatingcapacity',
-      'employee',
-      'branch'
-    ];
+  private setFormControlsStateOnEdit(){
+    FormUtils.setFormControlsState(this.vehicleForm, [
+        'make', 'code', 'number', 'yom', 'dob',
+        'chasisnumber', 'enginenumber', 'mileage',
+        'seatingcapacity', 'employee', 'branch'
+      ], true);
+  }
 
-    disableControls.forEach(control => this.vehicleForm.get(control)?.disable());
+  private setFormControlsStateOnCreate(){
+    FormUtils.setFormControlsState(this.vehicleForm, [
+        'make', 'code', 'number', 'yom', 'dob',
+        'chasisnumber', 'enginenumber', 'mileage',
+        'seatingcapacity', 'employee', 'branch'
+      ], false);
   }
 
   // ===== Table Selection =====

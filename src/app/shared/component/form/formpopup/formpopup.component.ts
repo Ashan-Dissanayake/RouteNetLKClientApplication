@@ -64,6 +64,11 @@ export class FormpopupComponent {
     }
   }
 
+  private onCancel():void {
+    this.dialogRef.close();
+    this.data.form.reset();
+  }
+
   private handleCreate(form: FormGroup): void {
     this.dialogService.showConfirmation({
       heading:'Creating Branch',
@@ -116,7 +121,7 @@ export class FormpopupComponent {
 
   private actionHandlers: Record<string, () => void> = {
     create: () => this.onSave(),
-    cancel: () => this.dialogRef.close()
+    cancel: () => this.onCancel()
   };
 
   handleAction(event: ButtonClickEvent | string) {
