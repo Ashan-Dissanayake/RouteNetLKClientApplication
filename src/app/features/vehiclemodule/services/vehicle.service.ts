@@ -26,4 +26,9 @@ export class VehicleService extends BaseHttpService <Vehicle>{
     return this.put(ApiEndpoints.vehicles,vehicle);
   }
 
+  deactivate(ids: number[] | number): Observable<number[]> {
+    const payload = Array.isArray(ids) ? ids : [ids];
+    return this.http.post<number[]>(ApiEndpoints.vehicledeactivate,ids);
+  }
+
 }

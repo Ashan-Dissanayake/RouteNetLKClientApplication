@@ -88,7 +88,7 @@ export class EmployeefacadeService {
 
   deleteEmployees(employees: Employee[]): Observable<number[]> {
     if (!employees || employees.length === 0) {
-      return throwError(() => new Error('No branches selected'));
+      return throwError(() => new Error('No Employee Selected'));
     }
     // Collect only closed branch IDs
     const employeeIds = employees

@@ -223,6 +223,26 @@ export class VehicleComponent implements OnInit,OnDestroy{
     this.openVehicleForm();
   }
 
+  deactivateSelectedVehicles() {
+    const toDeactivate = Array.from(this.selectedRows);
+    this.dialogService.showConfirmation({
+      heading: "Deactivation",
+      message: "Are sure ?"
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
+      this.vehicleFacadeService.deleteVehicle(toDeactivate)
+        ?.pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.dialogService.showSuccess('Selected vehicles deactivated.');
+            this.selectedRows.clear();
+            this.loadVehicleTable();
+          },
+          error: (err) => this.dialogService.showError('Failed to deactivate vehicles.', err)
+        });
+    })
+  }
+
   private bindChassisAndEngineRegex(){
     this.vehicleForm.controls['make'].valueChanges.pipe(
       takeUntil(this.destroy$),
@@ -284,6 +304,7 @@ export class VehicleComponent implements OnInit,OnDestroy{
   private actionHandlers: Record<string, () => void> = {
     'clear-search': () => this.vehicleFilterForm.reset(),
     'create': () => this.openVehicleForm(),
+    'bulk-deactivate': () => this.deactivateSelectedVehicles(),
   };
 
   onActionTriggered(event: ButtonClickEvent) {

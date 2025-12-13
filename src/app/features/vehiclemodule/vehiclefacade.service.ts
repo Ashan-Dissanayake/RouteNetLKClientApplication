@@ -107,6 +107,30 @@ export class VehiclefacadeService {
     return this.vehicleService.update(vehicleData);
   }
 
+  deleteVehicle(vehicles: Vehicle[]): Observable<number[]> {
+    if (!vehicles || vehicles.length === 0) {
+      return throwError(() => new Error('No vehicle selected'));
+    }
+
+    const allowedStatuses = ['decommissioned', 'out of service'];
+
+    const vehicleIds = vehicles
+      .filter(v =>
+        allowedStatuses.includes((v.vehiclestatus?.name ?? '').toLowerCase())
+      )
+      .map(v => v.id!)
+      .filter(id => id != null);
+
+    if (vehicleIds.length === 0) {
+      return throwError(() =>
+        new Error('Only vehicles with status OUT OF SERVICE or DECOMMISSIONED can be deactivated')
+      );
+    }
+
+    return this.vehicleService.deactivate(vehicleIds);
+  }
+
+
   // Private helpers
   private getVehicles(params?: any): Observable<Vehicle[]> {
     return this.vehicleService.get(params).pipe(map(res => res.data));
