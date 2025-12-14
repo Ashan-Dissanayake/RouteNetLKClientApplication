@@ -189,6 +189,7 @@ export class VehicleComponent implements OnInit,OnDestroy{
 
   // ===== CRUD =====
   openVehicleForm(): void {
+    this.vehicleForm.value.id?this.setFormControlsStateOnEdit():this.setFormControlsStateOnCreate();
     this.dialogService.showFormPopup({
       heading: this.vehicleForm.value.id ? 'Edit Vehicle' : 'Create Vehicle',
       form: this.vehicleForm,
