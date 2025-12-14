@@ -30,7 +30,6 @@ import {Seatingcapacity} from '../model/seatingcapacity';
 import {Employee} from '../../employeemodule/model/employee';
 import {Branch} from '../../branchmodule/model/branch';
 import {FormUtils} from '../../../shared/component/form/form-util';
-import {EmployeeExportMeta} from '../../employeemodule/employee.meta';
 import {exportToExcel} from '../../../shared/component/export/excel-export.util';
 
 @Component({
@@ -61,7 +60,6 @@ export class VehicleComponent implements OnInit,OnDestroy{
   readonly actionPanelConfig = VehicleActionPanelMeta;
   readonly vehicleFormMeta = VehicleFormMeta;
   readonly vehicleExportMeta = VehicleExportMeta;
-
 
   // ===== Form Controls =====
   vehicleFilterForm: FormGroup = new FormGroup({});
@@ -286,30 +284,6 @@ export class VehicleComponent implements OnInit,OnDestroy{
       ], false);
   }
 
-  // ===== Table Selection =====
-  onRowClick(row: any): void {
-    this.activeVehicle = row;
-  }
-
-  closeDetails(): void {
-    this.activeVehicle = null;
-  }
-
-  onRowAction(action: string, row: any) {
-    if (action === 'edit') this.editVehicle(row);
-  }
-
-  // Selection Handling
-  onRowCheckboxChanged(event: CheckboxEvent<any>) {
-    if (event.checked) this.selectedRows.add(event.row);
-    else this.selectedRows.delete(event.row);
-  }
-
-  onSelectAll(checked: boolean) {
-    this.selectedRows.clear();
-    if (checked) this.vehicles.forEach(row => this.selectedRows.add(row));
-  }
-
   // ===== Export Operations =====
   exportSelectedToPdf() {
     if (this.selectedRows.size > 0) {
@@ -343,6 +317,30 @@ export class VehicleComponent implements OnInit,OnDestroy{
       this.dialogService.showWarning('Please select at least one record to export.');
       return
     }
+  }
+
+  // ===== Table Selection =====
+  onRowClick(row: any): void {
+    this.activeVehicle = row;
+  }
+
+  closeDetails(): void {
+    this.activeVehicle = null;
+  }
+
+  onRowAction(action: string, row: any) {
+    if (action === 'edit') this.editVehicle(row);
+  }
+
+  // Selection Handling
+  onRowCheckboxChanged(event: CheckboxEvent<any>) {
+    if (event.checked) this.selectedRows.add(event.row);
+    else this.selectedRows.delete(event.row);
+  }
+
+  onSelectAll(checked: boolean) {
+    this.selectedRows.clear();
+    if (checked) this.vehicles.forEach(row => this.selectedRows.add(row));
   }
 
   // ===== Action Panel =====

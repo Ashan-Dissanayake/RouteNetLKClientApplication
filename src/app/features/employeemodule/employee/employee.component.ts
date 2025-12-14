@@ -61,7 +61,6 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   readonly employeeFormMeta = EmployeeFormMeta;
   readonly employeeExportMeta = EmployeeExportMeta;
 
-
   // ===== Form Controls =====
   employeeFilterForm: FormGroup = new FormGroup({});
   employeeForm: FormGroup = new FormGroup({});
@@ -351,7 +350,7 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   }
 
   // Selection Handling
-  onRowCheckboxChanged(event: CheckboxEvent<any>) {
+  onRowCheckboxChanged(event: CheckboxEvent) {
     if (event.checked) this.selectedRows.add(event.row);
     else this.selectedRows.delete(event.row);
   }
