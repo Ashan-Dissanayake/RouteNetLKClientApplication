@@ -16,7 +16,7 @@ export class ErrorInterceptor implements HttpInterceptor {
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse) => {
         const errorMessage = this.extractUserMessage(error);
-        // Replace original error with one containing the clean message
+        // Replace the original error with one containing the clean message
         return throwError(() => ({
           ...error,
           errorMessage

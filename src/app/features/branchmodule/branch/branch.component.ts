@@ -21,7 +21,6 @@ import {SideViewComponent} from '../../../shared/component/side-view/side-view.c
 import {MatDivider} from '@angular/material/divider';
 import {exportToExcel} from '../../../shared/component/export/excel-export.util';
 import {FormUtils} from '../../../shared/component/form/form-util';
-import {ExportService} from '../../../shared/component/export/export.service';
 
 @Component({
   selector: 'app-branch',
@@ -286,7 +285,6 @@ export class BranchComponent implements OnInit, OnDestroy {
       return
     }
   }
-
 
   // Selection Handling
   onRowCheckboxChanged(event: CheckboxEvent<any>) {
