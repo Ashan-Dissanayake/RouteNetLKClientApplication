@@ -1,18 +1,18 @@
-mat-dialog-actions{
-  max-height: 68px;
-  background-color:#FAFAFA!important;
+$dialog-bg-color: #FAFAFA;
 
+mat-dialog-actions {
+  max-height: 68px;
+  background-color: $dialog-bg-color !important;
 }
 
-mat-dialog-content{
-  ::ng-deep{
-    background-color:#FAFAFA!important;
-    form{
-        padding-left: 20px
-    }
+mat-dialog-content {
+  background-color: $dialog-bg-color !important;
+
+  form {
+    padding-left: 20px;
   }
 }
+
 ::-webkit-scrollbar {
   display: none;
 }
-

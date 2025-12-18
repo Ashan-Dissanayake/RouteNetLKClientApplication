@@ -19,7 +19,7 @@ import {
   MatTable,
   MatTableDataSource
 } from '@angular/material/table';
-import {NgForOf, NgIf, NgTemplateOutlet} from '@angular/common';
+import {NgClass, NgForOf, NgIf, NgTemplateOutlet} from '@angular/common';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {FormsModule} from '@angular/forms';
 
@@ -45,6 +45,7 @@ import {FormsModule} from '@angular/forms';
     MatHeaderCellDef,
     MatCheckbox,
     FormsModule,
+    NgClass,
   ],
   templateUrl: './data-table.component.html',
   standalone: true,
@@ -57,6 +58,7 @@ export class DataTableComponent<T = any> implements OnChanges, AfterViewInit {
   @Input() sortable = false;
   @Input() paginatable = false;
   @Input() pageSizeOptions: number[] = [8, 16, 24];
+  @Input() tableClass: string | string[] = '';
 
   @Output() rowClick = new EventEmitter<T>();
   @Output() actionClick = new EventEmitter<ActionEvent<T>>();

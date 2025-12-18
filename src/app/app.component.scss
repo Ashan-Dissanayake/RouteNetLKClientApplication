@@ -1,3 +1,12 @@
+/* --- Variables --- */
+$primary-gradient: linear-gradient(180deg, #006A71 0%, #004649 100%);
+$text-white: #fff;
+$bg-main: #F5F5F5;
+$transition-standard: 0.3s ease;
+$transition-fast: 0.2s ease;
+$sidenav-width: 250px;
+$sidenav-mini-width: 60px;
+
 /* === Sidenav Container === */
 mat-sidenav-container {
   font-family: "Inter", "Roboto", sans-serif;
@@ -5,19 +14,18 @@ mat-sidenav-container {
 
 /* === Toolbar === */
 mat-toolbar {
-  //background: linear-gradient(90deg, #140648 0%, #1e0f8c 100%);
-  background: linear-gradient(180deg, #006A71 0%, #004649 100%);
-  color: #fff;
+  background: $primary-gradient;
+  color: $text-white;
   font-weight: 600;
   font-size: 15px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   display: flex;
   align-items: center;
   padding: 0 16px;
 
   button mat-icon {
-    color: #fff;
-    transition: transform 0.2s ease;
+    color: $text-white;
+    transition: transform $transition-fast;
 
     &:hover {
       transform: scale(1.1);
@@ -28,18 +36,17 @@ mat-toolbar {
 /* === Sidenav === */
 mat-sidenav {
   border-radius: unset;
-  width: 250px;
-  //background: linear-gradient(180deg, #140648 0%, #1e0f8c 100%);
-  background: linear-gradient(180deg, #006A71 0%, #004649 100%);
-  color: #fff;
+  width: $sidenav-width;
+  background: $primary-gradient;
+  color: $text-white;
   font-size: 13px;
   padding: 24px 12px;
   box-sizing: border-box;
-  border-right: 1px solid rgba(255,255,255,0.05);
-  transition: width 0.3s ease, background-color 0.2s ease;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  transition: width $transition-standard, background-color $transition-fast;
 
   &.mini {
-    width: 60px;
+    width: $sidenav-mini-width;
   }
 
   mat-nav-list {
@@ -49,11 +56,11 @@ mat-sidenav {
     a.mat-mdc-list-item {
       display: flex;
       align-items: center;
-      color: #fff !important;
+      color: $text-white !important;
       text-decoration: none;
       padding: 10px 12px;
       border-radius: 8px;
-      transition: background 0.2s, padding-left 0.2s;
+      transition: background $transition-fast, padding-left $transition-fast;
 
       &:hover {
         background-color: rgba(255, 255, 255, 0.08);
@@ -66,7 +73,7 @@ mat-sidenav {
 
       mat-icon {
         margin-right: 12px;
-        color: #fff;
+        color: $text-white;
         font-size: 20px;
       }
 
@@ -80,35 +87,31 @@ mat-sidenav {
 
     .sub-menu {
       padding-left: 20px;
-      transition: max-height 0.3s ease;
+      transition: max-height $transition-standard;
     }
 
     .sub-item {
       padding-left: 28px;
+
       &:hover {
-        background-color: rgba(255,255,255,0.05);
+        background-color: rgba(255, 255, 255, 0.05);
       }
     }
 
     .expand-icon {
       margin-left: auto;
-      color: #fff;
-      transition: transform 0.3s ease;
-    }
-
-    a[aria-expanded="true"] .expand-icon {
-      //transform: rotate(180deg);
+      color: $text-white;
+      transition: transform $transition-standard;
     }
   }
 }
 
 /* === Main Content === */
 mat-sidenav-content {
-  padding: 0 20px 0 20px;
-  background-color:#F5F5F5;
+  padding: 0 20px;
+  background-color: $bg-main;
   min-height: 100vh;
 }
-
 
 /* === Responsive === */
 @media (max-width: 800px) {
@@ -118,6 +121,7 @@ mat-sidenav-content {
     .sub-menu {
       padding-left: 12px;
     }
+
     .sub-item {
       padding-left: 20px;
     }
@@ -127,5 +131,3 @@ mat-sidenav-content {
     padding: 12px;
   }
 }
-
-

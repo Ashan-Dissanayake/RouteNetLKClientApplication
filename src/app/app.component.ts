@@ -61,10 +61,11 @@ export class AppComponent {
       icon: 'admin_panel_settings',
       label: 'Admin',
       children: [
-        { icon: 'people', label: 'Employee', route: '/admin/employee' },
+        { icon: 'badge', label: 'Employee', route: '/admin/employee' },
         { icon: 'person', label: 'User', route: '/admin/user' },
-        { icon: 'apartment', label: 'Branch', route: '/admin/branch' },
-        { icon: 'directions_bus', label: 'Vehicle', route: '/admin/vehicle' }
+        { icon: 'account_tree', label: 'Branch', route: '/admin/branch' },
+        { icon: 'directions_bus', label: 'Vehicle', route: '/admin/vehicle' },
+        { icon: 'groups', label: 'crew', route: '/admin/crew' },
       ],
       expanded: false
     },

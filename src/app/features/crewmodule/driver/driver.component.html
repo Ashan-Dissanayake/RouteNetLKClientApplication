@@ -1,0 +1,84 @@
+<app-side-view
+  [opened]="activeDriver !== null"
+  [data]="activeDriver"
+  [title]="'Driver Details'"
+  (closed)="closeDetails()"
+  [viewTemplate]="driverDetailTemplate"
+>
+  <app-data-table
+    tableClass="driver-table"
+    [data]="drivers"
+    [columns]="tableColumns"
+    [sortable]="true"
+    [paginatable]="true"
+    [pageSizeOptions]="[10, 20]"
+    (rowClick)="onRowClick($event)"
+    (actionClick)="onRowAction($event.action, $event.row)"
+    (checkBoxClick)="onRowCheckboxChanged($event)"
+    (selectAllClick)="onSelectAll($event)"
+  >
+    <!-- Row Actions -->
+    <ng-template tableCell="actions" let-row let-action="action">
+      <button mat-button (click)="action('edit', row); $event.stopPropagation()">
+        <mat-icon>mode_edit</mat-icon>
+      </button>
+    </ng-template>
+  </app-data-table>
+</app-side-view>
+
+<ng-template #driverDetailTemplate let-row>
+  <div  class="driver-detail-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="title-section">
+        <mat-icon color="primary" class="driver-icon">people</mat-icon>
+        <div>
+          <h2 class="driver-title">{{ row.employee.callingname }}</h2>
+          <p class="driver-subtitle">Number: {{ row.number }}</p>
+        </div>
+      </div>
+
+      <span
+        class="status-chip"
+        [ngClass]="{
+        'eligible': row.crewstatus.name === 'Eligible',
+        'ineligible': row.crewstatus.name === 'Ineligible',
+        'active': row.crewstatus.name === 'Active',
+        'inactive': row.crewstatus.name === 'Inactive'
+      }">
+      {{ row.crewstatus.name }}
+      </span>
+    </div>
+
+    <mat-divider></mat-divider>
+    <!-- General Info -->
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="label">Route Familiarity Level</span>
+        <span class="value">{{ row.routefamiliaritylevel.name || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">License Category</span>
+        <span class="value">{{ row.licensecategory.name || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">License Number</span>
+        <span class="value">{{ row.licensenumber || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">License Expiring Date</span>
+        <span class="value">{{ row.dolicenseexpired || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Medical Expiring Date</span>
+        <span class="value">{{ row.domedicalexpired || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Allowed Bus Type</span>
+        <span class="value">{{ row.allowedbustype.name || '-' }}</span>
+      </div>
+    </div>
+    <mat-divider></mat-divider>
+  </div>
+
+</ng-template>

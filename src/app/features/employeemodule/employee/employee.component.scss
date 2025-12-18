@@ -1,126 +1,115 @@
+$text-main: #333;
+$text-muted: #666;
+$text-label: #777;
+$font-family: Roboto, 'Segoe UI', sans-serif;
+
+$status-colors: (
+        'active': (color: #0b6b2f, bg: #d7f6df),
+        'suspend': (color: #000000, bg: #f5d253),
+        'Onleave': (color: #ffffff, bg: #10a695),
+        'resigned': (color: #8b0000, bg: #f9d9d9)
+);
+
 .container {
   padding: 10px;
 }
 
-#serverSearch{
-  ::ng-deep{
-    .mat-mdc-form-field{
-      width: unset!important;
-      padding-inline-start:20px;
-    }
+#serverSearch {
+  ::ng-deep .mat-mdc-form-field {
+    width: unset !important;
+    padding-inline-start: 20px;
   }
 }
 
-
-//Sideview
 .employee-detail-container {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
   padding: 1rem;
-  color: #333;
-  font-family: Roboto, 'Segoe UI', sans-serif;
+  color: $text-main;
+  font-family: $font-family;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .title-section {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      .employee-icon {
+        font-size: 40px;
+      }
+
+      .employee-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      .employee-subtitle {
+        font-size: 0.9rem;
+        color: $text-muted;
+        margin: 0;
+      }
+    }
+  }
+
+  .status-chip {
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-radius: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    @each $status, $colors in $status-colors {
+      &.#{$status} {
+        color: map-get($colors, color);
+        background: map-get($colors, bg);
+      }
+    }
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 24px;
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+
+      .label {
+        font-size: 0.8rem;
+        color: $text-label;
+        margin-bottom: 2px;
+        text-transform: uppercase;
+      }
+
+      .value {
+        font-size: 1rem;
+        font-weight: 500;
+        color: #222;
+        word-break: break-word;
+      }
+    }
+  }
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+/* Responsive adjustments */
+.coverage-grid {
+  display: grid; // Assumed layout base
 
-.title-section {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.employee-icon {
-  font-size: 40px;
-}
-
-.employee-title {
-  font-size: 1.4rem;
-  font-weight: 600;
-  margin: 0;
-}
-
-.employee-subtitle {
-  font-size: 0.9rem;
-  color: #666;
-  margin: 0;
-}
-
-.status-chip {
-  font-weight: 600;
-  font-size: 0.8rem;
-  padding: 4px 10px;
-  border-radius: 16px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.status-chip.active {
-  color: #0b6b2f;
-  background: #d7f6df;
-}
-
-.status-chip.suspend {
-  color: #000000;
-  background: #f5d253;
-}
-
-.status-chip.Onleave {
-  color: #ffffff;
-  background: #10a695;
-}
-
-.status-chip.resigned {
-  color: #8b0000;
-  background: #f9d9d9;
-}
-
-.info-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px 24px;
-}
-
-.info-item {
-  display: flex;
-  flex-direction: column;
-}
-
-.label {
-  font-size: 0.8rem;
-  color: #777;
-  margin-bottom: 2px;
-  text-transform: uppercase;
-}
-
-.value {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #222;
-  word-break: break-word;
-}
-
-
-  /* Responsive adjustments */
   @media (max-width: 1200px) {
-    .coverage-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
+    grid-template-columns: repeat(3, 1fr);
   }
-
   @media (max-width: 800px) {
-    .coverage-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
+    grid-template-columns: repeat(2, 1fr);
   }
-
   @media (max-width: 500px) {
-    .coverage-grid {
-      grid-template-columns: 1fr;
-    }
+    grid-template-columns: 1fr;
   }
-
+}

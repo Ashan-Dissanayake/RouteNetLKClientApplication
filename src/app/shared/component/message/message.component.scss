@@ -1,24 +1,29 @@
+$primary-teal: #048f98;
+$dark-teal: #046269;
+$card-text-white: #ffffff;
+$button-bg: #ffffff;
+$button-text: #101010;
+$standard-padding: 20px;
+$tight-padding: 10px;
+
 mat-card {
-  padding: 20px;
-  background-color: #048f98 !important;
-  //background-color: #ffe0cc!important;
-}
+  padding: $standard-padding;
+  background-color: $primary-teal !important;
 
-mat-card-title {
-  padding: 10px 20px 10px 20px;
-  color: white;
-  //color: #140648!important;
-}
+  mat-card-title {
+    padding: $tight-padding $standard-padding;
+    color: $card-text-white;
+  }
 
-mat-card-content {
-  padding: 10px 20px 20px 20px;
-  color: white;
-  //color: #140648;
+  mat-card-content {
+    padding: $tight-padding $standard-padding $standard-padding;
+    color: $card-text-white;
+  }
 }
 
 button {
-  background-color: #ffffff !important;
-  color: #101010 !important;
+  background-color: $button-bg !important;
+  color: $button-text !important;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
@@ -27,8 +32,7 @@ button {
   align-items: center;
 
   &:hover:not(.mat-disabled) {
-    background-color: #046269 !important;
-    color: white !important;
+    background-color: $dark-teal !important;
+    color: $card-text-white !important;
   }
-
 }

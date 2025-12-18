@@ -1,70 +1,78 @@
 :host {
+  $border-color: #333333;
+  $secondary-border: #818181;
+  $bg-panel: rgba(227, 227, 227, 0.08);
+  $bg-field: #f5f4f4;
+  $bg-btn: #fdfbff;
+  $hover-color: #048f98;
 
   .listbox-container {
-    min-height: 250px;
-    display: -webkit-box;
+    display: flex;
+    flex-direction: row; // Ensures horizontal orientation
     align-items: center;
-    box-shadow: unset;
-    background: unset;
+    justify-content: space-between;
+    min-height: 250px;
+    padding: 25px 1% 1% 40px;
+    background: none;
+    box-shadow: none;
+    position: relative;
     left: -20px;
-    padding: 25px 1% 1%;
-    padding-inline-start: 40px;
 
     .source-list,
     .destination-list {
-      min-height: 210px;
       display: flex;
       flex-direction: column;
       width: 42%;
-      background: rgba(227, 227, 227, 0.08);
-      border: #333333 1px solid;
-      box-shadow: unset;
+      min-height: 210px;
       max-height: 180px;
+      background: $bg-panel;
+      border: 1px solid $border-color;
+      box-shadow: none;
 
       mat-form-field {
-        background: #f5f4f4;
+        background: $bg-field;
       }
 
       mat-selection-list {
         flex: 1;
         overflow: auto;
       }
-  }
-  }
+    }
 
-  .button-panel {
-    width: 8%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    box-shadow: none;
-    background: none;
-    margin: 0 15px;
-    -webkit-padding-start: 22px;
-    -webkit-padding-end: 22px;
-    bottom: 9px;
+    .button-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 8%;
+      gap: 10px;
+      margin: 0 15px;
+      padding: 0 22px;
+      background: none;
+      box-shadow: none;
+      position: relative;
+      bottom: 9px;
 
-    button {
-      color: #333333;
-      background: #fdfbff;
-      border-radius: 10px;
-      border: 1px solid #818181;
-      padding:unset;
+      button {
+        background: $bg-btn;
+        color: $border-color;
+        border: 1px solid $secondary-border;
+        border-radius: 10px;
+        padding: unset;
 
-      &:hover {
-        background-color: #048f98 !important;
-        color: #ffffff;
-        border: 1px solid #fdfdfe;
-        cursor: pointer;
-      }
+        &:hover {
+          cursor: pointer;
+          background-color: $hover-color !important;
+          color: #ffffff;
+          border: 1px solid #fdfdfe;
+        }
 
-      mat-icon {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin: 0;
+        mat-icon {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin: 0;
+        }
       }
     }
   }
@@ -73,11 +81,11 @@
     transform: scaleX(-1);
   }
 
-  ::-webkit-scrollbar {
-    display: none;
+  .mdc-list-item__primary-text {
+    font-size: 13px !important;
   }
 
-  .mdc-list-item__primary-text{
-    font-size: 13px!important;
+  ::-webkit-scrollbar {
+    display: none;
   }
 }

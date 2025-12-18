@@ -27,7 +27,11 @@ export const ApiEndpoints = {
     employeesList:`${baseUrl}/employees/list`,
     employeesdeactivate: `${baseUrl}/employees/deactivate`,
 
-    //Vehicle
+    //Crew
+    drivers:`${baseUrl}/drivers`,
+
+
+  //Vehicle
     vehicles:`${baseUrl}/vehicles`,
     servicetype:`${baseUrl}/servicetypes/list`,
     conditionrate:`${baseUrl}/conditionrates/list`,

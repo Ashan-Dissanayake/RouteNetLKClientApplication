@@ -1,125 +1,133 @@
-/* === TABLE CONTAINER === */
-mat-table {
-  background-color: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.05),
-    0 2px 8px rgba(0, 0, 0, 0.06);
-  border: 1px solid #e3e7ec;
-}
+.table-wrapper {
+  // === CONFIGURATION VARIABLES ===
+  $primary-color: #1976d2;
+  $secondary-color: #2196f3;
+  $text-main: #333;
+  $text-header: #2f3b52;
+  $text-muted: #555;
+  $border-color: #e3e7ec;
+  $border-light: #f1f3f5;
+  $header-bg: linear-gradient(180deg, #f6f8fa 0%, #f0f2f5 100%);
+  $font-size-base: 13px;
+  $transition-speed: 0.2s ease;
 
-/* === HEADER ROW === */
-mat-header-row {
-  background: linear-gradient(180deg, #f6f8fa 0%, #f0f2f5 100%);
-  font-weight: 600;
-  font-size: 13px;
-  color: #2f3b52;
-  border-bottom: 1px solid #d7dbe0;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  height: 48px;
-}
-
-mat-header-cell {
-  white-space: nowrap;
-  user-select: none;
-}
-
-/* === DATA ROWS === */
-mat-row {
-  font-size: 13px;
-  color: #333;
-  cursor: pointer;
-  transition: background-color 0.2s ease, box-shadow 0.15s ease;
-  height: 46px;
-  border-bottom: 1px solid #f1f3f5;
-
-  &:hover {
-    background-color: #f9fbfc;
-    box-shadow: inset 3px 0 0 #1976d2; /* subtle left accent */
+  /* === TABLE CONTAINER === */
+  mat-table {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid $border-color;
   }
 
-  &.selected {
-    background-color: #e3f2fd;
-    box-shadow: inset 3px 0 0 #2196f3;
-  }
-}
-
-/* === CELLS === */
-mat-cell {
-  padding: 10px 16px;
-  vertical-align: middle;
-  line-height: 1.2;
-  word-break: break-word;
-}
-
-mat-cell:first-of-type,
-mat-header-cell:first-of-type {
-  padding-left: 8px !important;
-}
-
-/* === CHECKBOX COLUMN === */
-.checkbox-cell {
-  max-width: 38px;
-  text-align: center;
-  mat-checkbox {
-    transform: scale(0.8);
-  }
-}
-
-/* === SORT ICONS === */
-.mat-sort-header-container {
-  justify-content: space-between;
-}
-
-.mat-sort-header-arrow {
-  opacity: 0.6 !important;
-}
-
-/* === PAGINATOR === */
-mat-paginator {
-  background-color: #fff;
-  border-top: 1px solid #e3e7ec;
-  font-size: 13px;
-  border-radius: 0 0 8px 8px;
-}
-
-.mat-mdc-paginator-range-label {
-  color: #555;
-}
-
-.mat-mdc-icon-button {
-  color: #555;
-
-  &:hover {
-    background: rgba(25, 118, 210, 0.08);
-    color: #1976d2;
-  }
-}
-
-/* === NO DATA STATE === */
-::ng-deep .mat-mdc-table .mat-mdc-no-data-row {
-  color: #888;
-  font-style: italic;
-  text-align: center;
-  padding: 20px 0;
-}
-
-/* === RESPONSIVE TABLE === */
-@media (max-width: 1024px) {
-  mat-cell,
-  mat-header-cell {
-    padding: 8px 10px;
-    font-size: 12px;
-  }
-}
-
-@media (max-width: 768px) {
+  /* === ROWS === */
   mat-header-row {
-    font-size: 11.5px;
+    background: $header-bg;
+    font-weight: 600;
+    font-size: $font-size-base;
+    color: $text-header;
+    border-bottom: 1px solid #d7dbe0;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    height: 48px;
+
+    @media (max-width: 768px) {
+      font-size: 11.5px;
+    }
   }
+
   mat-row {
-    font-size: 12px;
+    font-size: $font-size-base;
+    color: $text-main;
+    cursor: pointer;
+    transition: background-color $transition-speed, box-shadow 0.15s ease;
+    height: 46px;
+    border-bottom: 1px solid $border-light;
+
+    &:hover {
+      background-color: #f9fbfc;
+      box-shadow: inset 3px 0 0 $primary-color;
+    }
+
+    &.selected {
+      background-color: #e3f2fd;
+      box-shadow: inset 3px 0 0 $secondary-color;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 12px;
+    }
+  }
+
+  /* === CELLS === */
+  mat-cell, mat-header-cell {
+    padding: 10px 16px;
+    vertical-align: middle;
+    line-height: 1.2;
+
+    &:first-of-type {
+      padding-left: 8px !important;
+    }
+
+    @media (max-width: 1024px) {
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+  }
+
+  mat-header-cell {
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  mat-cell {
+    word-break: break-word;
+  }
+
+  /* === SPECIFIC ELEMENTS === */
+  .checkbox-cell {
+    max-width: 38px;
+    text-align: center;
+
+    mat-checkbox {
+      transform: scale(0.8);
+    }
+  }
+
+  .mat-sort-header-container {
+    justify-content: space-between;
+  }
+
+  .mat-sort-header-arrow {
+    opacity: 0.6 !important;
+  }
+
+  /* === PAGINATOR === */
+  mat-paginator {
+    background-color: #fff;
+    border-top: 1px solid $border-color;
+    font-size: $font-size-base;
+    border-radius: 0 0 8px 8px;
+
+    .mat-mdc-paginator-range-label {
+      color: $text-muted;
+    }
+
+    .mat-mdc-icon-button {
+      color: $text-muted;
+
+      &:hover {
+        background: rgba($primary-color, 0.08);
+        color: $primary-color;
+      }
+    }
+  }
+
+  /* === NO DATA STATE === */
+  ::ng-deep .mat-mdc-table .mat-mdc-no-data-row {
+    color: #888;
+    font-style: italic;
+    text-align: center;
+    padding: 20px 0;
   }
 }

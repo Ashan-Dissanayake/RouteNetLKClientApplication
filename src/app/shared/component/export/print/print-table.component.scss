@@ -1,7 +1,13 @@
+$print-bg: #fff;
+$print-text: #000;
+$print-border: #ddd;
+$spacing-base: 8px;
+$spacing-large: 16px;
+
 .print-container {
-  padding: 16px;
-  background: #fff;
-  color: #000;
+  padding: $spacing-large;
+  background: $print-bg;
+  color: $print-text;
   min-width: 600px;
   max-height: 800px;
 }
@@ -9,15 +15,16 @@
 .print-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 8px;
+  margin-top: $spacing-base;
+
+  th, td {
+    border: 1px solid $print-border;
+    padding: $spacing-base;
+    text-align: left;
+  }
 }
 
-.print-table th, .print-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
 .print-actions {
-  margin-top: 16px;
+  margin-top: $spacing-large;
   text-align: left;
 }

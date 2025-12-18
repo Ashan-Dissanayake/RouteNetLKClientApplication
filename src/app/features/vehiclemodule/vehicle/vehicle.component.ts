@@ -321,25 +321,25 @@ export class VehicleComponent implements OnInit,OnDestroy{
   }
 
   // ===== Table Selection =====
-  onRowClick(row: any): void {
+ protected onRowClick(row: any): void {
     this.activeVehicle = row;
   }
 
-  closeDetails(): void {
+  protected closeDetails(): void {
     this.activeVehicle = null;
   }
 
-  onRowAction(action: string, row: any) {
+ protected onRowAction(action: string, row: any) {
     if (action === 'edit') this.editVehicle(row);
   }
 
   // Selection Handling
-  onRowCheckboxChanged(event: CheckboxEvent<any>) {
+ protected onRowCheckboxChanged(event: CheckboxEvent<any>) {
     if (event.checked) this.selectedRows.add(event.row);
     else this.selectedRows.delete(event.row);
   }
 
-  onSelectAll(checked: boolean) {
+ protected onSelectAll(checked: boolean) {
     this.selectedRows.clear();
     if (checked) this.vehicles.forEach(row => this.selectedRows.add(row));
   }

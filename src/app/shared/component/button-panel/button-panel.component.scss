@@ -1,27 +1,27 @@
+$btn-primary: #048f98;
+$btn-primary-hover: #004649;
+$btn-disabled: rgba(125, 136, 141, 0.69);
+$btn-radius: 4px;
+$btn-font-size: 13px;
+
 button {
-  background-color: #048f98 !important;
-  //background-color: #ea7d38 !important;
+  background-color: $btn-primary !important;
   color: white !important;
-  border-radius: 4px;
+  border-radius: $btn-radius;
   cursor: pointer;
-  font-size: 13px;
+  font-size: $btn-font-size;
   margin-right: 8px;
   margin-bottom: 10px;
   align-items: center;
 
   &:hover:not(.mat-disabled) {
-    //background-color: #dc5619 !important;
-    background-color: #004649 !important;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.18);
+    background-color: $btn-primary-hover !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.18);
   }
 
+  &:disabled {
+    background-color: $btn-disabled !important;
+    color: white !important;
+    cursor: not-allowed;
+  }
 }
-
-/* Disabled state */
-button:disabled {
-  background-color: rgba(125, 136, 141, 0.69) !important;
-  color: white !important;
-  cursor: not-allowed;
-}
-
-

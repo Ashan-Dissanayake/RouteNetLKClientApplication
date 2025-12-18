@@ -1,24 +1,27 @@
+$primary-teal: #048f98;
+$hover-teal: #046269;
+$white: #ffffff;
+$dark-text: #101010;
+$card-padding: 20px;
+
 mat-card {
-  padding: 20px;
-  background-color: #048f98 !important;
-  //background-color: #ffe0cc!important;
-}
+  padding: $card-padding;
+  background-color: $primary-teal !important;
 
-mat-card-title {
-  padding: 10px 20px 10px 20px;
-  color: white;
-  //color: #140648!important;
-}
+  mat-card-title {
+    padding: 10px $card-padding;
+    color: $white;
+  }
 
-mat-card-content {
-  padding: 10px 20px 20px 20px;
-  color: white;
-  //color: #140648;
+  mat-card-content {
+    padding: 10px $card-padding $card-padding;
+    color: $white;
+  }
 }
 
 button {
-  background-color: #ffffff !important;
-  color: #101010 !important;
+  background-color: $white !important;
+  color: $dark-text !important;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
@@ -27,8 +30,7 @@ button {
   align-items: center;
 
   &:hover:not(.mat-disabled) {
-    background-color: #046269 !important;
-    color: white !important;
+    background-color: $hover-teal !important;
+    color: $white !important;
   }
-
 }
