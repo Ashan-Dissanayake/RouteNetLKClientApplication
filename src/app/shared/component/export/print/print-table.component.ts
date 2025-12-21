@@ -4,7 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {PrintService} from '../print-service';
 import {PrintDialogOptions} from '../../../../core/dialog.service';
-import {ButtonAction, ButtonClickEvent, ButtonPanelComponent} from '../../button-panel/button-panel.component';
+import {ButtonAction, ButtonClickEvent, ButtonPanelComponent} from '../../button/button-panel/button-panel.component';
 
 
 @Component({

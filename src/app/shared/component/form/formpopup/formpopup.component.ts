@@ -4,7 +4,7 @@ import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/
 import {DynamicFieldComponent} from '../dynamic-field.component';
 import {NgFor, NgIf} from '@angular/common';
 import {FormField} from '../../../models/formfieldata.model';
-import {ButtonAction, ButtonClickEvent, ButtonPanelComponent} from '../../button-panel/button-panel.component';
+import {ButtonAction, ButtonClickEvent, ButtonPanelComponent} from '../../button/button-panel/button-panel.component';
 import {DialogService} from '../../../../core/dialog.service';
 import {FormUtils} from '../form-util';
 

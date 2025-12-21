@@ -1,3 +1,5 @@
+import {FormField} from '../../shared/models/formfieldata.model';
+
 export const DriverTableMeta = [
   {key: 'employee.callingname', label: 'Name'},
   {key: 'number', label: 'Number'},
@@ -10,3 +12,9 @@ export const DriverTableMeta = [
   {key: 'crewstatus.name', label: 'Status'},
   {key: 'actions', label: 'Actions'}
 ];
+
+export const DriverFilterMeta: FormField[] = [
+  {name: 'ssnumber', type: 'text', label: 'Driver Number', required: false, mode: "none"},
+  {name: 'sscrewstatus', type: 'select', label: 'Crew Status', required: false, mode: 'options'},
+  {name: 'ssroutefamilitylevel', type: 'select', label: 'Route Familiarity Level', required: false, mode: 'options'},
+] as FormField[];

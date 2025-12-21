@@ -1,5 +1,5 @@
 import {FormField} from '../../shared/models/formfieldata.model';
-import {ButtonAction} from '../../shared/component/button-panel/button-panel.component';
+import {ButtonAction} from '../../shared/component/button/button-panel/button-panel.component';
 
 // export  const DashBoardMeta = [
 //   { label: 'Total Branches', value: 1234 },
@@ -8,7 +8,7 @@ import {ButtonAction} from '../../shared/component/button-panel/button-panel.com
 //   { label: 'Regular', value: 184 }
 // ];
 
-export const ActionPanelMeta: ButtonAction[] = [
+export const BranchActionPanelMeta: ButtonAction[] = [
   { label: 'Create', type: 'create', icon: 'add' },
   {
     label: 'Export',

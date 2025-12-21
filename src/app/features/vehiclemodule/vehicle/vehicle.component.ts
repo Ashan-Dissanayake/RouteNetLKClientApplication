@@ -21,7 +21,7 @@ import {Servicetype} from '../model/servicetype';
 import {Conditionrate} from '../model/conditionrate';
 import {FormbuilderService} from '../../../core/formbuilder.service';
 import {DialogService} from '../../../core/dialog.service';
-import {ButtonClickEvent, ButtonPanelComponent} from '../../../shared/component/button-panel/button-panel.component';
+import {ButtonClickEvent, ButtonPanelComponent} from '../../../shared/component/button/button-panel/button-panel.component';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
 import {Vehiclestatus} from '../model/vehiclestatus';
 import {Make} from '../model/make';

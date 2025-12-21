@@ -8,8 +8,8 @@ import {BranchStatus} from '../model/branchstatus';
 import {BranchType} from '../model/branchtype';
 import {District} from '../model/district';
 import {Province} from '../model/province';
-import {ActionPanelMeta, FilterMeta, FormMeta, PrintTableMeta, TableMeta} from '../branch.meta';
-import {ButtonClickEvent, ButtonPanelComponent } from '../../../shared/component/button-panel/button-panel.component';
+import {BranchActionPanelMeta, FilterMeta, FormMeta, PrintTableMeta, TableMeta} from '../branch.meta';
+import {ButtonClickEvent, ButtonPanelComponent } from '../../../shared/component/button/button-panel/button-panel.component';
 import {DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
 import {DialogService} from '../../../core/dialog.service';
@@ -49,7 +49,7 @@ export class BranchComponent implements OnInit, OnDestroy {
   // ===== Metadata & Configurations =====
   readonly tableColumns = TableMeta;
   //readonly dashboardStats = DashBoardMeta;
-  readonly actionPanelConfig = ActionPanelMeta;
+  readonly actionPanelConfig = BranchActionPanelMeta;
   readonly branchFormMeta = FormMeta;
   readonly branchFilterMeta = FilterMeta;
   readonly printableColumns = PrintTableMeta;

@@ -1,4 +1,4 @@
-export class Routefamiliaritylevel{
+export class LicenseCategory{
   id!:number;
   name!:string
 

@@ -29,6 +29,9 @@ export const ApiEndpoints = {
 
     //Crew
     drivers:`${baseUrl}/drivers`,
+    allowedBusTypes:`${baseUrl}/allowedbustypes/list`,
+    crewStatuses:`${baseUrl}/crewstatuses/list`,
+    routeFamiliarityLevels:`${baseUrl}/routefamiliaritylevels/list`,
 
 
   //Vehicle

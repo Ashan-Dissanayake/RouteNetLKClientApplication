@@ -1,4 +1,4 @@
-export class Crewstatus{
+export class CrewStatus{
   id!:number;
   name!:string
 

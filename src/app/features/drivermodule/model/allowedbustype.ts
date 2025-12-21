@@ -1,4 +1,4 @@
-export class Allowedbustype{
+export class AllowedBusType{
   id!:number;
   name!:string
 

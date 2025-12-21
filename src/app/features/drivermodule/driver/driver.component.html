@@ -1,3 +1,27 @@
+
+<div class="container">
+  <h2>Driver Details Management</h2>
+</div>
+
+<!-- ===== Action Panel ===== -->
+<app-button-panel
+  [buttons]="actionPanelConfig"
+  (actionClicked)="onActionTriggered($event)"
+  (dropdownClicked)="onDropdownOnlyClick($event)">
+</app-button-panel>
+
+<!-- ===== Filter Section ===== -->
+<div *ngIf="filterForm && dataInitialized" id="serverSearch">
+  <form [formGroup]="filterForm">
+    <dynamic-field
+      *ngFor="let field of driverFilterMeta"
+      [formInstance]="filterForm"
+      [field]="field"
+    >
+    </dynamic-field>
+  </form>
+</div>
+
 <app-side-view
   [opened]="activeDriver !== null"
   [data]="activeDriver"

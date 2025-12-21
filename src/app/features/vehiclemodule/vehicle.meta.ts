@@ -1,5 +1,5 @@
 import {FormField} from '../../shared/models/formfieldata.model';
-import {ButtonAction} from '../../shared/component/button-panel/button-panel.component';
+import {ButtonAction} from '../../shared/component/button/button-panel/button-panel.component';
 
 export const VehicleTableMeta = [
   {key: 'seatingcapacity.make.name', label: 'Make/Model'},

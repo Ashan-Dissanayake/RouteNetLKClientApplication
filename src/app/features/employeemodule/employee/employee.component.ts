@@ -21,7 +21,7 @@ import {Department} from '../model/department';
 import {FormbuilderService} from '../../../core/formbuilder.service';
 import {DialogService} from '../../../core/dialog.service';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
-import {ButtonClickEvent, ButtonPanelComponent} from '../../../shared/component/button-panel/button-panel.component';
+import {ButtonClickEvent, ButtonPanelComponent} from '../../../shared/component/button/button-panel/button-panel.component';
 import {Designation} from '../model/designation';
 import {Employeestatus} from '../model/employeestatus';
 import {Employeetype} from '../model/employeetype';
