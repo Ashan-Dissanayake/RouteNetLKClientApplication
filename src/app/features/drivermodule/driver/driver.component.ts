@@ -26,6 +26,7 @@ import {DriverFilterMeta, DriverTableMeta} from '../driver.meta';
 
 @Component({
   selector: 'app-crew',
+  standalone:true,
   imports: [
     DataTableComponent,
     MatButton,
@@ -90,7 +91,6 @@ export class DriverComponent implements OnInit,OnDestroy {
   private initialize(): void {
     forkJoin({
       crewStatuses: this.driverFacadeService.loadCrewStatuses(),
-      allowedBusTypes: this.driverFacadeService.loadAllowedBusTypes(),
       routeFamiliarityLevels: this.driverFacadeService.loadRouteFamiliarityLevels(),
     }).subscribe({
       next: data => this.handleMetadataLoad(data),
@@ -112,7 +112,6 @@ export class DriverComponent implements OnInit,OnDestroy {
 
   private initializeForms(): void {
     this.filterForm = this.formBuilder.build(this.driverFilterMeta, {
-      ssallowedbustype: this.allowedBusTypes,
       sscrewstatus:this.crewStatuses,
       ssroutefamilitylevel:this.routeFamiliarityLevels,
     });

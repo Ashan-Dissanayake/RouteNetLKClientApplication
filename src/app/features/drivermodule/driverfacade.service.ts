@@ -33,10 +33,6 @@ export class DriverFacadeService {
     return this.crewStatusService.get().pipe(map(res => res.data));
   }
 
-  loadAllowedBusTypes(): Observable<AllowedBusType[]> {
-    return this.allowedBusTypeService.get().pipe(map(res => res.data));
-  }
-
   loadRouteFamiliarityLevels(): Observable<RouteFamiliarityLevel[]> {
     return this.routeFamiliarityLevelService.get().pipe(map(res => res.data));
   }
