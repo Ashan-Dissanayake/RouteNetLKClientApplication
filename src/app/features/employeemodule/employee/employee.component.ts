@@ -92,7 +92,6 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   // ===== Lifecycle =====
   ngOnInit(): void {
     this.initialize();
-    this.configureActionPanel();
   }
 
   ngOnDestroy(): void {
@@ -149,14 +148,6 @@ export class EmployeeComponent implements OnInit, OnDestroy {
 
     this.setGender();
     this.setEmail();
-  }
-
-  private configureActionPanel(): void {
-    this.actionPanelConfig.forEach(btn => {
-      if (btn.type === 'bulk-deactivate') {
-        btn.disabled = () => this.selectedRows.size === 0;
-      }
-    });
   }
 
   // ===== Data Loading =====

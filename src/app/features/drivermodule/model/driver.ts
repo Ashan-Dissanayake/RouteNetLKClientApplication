@@ -9,8 +9,11 @@ export class Driver{
   id!:number;
   employee!:Employee;
   number!:string;
+  licensenumber!:string;
+  dolicenseissued!:string;
   dolicenseexpired!:string;
   domedicalexpired!:string;
+  domedicalissued!:string;
   licensecategory!:LicenseCategory;
   crewstatus!:CrewStatus;
   routefamiliaritylevel!:RouteFamiliarityLevel;

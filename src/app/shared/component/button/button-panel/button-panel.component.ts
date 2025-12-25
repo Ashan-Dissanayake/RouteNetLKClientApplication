@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
 import {MatButton} from '@angular/material/button';
 import {NgForOf, NgIf} from '@angular/common';
 import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
@@ -20,11 +20,16 @@ import {MatIcon} from '@angular/material/icon';
   standalone: true,
   styleUrl: './button-panel.component.scss'
 })
-export class ButtonPanelComponent {
+export class ButtonPanelComponent implements OnChanges{
 
   @Input() buttons: ButtonAction[] = [];
+  @Input() contextData: any;
   @Output() actionClicked = new EventEmitter<ButtonClickEvent>();
   @Output() dropdownClicked = new EventEmitter<ButtonClickEvent>();
+
+  ngOnChanges() {
+    this.configureActions();
+  }
 
   onClick(button: ButtonAction, fromDropdown = false) {
     const event: ButtonClickEvent = { type: button.type, source: button };
@@ -37,15 +42,29 @@ export class ButtonPanelComponent {
   }
 
   //Evaluate disabled state (supports boolean or function)
+  // isDisabled(button: ButtonAction): boolean {
+  //   return typeof button.disabled === 'function'
+  //     ? button.disabled()
+  //     : !!button.disabled;
+  // }
+  //
+  // //Return unique menu ID for each button
+  // menuId(index: number): string {
+  //   return `menu-${index}`;
+  // }
+
   isDisabled(button: ButtonAction): boolean {
     return typeof button.disabled === 'function'
-      ? button.disabled()
+      ? button.disabled(this.contextData)
       : !!button.disabled;
   }
 
-  //Return unique menu ID for each button
-  menuId(index: number): string {
-    return `menu-${index}`;
+  configureActions(): void {
+    this.buttons.forEach(btn => {
+      if (btn.type === 'bulk-deactivate') {
+        btn.disabled = (ctx: any) => ctx.selectedRows?.size === 0;
+      }
+    });
   }
 
 }
@@ -56,7 +75,7 @@ export interface ButtonAction {
   icon?: string;                                // Optional icon name
   iconType?: 'mat' | 'fa' | 'custom';           // Support multiple icon sets
   color?: 'red' | 'accent' | 'warn';        // Material color scheme
-  disabled?: boolean | (() => boolean);         // Can be boolean or function
+  disabled?: boolean | ((contextData: any) => boolean);         // Can be boolean or function
   dropdown?: ButtonAction[];                    // Nested actions
   group?: string;                               // Optional grouping
 }

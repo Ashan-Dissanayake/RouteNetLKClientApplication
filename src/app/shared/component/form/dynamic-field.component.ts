@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, ViewChild} from '@angular/core';
 import {MatFormField, MatFormFieldModule} from '@angular/material/form-field';
 import {MatError, MatInput, MatLabel} from '@angular/material/input';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -6,7 +6,7 @@ import {FormField} from '../../models/formfieldata.model';
 import {NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
 import {
   MatDatepicker,
-  MatDatepickerInput,
+  MatDatepickerInput, MatDatepickerInputEvent,
   MatDatepickerModule,
   MatDatepickerToggle
 } from '@angular/material/datepicker';
@@ -23,14 +23,16 @@ import {FilePickerComponent} from '../file-picker/file-picker.component';
 
         <input *ngSwitchCase="'hidden'"
                type="hidden"
-               [formControlName]="field.name" />
+               [formControlName]="field.name"/>
 
         <!-- Text -->
         <mat-form-field *ngSwitchCase="'text'" appearance="outline">
           <mat-label>{{ field.label || field.name }}</mat-label>
-          <input matInput [formControlName]="field.name"  />
-          <mat-error *ngIf="formInstance.get(field.name)?.invalid && (formInstance.get(field.name)?.dirty || formInstance.get(field.name)?.touched)">
-            <ng-container *ngIf="formInstance.get(field.name)?.hasError('required')">This field is required.</ng-container>
+          <input matInput [formControlName]="field.name"/>
+          <mat-error
+            *ngIf="formInstance.get(field.name)?.invalid && (formInstance.get(field.name)?.dirty || formInstance.get(field.name)?.touched)">
+            <ng-container *ngIf="formInstance.get(field.name)?.hasError('required')">This field is required.
+            </ng-container>
             <ng-container *ngIf="formInstance.get(field.name)?.hasError('pattern')">Invalid format.</ng-container>
           </mat-error>
         </mat-form-field>
@@ -39,8 +41,10 @@ import {FilePickerComponent} from '../file-picker/file-picker.component';
         <mat-form-field *ngSwitchCase="'file'" appearance="outline">
           <mat-label>{{ field.label || field.name }}</mat-label>
           <app-file-picker [formControlName]="field.name"></app-file-picker>
-          <mat-error *ngIf="formInstance.get(field.name)?.invalid && (formInstance.get(field.name)?.dirty || formInstance.get(field.name)?.touched)">
-            <ng-container *ngIf="formInstance.get(field.name)?.hasError('required')">This field is required.</ng-container>
+          <mat-error
+            *ngIf="formInstance.get(field.name)?.invalid && (formInstance.get(field.name)?.dirty || formInstance.get(field.name)?.touched)">
+            <ng-container *ngIf="formInstance.get(field.name)?.hasError('required')">This field is required.
+            </ng-container>
           </mat-error>
         </mat-form-field>
 
@@ -52,12 +56,14 @@ import {FilePickerComponent} from '../file-picker/file-picker.component';
                  [min]="1900"
                  [max]="currentYear"
                  step="1"
-                 [formControlName]="field.name"  />
-          <mat-error *ngIf="formInstance.get(field.name)?.invalid && (formInstance.get(field.name)?.dirty || formInstance.get(field.name)?.touched)">
+                 [formControlName]="field.name"/>
+          <mat-error
+            *ngIf="formInstance.get(field.name)?.invalid && (formInstance.get(field.name)?.dirty || formInstance.get(field.name)?.touched)">
             <ng-container *ngIf="formInstance.get(field.name)?.hasError('required')">
               This field is required.
             </ng-container>
-            <ng-container *ngIf="formInstance.get(field.name)?.hasError('min') || formInstance.get(field.name)?.hasError('max')">
+            <ng-container
+              *ngIf="formInstance.get(field.name)?.hasError('min') || formInstance.get(field.name)?.hasError('max')">
               Enter a valid year between 1900 and {{ currentYear }}.
             </ng-container>
           </mat-error>
@@ -65,18 +71,6 @@ import {FilePickerComponent} from '../file-picker/file-picker.component';
 
 
         <!-- Select -->
-<!--        <mat-form-field *ngSwitchCase="'select'" appearance="outline">-->
-<!--          <mat-label>{{ field.label || field.name }}</mat-label>-->
-<!--          <mat-select [formControlName]="field.name" [compareWith]="compareFn(field.referenceName)">-->
-<!--            <mat-option *ngFor="let opt of field.options" [value]="opt">-->
-<!--              {{ opt[field.optionLabelKey || 'name']}}-->
-<!--            </mat-option>-->
-<!--          </mat-select>-->
-<!--          <mat-error *ngIf="formInstance.get(field.name)?.invalid && (formInstance.get(field.name)?.dirty || formInstance.get(field.name)?.touched)">-->
-<!--            <ng-container *ngIf="formInstance.get(field.name)?.hasError('required')">This field is required.</ng-container>-->
-<!--          </mat-error>-->
-<!--        </mat-form-field>-->
-
         <mat-form-field *ngSwitchCase="'select'" appearance="outline">
           <mat-label>{{ field.label || field.name }}</mat-label>
           <mat-select [formControlName]="field.name" [compareWith]="compareFn">
@@ -84,8 +78,10 @@ import {FilePickerComponent} from '../file-picker/file-picker.component';
               {{ opt[field.optionLabelKey || 'name']}}
             </mat-option>
           </mat-select>
-          <mat-error *ngIf="formInstance.get(field.name)?.invalid && (formInstance.get(field.name)?.dirty || formInstance.get(field.name)?.touched)">
-            <ng-container *ngIf="formInstance.get(field.name)?.hasError('required')">This field is required.</ng-container>
+          <mat-error
+            *ngIf="formInstance.get(field.name)?.invalid && (formInstance.get(field.name)?.dirty || formInstance.get(field.name)?.touched)">
+            <ng-container *ngIf="formInstance.get(field.name)?.hasError('required')">This field is required.
+            </ng-container>
           </mat-error>
         </mat-form-field>
 
@@ -95,22 +91,47 @@ import {FilePickerComponent} from '../file-picker/file-picker.component';
           <input matInput [matDatepicker]="picker"
                  [min]="field.dateConfig?.minDate"
                  [max]="field.dateConfig?.maxDate"
-                 [formControlName]="field.name" />
+                 [formControlName]="field.name"/>
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
-          <mat-error *ngIf="formInstance.get(field.name)?.invalid && (formInstance.get(field.name)?.dirty || formInstance.get(field.name)?.touched)">
-            <ng-container *ngIf="formInstance.get(field.name)?.hasError('required')">This field is required.</ng-container>
+          <mat-error
+            *ngIf="formInstance.get(field.name)?.invalid && (formInstance.get(field.name)?.dirty || formInstance.get(field.name)?.touched)">
+            <ng-container *ngIf="formInstance.get(field.name)?.hasError('required')">This field is required.
+            </ng-container>
           </mat-error>
         </mat-form-field>
 
-        <!-- Dual Listbox -->
+        <!--Date Range-->
+        <mat-form-field *ngSwitchCase="'date-range'" appearance="outline">
+          <mat-label>{{ field.label || field.name }}</mat-label>
+
+          <mat-date-range-input
+            [formGroup]="$any(formInstance.get(field.name))"
+            [rangePicker]="picker">
+
+            <input matStartDate formControlName="start" placeholder="Start date"
+                   (dateChange)="onStartDateChange($event, $any(field.dateConfig?.range), field.name)">
+            <input matEndDate formControlName="end" placeholder="End date">
+
+          </mat-date-range-input>
+
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+
+          <mat-error *ngIf="formInstance.get(field.name)?.invalid">
+            This field is required
+          </mat-error>
+        </mat-form-field>
+
+
+        <!-- Dual List Box -->
         <mat-form-field *ngSwitchCase="'dualist'" appearance="outline">
           <mat-label>{{ field.label || field.name }}</mat-label>
           <mat-dual-listbox
             [formControlName]="field.name"
             [sourceList]="field.options || []"
             displayProperty="name"
-            [destinationObjectReference]="field.referencePath || []" >
+            [destinationObjectReference]="field.referencePath || []">
           </mat-dual-listbox>
           <mat-error *ngIf="formInstance.get(field.name)?.hasError('required')">
             This field is required.
@@ -149,6 +170,10 @@ export class DynamicFieldComponent {
   @Input() formInstance!: FormGroup;
   @Input() field!: FormField;
 
+  endDate: Date | undefined;
+  @ViewChild('picker') picker!: MatDatepicker<any>;
+
+
   compareFn(o1: any | null, o2: any | null): boolean {
     if (!o1 || !o2) {
       return o1 === o2;
@@ -156,10 +181,34 @@ export class DynamicFieldComponent {
     return o1.id === o2.id;
   }
 
+  onStartDateChange(
+    event: MatDatepickerInputEvent<Date>,
+    range: number | { years?: number; months?: number; days?: number } = 0,
+    fieldName: string
+  ) {
+    const start = event.value;
+    if (!start) return;
+
+    const end = new Date(start);
+
+    if (typeof range === 'number') {
+      end.setFullYear(end.getFullYear() + range);
+    } else {
+      if (range.years) end.setFullYear(end.getFullYear() + range.years);
+      if (range.months) end.setMonth(end.getMonth() + range.months);
+      if (range.days) end.setDate(end.getDate() + range.days);
+    }
+
+    const rangeGroup = this.formInstance.get(fieldName) as FormGroup;
+    rangeGroup.patchValue({ end });
+
+    this.picker?.close();
+  }
 
 
   currentYear = new Date().getFullYear();
 
 
+  protected readonly oninput = oninput;
 }
 

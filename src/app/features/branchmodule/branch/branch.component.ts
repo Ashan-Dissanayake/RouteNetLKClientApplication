@@ -84,7 +84,6 @@ export class BranchComponent implements OnInit, OnDestroy {
   // ===== Lifecycle =====
   ngOnInit() {
     this.initializeMetadata();
-    this.configureActionPanel();
   }
 
   ngOnDestroy(): void {
@@ -129,14 +128,6 @@ export class BranchComponent implements OnInit, OnDestroy {
 
     this.branchFilterForm = this.formBuilder.build(this.branchFilterMeta, {
       ssbranchstatus: this.branchStatuses
-    });
-  }
-
-  private configureActionPanel(): void {
-    this.actionPanelConfig.forEach(btn => {
-      if (btn.type === 'bulk-deactivate') {
-        btn.disabled = () => this.selectedRows.size === 0;
-      }
     });
   }
 

@@ -5,7 +5,6 @@ import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../core/api-endpoints';
 import {Employee} from '../model/employee';
-import {Branch} from '../../branchmodule/model/branch';
 
 @Injectable({ providedIn: 'root' })
 export class EmployeeService extends BaseHttpService <Employee>{
@@ -21,6 +20,10 @@ export class EmployeeService extends BaseHttpService <Employee>{
   getSummary():Observable<ApiResponse<Employee>>{
     return  this.getAll(ApiEndpoints.employeesList);
   }
+  getByDesignation():Observable<ApiResponse<Employee>>{
+    return  this.getAll(ApiEndpoints.employeesByDriver);
+  }
+
 
   save(employee:Employee):Observable<Employee>{
     return this.post(ApiEndpoints.employees,employee);
@@ -33,7 +36,7 @@ export class EmployeeService extends BaseHttpService <Employee>{
   deactivate(ids: number[] | number): Observable<number[]> {
     // Ensure we always send an array to the backend
     const payload = Array.isArray(ids) ? ids : [ids];
-    return this.http.post<number[]>(ApiEndpoints.employeesdeactivate,ids);
+    return this.http.post<number[]>(ApiEndpoints.employeesdeactivate,payload);
   }
 
 }

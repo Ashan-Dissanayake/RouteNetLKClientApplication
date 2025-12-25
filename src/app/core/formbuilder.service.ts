@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, ValidatorFn, Validators} from '@angular/forms';
+import {AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators} from '@angular/forms';
 import {Regex} from '../shared/models/regex.model';
 import {FormField} from '../shared/models/formfieldata.model';
 
@@ -10,7 +10,7 @@ export class FormbuilderService {
   constructor(private fb: FormBuilder) {}
 
   build(fields: FormField[], dataMap: Record<string, any>): FormGroup {
-    const group: Record<string, FormControl> = {};
+    const group: Record<string, AbstractControl> = {};
 
     fields.forEach((field) => {
       const validators: ValidatorFn[] = [];
@@ -26,6 +26,14 @@ export class FormbuilderService {
       if (field.mode === 'regex') {
         const regexRule = (dataMap['regexes'] as Regex)?.[field.name];
         if (regexRule) validators.push(Validators.pattern(regexRule.regex));
+      }
+
+      if (field.type === 'date-range') {
+        group[field.name] = this.fb.group({
+          start: new FormControl(null, field.required ? Validators.required : []),
+          end: new FormControl(null, field.required ? Validators.required : []),
+        });
+        return;
       }
 
       group[field.name] = new FormControl(

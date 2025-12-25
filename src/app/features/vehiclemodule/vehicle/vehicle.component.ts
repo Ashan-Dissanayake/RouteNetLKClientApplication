@@ -93,7 +93,6 @@ export class VehicleComponent implements OnInit,OnDestroy{
   // ===== Lifecycle =====
   ngOnInit(): void {
     this.initialize();
-    this.configureActionPanel();
   }
 
   ngOnDestroy(): void {
@@ -155,14 +154,6 @@ export class VehicleComponent implements OnInit,OnDestroy{
       regexes: this.regexRules
     });
     this.bindChassisAndEngineRegex();
-  }
-
-  private configureActionPanel(): void {
-    this.actionPanelConfig.forEach(btn => {
-      if (btn.type === 'bulk-deactivate') {
-        btn.disabled = () => this.selectedRows.size === 0;
-      }
-    });
   }
 
   // ===== Data Loading =====

@@ -6,7 +6,9 @@
   <app-button-panel
     [buttons]="actionPanelConfig"
     (actionClicked)="onActionTriggered($event)"
-    (dropdownClicked)="onDropdownOnlyClick($event)">
+    (dropdownClicked)="onDropdownOnlyClick($event)"
+    [contextData]="{ selectedRows: this.selectedRows }"
+  >
   </app-button-panel>
 
   <!-- ===== Filter Section ===== -->

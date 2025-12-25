@@ -18,5 +18,8 @@ export class DriverService extends BaseHttpService <Driver>{
     return  this.getAll(ApiEndpoints.drivers,params);
   }
 
+  save(driver:Driver):Observable<Driver>{
+    return this.post(ApiEndpoints.drivers,driver);
+  }
 
 }

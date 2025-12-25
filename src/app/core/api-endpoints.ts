@@ -24,6 +24,7 @@ export const ApiEndpoints = {
     employeetypes:`${baseUrl}/employeetypes/list`,
     employeestatuses:`${baseUrl}/employeestatuses/list`,
     employees:`${baseUrl}/employees`,
+    employeesByDriver:`${baseUrl}/employees/list/driver`,
     employeesList:`${baseUrl}/employees/list`,
     employeesdeactivate: `${baseUrl}/employees/deactivate`,
 
@@ -32,7 +33,7 @@ export const ApiEndpoints = {
     allowedBusTypes:`${baseUrl}/allowedbustypes/list`,
     crewStatuses:`${baseUrl}/crewstatuses/list`,
     routeFamiliarityLevels:`${baseUrl}/routefamiliaritylevels/list`,
-
+    licenseCategories:`${baseUrl}/licensecategories/list`,
 
   //Vehicle
     vehicles:`${baseUrl}/vehicles`,

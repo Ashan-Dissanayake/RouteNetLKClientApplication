@@ -7,14 +7,16 @@
 <app-button-panel
   [buttons]="actionPanelConfig"
   (actionClicked)="onActionTriggered($event)"
-  (dropdownClicked)="onDropdownOnlyClick($event)">
+  (dropdownClicked)="onDropdownOnlyClick($event)"
+  [contextData]="{ selectedRows: this.selectedRows }"
+>
 </app-button-panel>
 
 <!-- ===== Filter Section ===== -->
 <div *ngIf="filterForm && dataInitialized" id="serverSearch">
   <form [formGroup]="filterForm">
     <dynamic-field
-      *ngFor="let field of driverFilterMeta"
+      *ngFor="let field of filterFormMeta"
       [formInstance]="filterForm"
       [field]="field"
     >
@@ -23,8 +25,8 @@
 </div>
 
 <app-side-view
-  [opened]="activeDriver !== null"
-  [data]="activeDriver"
+  [opened]="activeRow !== null"
+  [data]="activeRow"
   [title]="'Driver Details'"
   (closed)="closeDetails()"
   [viewTemplate]="driverDetailTemplate"

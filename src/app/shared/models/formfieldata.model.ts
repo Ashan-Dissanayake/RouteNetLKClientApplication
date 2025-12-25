@@ -1,6 +1,7 @@
 export type DateConfig = {
     minDate?: Date;
     maxDate?: Date;
+    range?: { years:number,months:number,days:number};
 };
 
 export type OptionsField<T = unknown> = {
@@ -24,6 +25,7 @@ export type FieldType =
     | 'toggle'
     | 'year'
     | 'chips'
+    | 'date-range'
     | 'dualist';
 
 export type FieldMode = 'regex' | 'options' | 'none' | 'date';
