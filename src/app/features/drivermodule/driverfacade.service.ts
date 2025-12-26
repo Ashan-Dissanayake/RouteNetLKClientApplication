@@ -1,4 +1,4 @@
-import {afterRender, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Observable, throwError} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {DriverService} from './service/driver.service';
@@ -14,6 +14,7 @@ import {LicenseCategory} from './model/licensecategory';
 import {Regex} from '../../shared/models/regex.model';
 import {RegexService} from '../../core/regex.service';
 import {LicenseCategoryService} from './service/licensecategory.service';
+import {DriverMapper} from '../../shared/mappers/DriverMapper';
 
 @Injectable({
   providedIn: 'root',
@@ -68,29 +69,16 @@ export class DriverFacadeService {
   createDriver(driverData: Driver): Observable<Driver> {
     const status = driverData.crewstatus?.name?.toLowerCase();
     if (status !="eligible") return throwError(() => new Error('Driver should be in Eligible'));
-    return this.driverService.save(this.mapToDriver(driverData));
+    return this.driverService.save(DriverMapper.fromForm(driverData));
+  }
+
+  updateDriver(driverData: any): Observable<Driver> {
+    return this.driverService.update(DriverMapper.fromForm(driverData));
   }
 
   // Private helpers
   private getDrivers(params?: any): Observable<Driver[]> {
     return this.driverService.get(params).pipe(map(res => res.data));
-  }
-
-  private mapToDriver(payload: any): Driver {
-    return {
-      id: payload.id,
-      employee: payload.employee,
-      number: payload.number,
-      licensenumber: payload.licensenumber,
-      dolicenseissued:payload.licenseDateRange.start,
-      dolicenseexpired: payload.licenseDateRange?.end,
-      domedicalissued: payload.medicalDateRange?.start,
-      domedicalexpired: payload.medicalDateRange?.end,
-      licensecategory: payload.licensecategory,
-      crewstatus: payload.crewstatus,
-      routefamiliaritylevel: payload.routefamiliaritylevel,
-      allowedbustype: payload.allowedbustype // if exists
-    };
   }
 
 

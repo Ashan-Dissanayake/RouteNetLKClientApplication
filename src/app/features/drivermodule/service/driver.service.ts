@@ -5,6 +5,7 @@ import {HttpClient} from '@angular/common/http';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 import {Observable} from 'rxjs';
 import {ApiEndpoints} from '../../../core/api-endpoints';
+import {Vehicle} from '../../vehiclemodule/model/vehicle';
 
 
 @Injectable({ providedIn: 'root' })
@@ -20,6 +21,10 @@ export class DriverService extends BaseHttpService <Driver>{
 
   save(driver:Driver):Observable<Driver>{
     return this.post(ApiEndpoints.drivers,driver);
+  }
+
+  update(driver:Driver):Observable<Driver>{
+    return this.put(ApiEndpoints.drivers,driver);
   }
 
 }

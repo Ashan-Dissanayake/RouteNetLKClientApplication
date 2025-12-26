@@ -21,13 +21,15 @@ import {
   ButtonPanelComponent
 } from '../../../shared/component/button/button-panel/button-panel.component';
 import {
-  DriverFilterFormMeta,
+  DriverFilterFormMeta, DriverImmutableControllersMeta,
   DriverMainFormMeta,
   DriverTableMeta
 } from '../driver.meta';
 import {Employee} from '../../employeemodule/model/employee';
 import {LicenseCategory} from '../model/licensecategory';
 import {FormUtils} from '../../../shared/component/form/form-util';
+import {DriverMapper} from '../../../shared/mappers/DriverMapper';
+import {VehicleImmutableControllersMeta} from '../../vehiclemodule/vehicle.meta';
 
 
 @Component({
@@ -58,6 +60,7 @@ export class DriverComponent implements OnInit,OnDestroy {
   protected readonly filterFormMeta = DriverFilterFormMeta;
   protected readonly mainFormMeta = DriverMainFormMeta;
   protected readonly actionPanelConfig = ActionPanelMeta;
+  readonly immutableControllers = DriverImmutableControllersMeta;
 
   // ===== Forms =====
   protected filterForm: FormGroup = new FormGroup({});
@@ -166,6 +169,9 @@ export class DriverComponent implements OnInit,OnDestroy {
 
   // ===== CRUD =====
   protected  openMainForm(): void {
+    this.mainForm.value.id?
+      FormUtils.setFormControlsState(this.mainForm,this.immutableControllers,true):
+      FormUtils.setFormControlsState(this.mainForm,this.immutableControllers,false);
     this.dialogService.showFormPopup({
       heading: this.mainForm.value.id ? 'Edit Driver' : 'Create Driver',
       form: this.mainForm,
@@ -179,19 +185,32 @@ export class DriverComponent implements OnInit,OnDestroy {
   }
 
   private save(formData: any): void {
-    const operation$ = this.driverFacadeService.createDriver(formData);
+    const operation$ = formData.id
+      ? this.driverFacadeService.updateDriver(formData)
+      : this.driverFacadeService.createDriver(formData);
     operation$?.pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.dialogService.showSuccess('Driver saved successfully.');
-        this.loadDriverTable();
-        this.initializeMainForm();
-        FormUtils.resetForm(this.mainForm);
       },
       error: (err) =>{
         console.log(err)
         this.dialogService.showMessage({heading:'Failed to save Vehicle.', message:err.errorMessage})
+      },
+      complete:()=>{
+        this.loadDriverTable();
+        this.initializeMainForm();
+        FormUtils.resetForm(this.mainForm);
+        FormUtils.setFormControlsState(this.mainForm,this.immutableControllers,false);
       }
     });
+  }
+
+  private editRow(row: Driver): void {
+    this.employees = this.drivers.map(driver => driver.employee);
+    this.initializeMainForm();
+    const  mappedRow = DriverMapper.toForm(row);
+    this.mainForm.patchValue(mappedRow);
+    this.openMainForm();
   }
 
   // ===== Table Selection =====
@@ -203,7 +222,9 @@ export class DriverComponent implements OnInit,OnDestroy {
     this.activeRow = null;
   }
 
-  protected onRowAction(action: string, row: any) { }
+  protected onRowAction(action: string, row: any) {
+    if (action === 'edit') this.editRow(row);
+  }
 
   // Selection Handling
   protected onRowCheckboxChanged(event: CheckboxEvent):void {

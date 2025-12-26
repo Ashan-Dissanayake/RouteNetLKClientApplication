@@ -20,6 +20,7 @@ export class EmployeeService extends BaseHttpService <Employee>{
   getSummary():Observable<ApiResponse<Employee>>{
     return  this.getAll(ApiEndpoints.employeesList);
   }
+
   getByDesignation():Observable<ApiResponse<Employee>>{
     return  this.getAll(ApiEndpoints.employeesByDriver);
   }

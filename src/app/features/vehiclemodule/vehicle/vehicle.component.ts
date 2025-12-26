@@ -1,5 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {
+  VehicleImmutableControllersMeta,
   VehicleActionPanelMeta,
   VehicleExportMeta,
   VehicleFilterMeta,
@@ -60,6 +61,7 @@ export class VehicleComponent implements OnInit,OnDestroy{
   readonly actionPanelConfig = VehicleActionPanelMeta;
   readonly vehicleFormMeta = VehicleFormMeta;
   readonly vehicleExportMeta = VehicleExportMeta;
+  readonly vehicleImmutableControllers = VehicleImmutableControllersMeta;
 
   // ===== Form Controls =====
   vehicleFilterForm: FormGroup = new FormGroup({});
@@ -180,7 +182,10 @@ export class VehicleComponent implements OnInit,OnDestroy{
 
   // ===== CRUD =====
   openVehicleForm(): void {
-    this.vehicleForm.value.id?this.setFormControlsStateOnEdit():this.setFormControlsStateOnCreate();
+    // this.vehicleForm.value.id?this.setFormControlsStateOnEdit():this.setFormControlsStateOnCreate();
+    this.vehicleForm.value.id?
+      FormUtils.setFormControlsState(this.vehicleForm,this.vehicleImmutableControllers,true):
+      FormUtils.setFormControlsState(this.vehicleForm,this.vehicleImmutableControllers,false);
     this.dialogService.showFormPopup({
       heading: this.vehicleForm.value.id ? 'Edit Vehicle' : 'Create Vehicle',
       form: this.vehicleForm,
@@ -203,7 +208,8 @@ export class VehicleComponent implements OnInit,OnDestroy{
         this.dialogService.showSuccess('Vehicle saved successfully.');
         this.loadVehicleTable();
         FormUtils.resetForm(this.vehicleForm);
-        this.setFormControlsStateOnCreate();
+        // this.setFormControlsStateOnCreate();
+        FormUtils.setFormControlsState(this.vehicleForm,this.vehicleImmutableControllers,false);
       },
       error: (err) =>{
         console.log(err)
@@ -213,12 +219,10 @@ export class VehicleComponent implements OnInit,OnDestroy{
   }
 
   editVehicle(row: Vehicle): void {
-    this.setFormControlsStateOnEdit();
-
+    //this.setFormControlsStateOnEdit();
     const normalizedRow = FormUtils.normalizeObject(row,  [
       { from: 'seatingcapacity.make', to: 'make', remove: false }
     ]);
-
     this.vehicleForm.patchValue(normalizedRow);
     this.openVehicleForm();
   }
@@ -260,21 +264,21 @@ export class VehicleComponent implements OnInit,OnDestroy{
     });
   }
 
-  private setFormControlsStateOnEdit(){
-    FormUtils.setFormControlsState(this.vehicleForm, [
-        'make', 'code', 'number', 'yom', 'dob',
-        'chasisnumber', 'enginenumber', 'mileage',
-        'seatingcapacity', 'employee', 'branch'
-      ], true);
-  }
-
-  private setFormControlsStateOnCreate(){
-    FormUtils.setFormControlsState(this.vehicleForm, [
-        'make', 'code', 'number', 'yom', 'dob',
-        'chasisnumber', 'enginenumber', 'mileage',
-        'seatingcapacity', 'employee', 'branch'
-      ], false);
-  }
+  // private setFormControlsStateOnEdit(){
+  //   FormUtils.setFormControlsState(this.vehicleForm, [
+  //       'make', 'code', 'number', 'yom', 'dob',
+  //       'chasisnumber', 'enginenumber', 'mileage',
+  //       'seatingcapacity', 'employee', 'branch'
+  //     ], true);
+  // }
+  //
+  // private setFormControlsStateOnCreate(){
+  //   FormUtils.setFormControlsState(this.vehicleForm, [
+  //       'make', 'code', 'number', 'yom', 'dob',
+  //       'chasisnumber', 'enginenumber', 'mileage',
+  //       'seatingcapacity', 'employee', 'branch'
+  //     ], false);
+  // }
 
   // ===== Export Operations =====
   exportSelectedToPdf() {

@@ -68,3 +68,9 @@ export const VehicleExportMeta = [
   {key: 'conditionrate.name', header: 'Condition'},
   {key: 'vehiclestatus.name', header: 'Status'},
 ]
+
+export const VehicleImmutableControllersMeta = [
+  'make', 'code', 'number', 'yom', 'dob',
+  'chasisnumber', 'enginenumber', 'mileage',
+  'seatingcapacity', 'employee', 'branch'
+]
