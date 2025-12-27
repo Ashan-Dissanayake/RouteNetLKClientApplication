@@ -1,6 +1,6 @@
 import {FormField} from '../../shared/models/formfieldata.model';
 
-export const DriverTableMeta = [
+export const DRIVER_TABLE_META = [
   {key: 'employee.callingname', label: 'Name'},
   {key: 'number', label: 'Number'},
   {key: 'licensenumber', label: 'License Number'},
@@ -12,13 +12,13 @@ export const DriverTableMeta = [
   {key: 'actions', label: 'Actions'}
 ];
 
-export const DriverFilterFormMeta: FormField[] = [
+export const DRIVER_FILTER_FORM_META: FormField[] = [
   {name: 'ssnumber', type: 'text', label: 'Driver Number', required: false, mode: "none"},
   {name: 'sscrewstatus', type: 'select', label: 'Crew Status', required: false, mode: 'options'},
   {name: 'ssroutefamilitylevel', type: 'select', label: 'Route Familiarity Level', required: false, mode: 'options'},
 ] as FormField[];
 
-export const DriverMainFormMeta: FormField[] = [
+export const DRIVER_MAIN_FORM_META: FormField[] = [
   {name: 'id', type: 'hidden', label: 'Vehicle id', required: false, mode: 'none'},
   {name: 'employee', type: 'select', label: 'Name', required: true, mode: 'options',optionLabelKey: 'callingname',},
   {name: 'number', type: 'text', label: 'Driver Number', required: true, mode: 'regex'},
@@ -48,6 +48,6 @@ export const DriverMainFormMeta: FormField[] = [
   {name: 'routefamiliaritylevel', type: 'select', label: 'Route Familiarity Level', required: true, mode: 'options'},
 ] as FormField[];
 
-export const DriverImmutableControllersMeta = [
+export const DRIVER_IMMUTABLE_CONTROLLERS_META = [
   'employee','number','licensenumber','crewstatus',
 ]

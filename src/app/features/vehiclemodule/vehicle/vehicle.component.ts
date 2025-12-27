@@ -1,7 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {
   VehicleImmutableControllersMeta,
-  VehicleActionPanelMeta,
   VehicleExportMeta,
   VehicleFilterMeta,
   VehicleFormMeta,
@@ -32,6 +31,7 @@ import {Employee} from '../../employeemodule/model/employee';
 import {Branch} from '../../branchmodule/model/branch';
 import {FormUtils} from '../../../shared/component/form/form-util';
 import {exportToExcel} from '../../../shared/component/export/excel-export.util';
+import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
 
 @Component({
   selector: 'app-vehicle',
@@ -56,35 +56,35 @@ import {exportToExcel} from '../../../shared/component/export/excel-export.util'
 })
 export class VehicleComponent implements OnInit,OnDestroy{
   // ===== Metadata & Configurations =====
-  readonly tableColumns = VehicleTableMeta;
-  readonly vehicleFilterMeta = VehicleFilterMeta;
-  readonly actionPanelConfig = VehicleActionPanelMeta;
-  readonly vehicleFormMeta = VehicleFormMeta;
-  readonly vehicleExportMeta = VehicleExportMeta;
-  readonly vehicleImmutableControllers = VehicleImmutableControllersMeta;
+  protected readonly tableColumns = VehicleTableMeta;
+  protected readonly vehicleFilterMeta = VehicleFilterMeta;
+  protected readonly actionPanelConfig = buildActionPanel();
+  protected readonly vehicleFormMeta = VehicleFormMeta;
+  protected readonly vehicleExportMeta = VehicleExportMeta;
+  protected readonly vehicleImmutableControllers = VehicleImmutableControllersMeta;
 
   // ===== Form Controls =====
-  vehicleFilterForm: FormGroup = new FormGroup({});
-  vehicleForm: FormGroup = new FormGroup({});
+  protected vehicleFilterForm: FormGroup = new FormGroup({});
+  protected vehicleForm: FormGroup = new FormGroup({});
 
   // --- Data ---
-  vehicles!: Vehicle[];
-  servicetypes!: Servicetype[];
-  vehiclestatuses!: Vehiclestatus[];
-  makes!: Make[];
-  fueltypes!: Fueltype[];
-  conditionrates!: Conditionrate[];
-  seatingcapacities!: Seatingcapacity[];
-  employees!: Employee[];
-  branches!: Branch[];
-  regexRules!: any;
+  protected vehicles!: Vehicle[];
+  protected servicetypes!: Servicetype[];
+  protected vehiclestatuses!: Vehiclestatus[];
+  protected makes!: Make[];
+  protected fueltypes!: Fueltype[];
+  protected conditionrates!: Conditionrate[];
+  protected seatingcapacities!: Seatingcapacity[];
+  protected employees!: Employee[];
+  protected branches!: Branch[];
+  protected regexRules!: any;
 
-  dataInitialized = false;
+  protected dataInitialized = false;
 
   private destroy$ = new Subject<void>();
 
-  selectedRows = new Set<Vehicle>();
-  activeVehicle: Vehicle | null = null;
+  protected selectedRows = new Set<Vehicle>();
+  protected activeVehicle: Vehicle | null = null;
 
   constructor(
     private vehicleFacadeService:VehiclefacadeService,
@@ -181,7 +181,7 @@ export class VehicleComponent implements OnInit,OnDestroy{
   }
 
   // ===== CRUD =====
-  openVehicleForm(): void {
+  protected openVehicleForm(): void {
     // this.vehicleForm.value.id?this.setFormControlsStateOnEdit():this.setFormControlsStateOnCreate();
     this.vehicleForm.value.id?
       FormUtils.setFormControlsState(this.vehicleForm,this.vehicleImmutableControllers,true):
@@ -218,7 +218,7 @@ export class VehicleComponent implements OnInit,OnDestroy{
     });
   }
 
-  editVehicle(row: Vehicle): void {
+  protected editVehicle(row: Vehicle): void {
     //this.setFormControlsStateOnEdit();
     const normalizedRow = FormUtils.normalizeObject(row,  [
       { from: 'seatingcapacity.make', to: 'make', remove: false }
@@ -227,7 +227,7 @@ export class VehicleComponent implements OnInit,OnDestroy{
     this.openVehicleForm();
   }
 
-  deactivateSelectedVehicles() {
+  protected deactivateSelectedVehicles() {
     const toDeactivate = Array.from(this.selectedRows);
     this.dialogService.showConfirmation({
       heading: "Deactivation",
@@ -281,7 +281,7 @@ export class VehicleComponent implements OnInit,OnDestroy{
   // }
 
   // ===== Export Operations =====
-  exportSelectedToPdf() {
+  protected exportSelectedToPdf() {
     if (this.selectedRows.size > 0) {
       this.dialogService.showPrintDialog({
         width:'1500px',
@@ -300,7 +300,7 @@ export class VehicleComponent implements OnInit,OnDestroy{
     }
   }
 
-  exportSelectedToExcel(): void {
+  protected exportSelectedToExcel(): void {
     const selectedArray = Array.from(this.selectedRows);
 
     let isExported = exportToExcel(
@@ -320,7 +320,7 @@ export class VehicleComponent implements OnInit,OnDestroy{
     this.activeVehicle = row;
   }
 
-  protected closeDetails(): void {
+ protected closeDetails(): void {
     this.activeVehicle = null;
   }
 
@@ -340,7 +340,7 @@ export class VehicleComponent implements OnInit,OnDestroy{
   }
 
   // ===== Action Panel =====
-  private actionHandlers: Record<string, () => void> = {
+ private actionHandlers: Record<string, () => void> = {
     'clear-search': () => this.vehicleFilterForm.reset(),
     'create': () => this.openVehicleForm(),
     'bulk-deactivate': () => this.deactivateSelectedVehicles(),
@@ -348,13 +348,13 @@ export class VehicleComponent implements OnInit,OnDestroy{
     'export-excel': () => this.exportSelectedToExcel()
   };
 
-  onActionTriggered(event: ButtonClickEvent) {
+ protected onActionTriggered(event: ButtonClickEvent) {
     const handler = this.actionHandlers[event.type];
     if (handler) handler();
     else this.dialogService.showWarning(`No handler defined for action: ${event.type}`);
   }
 
-  onDropdownOnlyClick(event: ButtonClickEvent) {
+ protected onDropdownOnlyClick(event: ButtonClickEvent) {
     const dropdownTypes = ['export-pdf', 'export-excel'];
     if (dropdownTypes.includes(event.type)) {
       this.actionHandlers[event.type]?.();

@@ -8,7 +8,7 @@ import {BranchStatus} from '../model/branchstatus';
 import {BranchType} from '../model/branchtype';
 import {District} from '../model/district';
 import {Province} from '../model/province';
-import {BranchActionPanelMeta, FilterMeta, FormMeta, PrintTableMeta, TableMeta} from '../branch.meta';
+import {FilterMeta, FormMeta, PrintTableMeta, TableMeta} from '../branch.meta';
 import {ButtonClickEvent, ButtonPanelComponent } from '../../../shared/component/button/button-panel/button-panel.component';
 import {DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
@@ -21,6 +21,7 @@ import {SideViewComponent} from '../../../shared/component/side-view/side-view.c
 import {MatDivider} from '@angular/material/divider';
 import {exportToExcel} from '../../../shared/component/export/excel-export.util';
 import {FormUtils} from '../../../shared/component/form/form-util';
+import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
 
 @Component({
   selector: 'app-branch',
@@ -47,28 +48,27 @@ import {FormUtils} from '../../../shared/component/form/form-util';
 export class BranchComponent implements OnInit, OnDestroy {
 
   // ===== Metadata & Configurations =====
-  readonly tableColumns = TableMeta;
-  //readonly dashboardStats = DashBoardMeta;
-  readonly actionPanelConfig = BranchActionPanelMeta;
-  readonly branchFormMeta = FormMeta;
-  readonly branchFilterMeta = FilterMeta;
-  readonly printableColumns = PrintTableMeta;
+  protected readonly tableColumns = TableMeta;
+  protected readonly actionPanelConfig = buildActionPanel();
+  protected readonly branchFormMeta = FormMeta;
+  protected readonly branchFilterMeta = FilterMeta;
+  protected readonly printableColumns = PrintTableMeta;
 
   // ===== Form Controls =====
-  branchForm: FormGroup = new FormGroup({});
-  branchFilterForm: FormGroup = new FormGroup({});
+  protected branchForm: FormGroup = new FormGroup({});
+  protected branchFilterForm: FormGroup = new FormGroup({});
 
   // --- Data ---
-  branches!: Branch[];
-  branchStatuses!: BranchStatus[];
-  branchTypes!: BranchType[];
-  districts!: District[];
-  provinces!: Province[];
-  regexRules!: any;
+  protected branches!: Branch[];
+  protected branchStatuses!: BranchStatus[];
+  protected branchTypes!: BranchType[];
+  protected districts!: District[];
+  protected provinces!: Province[];
+  protected regexRules!: any;
 
-  dataInitialized = false;
-  selectedRows = new Set<Branch>();
-  activeBranch: Branch | null = null;
+  protected dataInitialized = false;
+  protected selectedRows = new Set<Branch>();
+  protected activeBranch: Branch | null = null;
 
   @ViewChild('printSection', {static: false}) printSectionRef!: ElementRef;
 
@@ -154,7 +154,7 @@ export class BranchComponent implements OnInit, OnDestroy {
   }
 
   // ===== CRUD =====
-  openBranchForm(): void {
+  protected openBranchForm(): void {
     this.dialogService.showFormPopup({
       heading: this.branchForm.value.id ? 'Edit Branch' : 'Create Branch',
       form: this.branchForm,
@@ -180,12 +180,12 @@ export class BranchComponent implements OnInit, OnDestroy {
     });
   }
 
-  editBranch(row: Branch): void {
+  protected editBranch(row: Branch): void {
     this.branchForm.patchValue(row);
     this.openBranchForm();
   }
 
-  deactivateSelectedBranches() {
+  protected deactivateSelectedBranches() {
     const toDeactivate = Array.from(this.selectedRows);
     this.dialogService.showConfirmation({
       heading: "Deactivation",
@@ -206,15 +206,15 @@ export class BranchComponent implements OnInit, OnDestroy {
   }
 
 // ===== Table Selection =====
-  onRowClick(row: any): void {
+  protected onRowClick(row: any): void {
     this.activeBranch = row;
   }
 
-  closeBranchDetails(): void {
+  protected closeBranchDetails(): void {
     this.activeBranch = null;
   }
 
-  onRowAction(action: string, row: any) {
+  protected onRowAction(action: string, row: any) {
     if (action === 'edit') this.editBranch(row);
   }
 
@@ -228,14 +228,14 @@ export class BranchComponent implements OnInit, OnDestroy {
     'clear-search': () => this.branchFilterForm.reset()
   };
 
-  onActionTriggered(event: ButtonClickEvent) {
+  protected onActionTriggered(event: ButtonClickEvent) {
     const handler = this.actionHandlers[event.type];
     if (handler) handler();
     else this.dialogService.showError(`No handler defined for action: ${event.type}`);
   }
 
 
-  onDropdownOnlyClick(event: ButtonClickEvent) {
+  protected onDropdownOnlyClick(event: ButtonClickEvent) {
     const dropdownTypes = ['export-pdf', 'export-excel'];
     if (dropdownTypes.includes(event.type)) {
       this.actionHandlers[event.type]?.();
@@ -245,7 +245,7 @@ export class BranchComponent implements OnInit, OnDestroy {
   }
 
   // ===== Export Operations =====
-  exportSelectedToPdf() {
+  protected exportSelectedToPdf() {
     if (this.selectedRows.size > 0) {
       this.dialogService.showPrintDialog({
         title: 'Branch Details',
@@ -263,7 +263,7 @@ export class BranchComponent implements OnInit, OnDestroy {
   }
 
 
-  exportSelectedToExcel(): void {
+  protected exportSelectedToExcel(): void {
     const selectedArray = Array.from(this.selectedRows);
     let isExported = exportToExcel(
       selectedArray,

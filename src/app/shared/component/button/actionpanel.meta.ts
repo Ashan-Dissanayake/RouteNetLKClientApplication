@@ -1,6 +1,6 @@
-import {ButtonAction} from '../component/button/button-panel/button-panel.component';
+import {ButtonAction} from './button-panel/button-panel.component';
 
-export const ActionPanelMeta: ButtonAction[] = [
+export const BASE_ACTION_PANEL_META: ButtonAction[] = [
   {label: 'Create', type: 'create', icon: 'add'},
   {
     label: 'Export',

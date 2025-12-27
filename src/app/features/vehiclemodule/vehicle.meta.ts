@@ -21,21 +21,6 @@ export const VehicleFilterMeta: FormField[] = [
   {name: 'ssconditionrate', type: 'select', label: 'Condition Rate', required: false, mode: 'options'},
 ] as FormField[];
 
-export const VehicleActionPanelMeta: ButtonAction[] = [
-  {label: 'Create', type: 'create', icon: 'add'},
-  {
-    label: 'Export',
-    type: 'export',
-    icon: 'download',
-    dropdown: [
-      {label: 'pdf', type: 'export-pdf'},
-      {label: 'Excel', type: 'export-excel'}
-    ]
-  },
-  {label: 'Deactivate', type: 'bulk-deactivate', icon: 'delete', disabled: false},
-  {label: 'Clear Search', type: 'clear-search', icon: 'cancel'}
-];
-
 export const VehicleFormMeta: FormField[] = [
   {name: 'id', type: 'hidden', label: 'Vehicle id', required: false, mode: 'none'},
   {name: 'make', type: 'select', label: 'Make/Model', required: true, mode: 'options'},

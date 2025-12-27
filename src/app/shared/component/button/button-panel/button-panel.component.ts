@@ -41,18 +41,6 @@ export class ButtonPanelComponent implements OnChanges{
     }
   }
 
-  //Evaluate disabled state (supports boolean or function)
-  // isDisabled(button: ButtonAction): boolean {
-  //   return typeof button.disabled === 'function'
-  //     ? button.disabled()
-  //     : !!button.disabled;
-  // }
-  //
-  // //Return unique menu ID for each button
-  // menuId(index: number): string {
-  //   return `menu-${index}`;
-  // }
-
   isDisabled(button: ButtonAction): boolean {
     return typeof button.disabled === 'function'
       ? button.disabled(this.contextData)

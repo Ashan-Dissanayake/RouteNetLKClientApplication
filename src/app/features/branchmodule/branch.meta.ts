@@ -1,29 +1,6 @@
 import {FormField} from '../../shared/models/formfieldata.model';
 import {ButtonAction} from '../../shared/component/button/button-panel/button-panel.component';
 
-// export  const DashBoardMeta = [
-//   { label: 'Total Branches', value: 1234 },
-//   { label: 'Active Branches', value: 1000 },
-//   { label: 'Head', value: 50 },
-//   { label: 'Regular', value: 184 }
-// ];
-
-export const BranchActionPanelMeta: ButtonAction[] = [
-  { label: 'Create', type: 'create', icon: 'add' },
-  {
-    label: 'Export',
-    type: 'export',
-    icon: 'download',
-    dropdown: [
-      { label: 'pdf', type: 'export-pdf' },
-      { label: 'Excel', type: 'export-excel' }
-    ]
-  },
-  { label: 'Deactivate', type: 'bulk-deactivate', icon: 'delete', disabled: false },
-  { label: 'Clear Search', type: 'clear-search', icon: 'cancel' }
-];
-
-
 export const FormMeta:FormField[] = [
   { name: 'id', type: 'hidden', label: 'Branch id', required: false, mode: 'none'},
   { name: 'name', type: 'text', label: 'Branch Name', required: true, mode: 'regex'},

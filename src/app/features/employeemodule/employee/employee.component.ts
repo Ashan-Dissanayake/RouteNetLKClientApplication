@@ -8,7 +8,6 @@ import {SideViewComponent} from '../../../shared/component/side-view/side-view.c
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
 import {MatIcon} from '@angular/material/icon';
 import {
-  EmployeeActionPanelMeta,
   EmployeeExportMeta,
   EmployeeFilterMeta,
   EmployeeFormMeta,
@@ -29,6 +28,7 @@ import {Gender} from '../model/gender';
 import {Branch} from '../../branchmodule/model/branch';
 import {FormUtils} from '../../../shared/component/form/form-util';
 import {exportToExcel} from '../../../shared/component/export/excel-export.util';
+import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
 
 @Component({
   selector: 'app-employee',
@@ -55,32 +55,32 @@ import {exportToExcel} from '../../../shared/component/export/excel-export.util'
 export class EmployeeComponent implements OnInit, OnDestroy {
 
   // ===== Metadata & Configurations =====
-  readonly tableColumns = EmployeeTableMeta;
-  readonly employeeFilterMeta = EmployeeFilterMeta;
-  readonly actionPanelConfig = EmployeeActionPanelMeta;
-  readonly employeeFormMeta = EmployeeFormMeta;
-  readonly employeeExportMeta = EmployeeExportMeta;
+  protected readonly tableColumns = EmployeeTableMeta;
+  protected readonly employeeFilterMeta = EmployeeFilterMeta;
+  protected readonly actionPanelConfig = buildActionPanel();
+  protected readonly employeeFormMeta = EmployeeFormMeta;
+  protected readonly employeeExportMeta = EmployeeExportMeta;
 
   // ===== Form Controls =====
-  employeeFilterForm: FormGroup = new FormGroup({});
-  employeeForm: FormGroup = new FormGroup({});
+  protected employeeFilterForm: FormGroup = new FormGroup({});
+  protected employeeForm: FormGroup = new FormGroup({});
 
   // --- Data ---
-  employees!: Employee[];
-  departments!: Department[];
-  designations!: Designation[];
-  employeeStatuses!: Employeestatus[];
-  employeeTypes!: Employeetype[];
-  genders!: Gender[];
-  branches!: Branch[];
-  regexRules!: any;
+  protected employees!: Employee[];
+  protected departments!: Department[];
+  protected designations!: Designation[];
+  protected employeeStatuses!: Employeestatus[];
+  protected employeeTypes!: Employeetype[];
+  protected genders!: Gender[];
+  protected branches!: Branch[];
+  protected regexRules!: any;
 
-  dataInitialized = false;
+  protected dataInitialized = false;
 
   private destroy$ = new Subject<void>();
 
-  selectedRows = new Set<Employee>();
-  activeEmployee: Employee | null = null;
+  protected selectedRows = new Set<Employee>();
+  protected activeEmployee: Employee | null = null;
 
   constructor(
     private formBuilder: FormbuilderService,
@@ -173,7 +173,7 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   }
 
   // ===== CRUD =====
-  openEmployeeForm(): void {
+  protected openEmployeeForm(): void {
     this.dialogService.showFormPopup({
       heading: this.employeeForm.value.id ? 'Edit Employee' : 'Create Employee',
       form: this.employeeForm,
@@ -202,13 +202,13 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     });
   }
 
-  editEmployee(row: Employee): void {
+  protected editEmployee(row: Employee): void {
     this.disableControllerOnEdit();
     this.employeeForm.patchValue(row);
     this.openEmployeeForm();
   }
 
-  deactivateSelectedEmployees() {
+  protected deactivateSelectedEmployees() {
     const toDeactivate = Array.from(this.selectedRows);
     this.dialogService.showConfirmation({
       heading: "Deactivation",
@@ -255,21 +255,21 @@ export class EmployeeComponent implements OnInit, OnDestroy {
    });
   }
 
-  disableControllerOnEdit(){
+  protected disableControllerOnEdit(){
     this.disableNumber();
     this.disableDatePicker();
   }
 
-  disableDatePicker(){
+  protected disableDatePicker(){
     this.employeeForm.controls['doj'].disable({onlySelf:true})
   }
 
-  disableNumber(){
+  protected disableNumber(){
     this.employeeForm.controls['number'].disable({onlySelf:true})
   }
 
   // ===== Export Operations =====
-  exportSelectedToPdf() {
+  protected exportSelectedToPdf() {
     if (this.selectedRows.size > 0) {
       this.dialogService.showPrintDialog({
         width:'1500px',
@@ -288,7 +288,7 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     }
   }
 
-  exportSelectedToExcel(): void {
+  protected exportSelectedToExcel(): void {
     const selectedArray = Array.from(this.selectedRows);
 
     let isExported = exportToExcel(
@@ -312,13 +312,13 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     'export-excel': () => this.exportSelectedToExcel()
   };
 
-  onActionTriggered(event: ButtonClickEvent) {
+  protected onActionTriggered(event: ButtonClickEvent) {
     const handler = this.actionHandlers[event.type];
     if (handler) handler();
     else this.dialogService.showWarning(`No handler defined for action: ${event.type}`);
   }
 
-  onDropdownOnlyClick(event: ButtonClickEvent) {
+  protected onDropdownOnlyClick(event: ButtonClickEvent) {
     const dropdownTypes = ['export-pdf', 'export-excel'];
     if (dropdownTypes.includes(event.type)) {
       this.actionHandlers[event.type]?.();
@@ -328,25 +328,25 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   }
 
   // ===== Table Selection =====
-  onRowClick(row: any): void {
+  protected onRowClick(row: any): void {
     this.activeEmployee = row;
   }
 
-  closeBranchDetails(): void {
+  protected closeBranchDetails(): void {
     this.activeEmployee = null;
   }
 
-  onRowAction(action: string, row: any) {
+  protected onRowAction(action: string, row: any) {
     if (action === 'edit') this.editEmployee(row);
   }
 
   // Selection Handling
-  onRowCheckboxChanged(event: CheckboxEvent) {
+  protected onRowCheckboxChanged(event: CheckboxEvent) {
     if (event.checked) this.selectedRows.add(event.row);
     else this.selectedRows.delete(event.row);
   }
 
-  onSelectAll(checked: boolean) {
+  protected onSelectAll(checked: boolean) {
     this.selectedRows.clear();
     if (checked) this.employees.forEach(row => this.selectedRows.add(row));
   }

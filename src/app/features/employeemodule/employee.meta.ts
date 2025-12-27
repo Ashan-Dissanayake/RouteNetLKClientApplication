@@ -22,21 +22,6 @@ export const EmployeeFilterMeta: FormField[] = [
   {name: 'ssdepartment', type: 'select', label: 'Department', required: false, mode: 'options'},
 ] as FormField[];
 
-export const EmployeeActionPanelMeta: ButtonAction[] = [
-  {label: 'Create', type: 'create', icon: 'add'},
-  {
-    label: 'Export',
-    type: 'export',
-    icon: 'download',
-    dropdown: [
-      {label: 'pdf', type: 'export-pdf'},
-      {label: 'Excel', type: 'export-excel'}
-    ]
-  },
-  {label: 'Deactivate', type: 'bulk-deactivate', icon: 'delete', disabled: false},
-  {label: 'Clear Search', type: 'clear-search', icon: 'cancel'}
-];
-
 export const EmployeeFormMeta: FormField[] = [
   {name: 'id', type: 'hidden', label: 'Employee id', required: false, mode: 'none'},
   {name: 'branch', type: 'select', label: 'Branch', required: true, mode: 'options'},

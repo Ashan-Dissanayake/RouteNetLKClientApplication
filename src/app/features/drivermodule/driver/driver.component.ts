@@ -8,7 +8,6 @@ import {SideViewComponent} from '../../../shared/component/side-view/side-view.c
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
 import {MatDivider} from '@angular/material/list';
 import {NgClass, NgForOf, NgIf} from '@angular/common';
-import {ActionPanelMeta} from '../../../shared/models/actionpanel.meta';
 import {FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {RouteFamiliarityLevel,} from '../model/routefamiliaritylevel';
 import {CrewStatus} from '../model/crewstatus';
@@ -21,15 +20,15 @@ import {
   ButtonPanelComponent
 } from '../../../shared/component/button/button-panel/button-panel.component';
 import {
-  DriverFilterFormMeta, DriverImmutableControllersMeta,
-  DriverMainFormMeta,
-  DriverTableMeta
+  DRIVER_FILTER_FORM_META, DRIVER_IMMUTABLE_CONTROLLERS_META, DRIVER_MAIN_FORM_META,
+  DRIVER_TABLE_META
 } from '../driver.meta';
 import {Employee} from '../../employeemodule/model/employee';
 import {LicenseCategory} from '../model/licensecategory';
 import {FormUtils} from '../../../shared/component/form/form-util';
 import {DriverMapper} from '../../../shared/mappers/DriverMapper';
 import {VehicleImmutableControllersMeta} from '../../vehiclemodule/vehicle.meta';
+import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
 
 
 @Component({
@@ -56,11 +55,11 @@ import {VehicleImmutableControllersMeta} from '../../vehiclemodule/vehicle.meta'
 export class DriverComponent implements OnInit,OnDestroy {
 
   // ===== Metadata & Configurations =====
-  protected readonly tableColumns = DriverTableMeta;
-  protected readonly filterFormMeta = DriverFilterFormMeta;
-  protected readonly mainFormMeta = DriverMainFormMeta;
-  protected readonly actionPanelConfig = ActionPanelMeta;
-  readonly immutableControllers = DriverImmutableControllersMeta;
+  protected readonly tableColumns = DRIVER_TABLE_META;
+  protected readonly filterFormMeta = DRIVER_FILTER_FORM_META;
+  protected readonly mainFormMeta = DRIVER_MAIN_FORM_META;
+  protected readonly actionPanelConfig = buildActionPanel({exclude: ['bulk-deactivate']});
+  readonly immutableControllers = DRIVER_IMMUTABLE_CONTROLLERS_META;
 
   // ===== Forms =====
   protected filterForm: FormGroup = new FormGroup({});
