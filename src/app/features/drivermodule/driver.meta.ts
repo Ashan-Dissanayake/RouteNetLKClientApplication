@@ -51,3 +51,14 @@ export const DRIVER_MAIN_FORM_META: FormField[] = [
 export const DRIVER_IMMUTABLE_CONTROLLERS_META = [
   'employee','number','licensenumber','crewstatus',
 ]
+
+export const DRIVER_DATA_EXPORT_META = [
+  { key: 'employee.callingname', header: 'Driver' },
+  { key: 'number', header: 'Driver Number' },
+  { key: 'licensenumber', header: 'License Number' },
+  {key: 'dolicenseexpired', header: 'License Exp Date'},
+  {key: 'domedicalexpired', header: 'Medical Exp Date'},
+  {key: 'licensecategory.name', header: 'License Category'},
+  {key: 'routefamiliaritylevel.name', header: 'Route Familiarity'},
+  {key: 'crewstatus.name', header: 'Status'},
+]

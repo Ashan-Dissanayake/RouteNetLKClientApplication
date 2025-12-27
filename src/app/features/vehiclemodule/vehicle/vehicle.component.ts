@@ -264,22 +264,6 @@ export class VehicleComponent implements OnInit,OnDestroy{
     });
   }
 
-  // private setFormControlsStateOnEdit(){
-  //   FormUtils.setFormControlsState(this.vehicleForm, [
-  //       'make', 'code', 'number', 'yom', 'dob',
-  //       'chasisnumber', 'enginenumber', 'mileage',
-  //       'seatingcapacity', 'employee', 'branch'
-  //     ], true);
-  // }
-  //
-  // private setFormControlsStateOnCreate(){
-  //   FormUtils.setFormControlsState(this.vehicleForm, [
-  //       'make', 'code', 'number', 'yom', 'dob',
-  //       'chasisnumber', 'enginenumber', 'mileage',
-  //       'seatingcapacity', 'employee', 'branch'
-  //     ], false);
-  // }
-
   // ===== Export Operations =====
   protected exportSelectedToPdf() {
     if (this.selectedRows.size > 0) {

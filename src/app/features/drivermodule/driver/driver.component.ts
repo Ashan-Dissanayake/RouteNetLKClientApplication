@@ -20,6 +20,7 @@ import {
   ButtonPanelComponent
 } from '../../../shared/component/button/button-panel/button-panel.component';
 import {
+  DRIVER_DATA_EXPORT_META,
   DRIVER_FILTER_FORM_META, DRIVER_IMMUTABLE_CONTROLLERS_META, DRIVER_MAIN_FORM_META,
   DRIVER_TABLE_META
 } from '../driver.meta';
@@ -27,8 +28,8 @@ import {Employee} from '../../employeemodule/model/employee';
 import {LicenseCategory} from '../model/licensecategory';
 import {FormUtils} from '../../../shared/component/form/form-util';
 import {DriverMapper} from '../../../shared/mappers/DriverMapper';
-import {VehicleImmutableControllersMeta} from '../../vehiclemodule/vehicle.meta';
 import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
+import {exportToExcel} from '../../../shared/component/export/excel-export.util';
 
 
 @Component({
@@ -59,7 +60,8 @@ export class DriverComponent implements OnInit,OnDestroy {
   protected readonly filterFormMeta = DRIVER_FILTER_FORM_META;
   protected readonly mainFormMeta = DRIVER_MAIN_FORM_META;
   protected readonly actionPanelConfig = buildActionPanel({exclude: ['bulk-deactivate']});
-  readonly immutableControllers = DRIVER_IMMUTABLE_CONTROLLERS_META;
+  protected readonly immutableControllers = DRIVER_IMMUTABLE_CONTROLLERS_META;
+  protected readonly exportMeta = DRIVER_DATA_EXPORT_META;
 
   // ===== Forms =====
   protected filterForm: FormGroup = new FormGroup({});
@@ -221,8 +223,43 @@ export class DriverComponent implements OnInit,OnDestroy {
     this.activeRow = null;
   }
 
-  protected onRowAction(action: string, row: any) {
+  protected onRowAction(action: string, row: any):void {
     if (action === 'edit') this.editRow(row);
+  }
+
+  // ===== Export Operations =====
+  protected exportSelectedToPdf():void {
+    if (this.selectedRows.size > 0) {
+      this.dialogService.showPrintDialog({
+        width:'1500px',
+        height:'650px',
+        title: 'Driver Details',
+        mode: 'table',
+        data: Array.from(this.selectedRows),
+        columns: this.exportMeta
+      }).subscribe((result) => {
+        if (result) {
+          this.selectedRows = new Set<Driver>();
+        }
+      });
+    } else {
+      this.dialogService.showWarning('Please select at least one record to print.');
+    }
+  }
+
+  protected exportSelectedToExcel(): void {
+    const selectedArray = Array.from(this.selectedRows);
+
+    let isExported = exportToExcel(
+      selectedArray,
+      this.exportMeta,
+      'selected-drivers.xlsx'
+    );
+
+    if (!isExported) {
+      this.dialogService.showWarning('Please select at least one record to export.');
+      return
+    }
   }
 
   // Selection Handling
@@ -240,6 +277,8 @@ export class DriverComponent implements OnInit,OnDestroy {
   private actionHandlers: Record<string, () => void> = {
     'clear-search': () => this.filterForm.reset(),
     'create': () => this.openMainForm(),
+    'export-pdf': () => this.exportSelectedToPdf(),
+    'export-excel': () => this.exportSelectedToExcel()
   };
 
   protected onActionTriggered(event: ButtonClickEvent):void {
