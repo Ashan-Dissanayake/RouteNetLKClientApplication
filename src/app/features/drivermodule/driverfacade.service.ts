@@ -60,7 +60,6 @@ export class DriverFacadeService {
     return this.regexService.getDynamicRegexes('driver', licenseCategory).pipe(map(res => res.data));
   }
 
-
   searchDriver(criteria: Record<string, any>): Observable<Driver[]> {
     const normalized = normalizeSearchCriteria(criteria);
     return this.getDrivers(normalized);

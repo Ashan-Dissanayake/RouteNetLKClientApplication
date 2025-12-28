@@ -12,11 +12,11 @@
 </app-button-panel>
 
 <!-- ===== Filter Section ===== -->
-<div *ngIf="employeeFilterForm && dataInitialized" id="serverSearch">
-  <form [formGroup]="employeeFilterForm">
+<div *ngIf="filterForm && dataInitialized" id="serverSearch">
+  <form [formGroup]="filterForm">
     <dynamic-field
-      *ngFor="let field of employeeFilterMeta"
-      [formInstance]="employeeFilterForm"
+      *ngFor="let field of filterFormMeta"
+      [formInstance]="filterForm"
       [field]="field"
     >
     </dynamic-field>
@@ -29,7 +29,7 @@
   [data]="activeEmployee"
   [title]="'Employee Details'"
   [viewTemplate]="employeeDetailTemplate"
-  (closed)="closeBranchDetails()"
+  (closed)="onCloseDetailView()"
 >
   <app-data-table
     [data]="employees"

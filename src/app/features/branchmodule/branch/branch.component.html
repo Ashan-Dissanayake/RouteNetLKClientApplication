@@ -12,11 +12,11 @@
   </app-button-panel>
 
   <!-- ===== Filter Section ===== -->
-  <div *ngIf="branchFilterForm && dataInitialized" id="serverSearch">
-    <form [formGroup]="branchFilterForm">
+  <div *ngIf="filterForm && dataInitialized" id="serverSearch">
+    <form [formGroup]="filterForm">
       <dynamic-field
-        *ngFor="let field of branchFilterMeta"
-        [formInstance]="branchFilterForm"
+        *ngFor="let field of filterFormMeta"
+        [formInstance]="filterForm"
         [field]="field"
       >
       </dynamic-field>
@@ -29,7 +29,7 @@
   [data]="activeBranch"
   [title]="'Branch Details'"
   [viewTemplate]="branchDetailTemplate"
-  (closed)="closeBranchDetails()"
+  (closed)="onCloseDetailView()"
 >
   <app-data-table
     [data]="branches"

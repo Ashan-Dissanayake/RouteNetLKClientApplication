@@ -4,13 +4,10 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../core/api-endpoints';
-import {Vehicle} from '../model/vehicle';
-import {Department} from '../../employeemodule/model/department';
-import {Servicetype} from '../model/servicetype';
 import {Conditionrate} from '../model/conditionrate';
 
 @Injectable({ providedIn: 'root' })
-export class ConditionrateService extends BaseHttpService <Conditionrate>{
+export class ConditionRateService extends BaseHttpService <Conditionrate>{
 
   constructor(protected override http: HttpClient) {
     super(http);

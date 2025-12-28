@@ -28,7 +28,7 @@
   [opened]="activeRow !== null"
   [data]="activeRow"
   [title]="'Driver Details'"
-  (closed)="closeDetails()"
+  (closed)="onCloseDetailView()"
   [viewTemplate]="driverDetailTemplate"
 >
   <app-data-table

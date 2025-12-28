@@ -7,7 +7,7 @@ import {ApiEndpoints} from '../../../core/api-endpoints';
 import {Employeetype} from '../model/employeetype';
 
 @Injectable({ providedIn: 'root' })
-export class EmployeetypeService extends BaseHttpService <Employeetype>{
+export class EmployeeTypeService extends BaseHttpService <Employeetype>{
 
   constructor(protected override http: HttpClient) {
     super(http);

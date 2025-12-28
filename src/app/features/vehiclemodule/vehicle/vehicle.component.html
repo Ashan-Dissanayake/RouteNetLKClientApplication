@@ -12,11 +12,11 @@
 </app-button-panel>
 
 <!-- ===== Filter Section ===== -->
-<div *ngIf="vehicleFilterForm && dataInitialized" id="serverSearch">
-  <form [formGroup]="vehicleFilterForm">
+<div *ngIf="filterForm && dataInitialized" id="serverSearch">
+  <form [formGroup]="filterForm">
     <dynamic-field
-      *ngFor="let field of vehicleFilterMeta"
-      [formInstance]="vehicleFilterForm"
+      *ngFor="let field of filterFormMeta"
+      [formInstance]="filterForm"
       [field]="field"
     >
     </dynamic-field>
@@ -27,7 +27,7 @@
   [opened]="activeVehicle !== null"
   [data]="activeVehicle"
   [title]="'Vehicle Details'"
-  (closed)="closeDetails()"
+  (closed)="onCloseDetailView()"
   [viewTemplate]="vehicleDetailTemplate"
 >
 <app-data-table

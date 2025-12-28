@@ -1,7 +1,7 @@
 import {FormField} from '../../shared/models/formfieldata.model';
 import {ButtonAction} from '../../shared/component/button/button-panel/button-panel.component';
 
-export const VehicleTableMeta = [
+export const VEHICLE_TABLE_META = [
   {key: 'seatingcapacity.make.name', label: 'Make/Model'},
   {key: 'code', label: 'Code'},
   {key: 'number', label: 'Plate Number'},
@@ -15,13 +15,13 @@ export const VehicleTableMeta = [
   {key: 'actions', label: 'Actions'} // provide a template for this column below
 ];
 
-export const VehicleFilterMeta: FormField[] = [
+export const VEHICLE_FILTER_FORM_META: FormField[] = [
   {name: 'sscode', type: 'text', label: 'Code', required: false, mode: "none"},
   {name: 'sservicetype', type: 'select', label: 'Service Type', required: false, mode: 'options'},
   {name: 'ssconditionrate', type: 'select', label: 'Condition Rate', required: false, mode: 'options'},
 ] as FormField[];
 
-export const VehicleFormMeta: FormField[] = [
+export const VEHICLE_MAIN_FORM_META: FormField[] = [
   {name: 'id', type: 'hidden', label: 'Vehicle id', required: false, mode: 'none'},
   {name: 'make', type: 'select', label: 'Make/Model', required: true, mode: 'options'},
   {name: 'code', type: 'text', label: 'Vehicle Code', required: true, mode: 'regex'},
@@ -45,7 +45,13 @@ export const VehicleFormMeta: FormField[] = [
   {name: 'branch', type: 'select', label: 'Branch', required: true, mode: 'options'}
 ] as FormField[];
 
-export const VehicleExportMeta = [
+export const VEHICLE_IMMUTABLE_CONTROLLERS_META = [
+  'make', 'code', 'number', 'yom', 'dob',
+  'chasisnumber', 'enginenumber', 'mileage',
+  'seatingcapacity', 'employee', 'branch'
+]
+
+export const VEHICLE_DATA_EXPORT_META = [
   { key: 'code', header: 'Code' },
   { key: 'number', header: 'Number' },
   { key: 'mileage', header: 'Mileage' },
@@ -54,8 +60,4 @@ export const VehicleExportMeta = [
   {key: 'vehiclestatus.name', header: 'Status'},
 ]
 
-export const VehicleImmutableControllersMeta = [
-  'make', 'code', 'number', 'yom', 'dob',
-  'chasisnumber', 'enginenumber', 'mileage',
-  'seatingcapacity', 'employee', 'branch'
-]
+

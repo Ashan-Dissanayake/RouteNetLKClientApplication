@@ -46,8 +46,64 @@ export class FormbuilderService {
     return this.fb.group(group,{updateOn:"change"});
   }
 
+  // Helpers
+  getInvalidControls(form: FormGroup): string[] {
+    return Object.keys(form.controls).filter(key => form.get(key)?.invalid);
+  }
+
+  getUpdatedValues(form: FormGroup): Record<string, any> {
+    return Object.entries(form.controls)
+      .filter(([_, ctrl]) => ctrl.dirty)
+      .reduce((acc, [key, ctrl]) => ({ ...acc, [key]: ctrl.value }), {});
+  }
+
+  formatLabel(field: string): string {
+    return field
+      .replace(/[_\-]/g, ' ')
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  resetForm(form: FormGroup): void {
+    form.reset();
+    Object.values(form.controls).forEach(ctrl => ctrl.markAsPristine());
+  }
+
+  setControlsState(form: FormGroup, controls: string[], disabled: boolean) {
+    controls.forEach(c => form.get(c)?.[disabled ? 'disable' : 'enable']());
+  }
+
+  mapNestedValues(obj: any, rules: NormalizationRule[]) {
+    const result = { ...obj };
+
+    rules.forEach(rule => {
+      const fromKeys = rule.from.split('.');
+      let value = result;
+
+      // Traverse to get the value
+      for (const key of fromKeys) {
+        value = value?.[key];
+        if (value === undefined) break;
+      }
+
+      // Assign to new key
+      result[rule.to] = value ?? null;
+
+      // Remove original top-level key if requested
+      if (rule.remove) {
+        delete result[fromKeys[0]];
+      }
+    });
+
+    return result;
+  }
+
 }
 
-
+type NormalizationRule = {
+  from: string; // path to extract, e.g., 'seatingcapacity.make'
+  to: string;   // new key, e.g., 'make'
+  remove?: boolean; // whether to remove the original key
+};
 
 

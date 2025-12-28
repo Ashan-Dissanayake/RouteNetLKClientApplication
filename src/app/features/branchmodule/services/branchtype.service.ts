@@ -8,7 +8,7 @@ import {ApiResponse} from '../../../shared/models/apiresponse.model';
 
 
 @Injectable({ providedIn: 'root' })
-export class BranchtypeService extends BaseHttpService <BranchType>{
+export class BranchTypeService extends BaseHttpService <BranchType>{
 
   constructor(protected override http: HttpClient) {
     super(http);

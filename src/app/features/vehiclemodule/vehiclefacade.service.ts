@@ -5,7 +5,7 @@ import {map} from 'rxjs/operators';
 import {Vehicle} from './model/vehicle';
 import {Servicetype} from './model/servicetype';
 import {ServicetypeService} from './services/servicetype.service';
-import {ConditionrateService} from './services/conditionrate.service';
+import {ConditionRateService} from './services/conditionrate.service';
 import {Employee} from '../employeemodule/model/employee';
 import {normalizeSearchCriteria} from '../../core/search-criteria-normalizer';
 import {Vehiclestatus} from './model/vehiclestatus';
@@ -15,28 +15,26 @@ import {FueltypeService} from './services/fueltype.service';
 import {SeatingcapacityService} from './services/seatingcapacity.service';
 import {Make} from './model/make';
 import {Fueltype} from './model/fueltype';
-import {Conditionrate} from './model/conditionrate';
 import {Seatingcapacity} from './model/seatingcapacity';
 import {EmployeeService} from '../employeemodule/services/employee.service';
 import {BranchService} from '../branchmodule/services/branch.service';
 import {Branch} from '../branchmodule/model/branch';
 import {Regex} from '../../shared/models/regex.model';
 import {RegexService} from '../../core/regex.service';
-import {buildServePath} from '@angular-devkit/build-angular/src/tools/webpack/configs';
 
 @Injectable({
   providedIn: 'root',
 })
-export class VehiclefacadeService {
+export class VehicleFacadeService {
 
   constructor(
     private vehicleService: VehicleService,
-    private servicetypeService: ServicetypeService,
-    private vehiclestatusService: VehiclestatusService,
+    private serviceTypeService: ServicetypeService,
+    private vehicleStatusService: VehiclestatusService,
     private makeService: MakeService,
-    private fueltypeService: FueltypeService,
-    private conditionrateService: ConditionrateService,
-    private seatingcapacityService: SeatingcapacityService,
+    private fuelTypeService: FueltypeService,
+    private conditionRateService: ConditionRateService,
+    private seatingCapacityService: SeatingcapacityService,
     private employeeService: EmployeeService,
     private branchService: BranchService,
     private regexService: RegexService
@@ -48,28 +46,28 @@ export class VehiclefacadeService {
     return this.getVehicles();
   }
 
-  loadServicetypes(): Observable<Servicetype[]> {
-    return this.servicetypeService.get().pipe(map(res => res.data));
+  loadServiceTypes(): Observable<Servicetype[]> {
+    return this.serviceTypeService.get().pipe(map(res => res.data));
   }
 
-  loadConditionrates(): Observable<Servicetype[]> {
-    return this.conditionrateService.get().pipe(map(res => res.data));
+  loadConditionRates(): Observable<Servicetype[]> {
+    return this.conditionRateService.get().pipe(map(res => res.data));
   }
 
-  loadVehiclesatuses(): Observable<Vehiclestatus[]> {
-    return this.vehiclestatusService.get().pipe(map(res => res.data));
+  loadVehicleStatuses(): Observable<Vehiclestatus[]> {
+    return this.vehicleStatusService.get().pipe(map(res => res.data));
   }
 
   loadMakes(): Observable<Make[]> {
     return this.makeService.get().pipe(map(res => res.data));
   }
 
-  loadFueltypes(): Observable<Fueltype[]> {
-    return this.fueltypeService.get().pipe(map(res => res.data));
+  loadFuelTypes(): Observable<Fueltype[]> {
+    return this.fuelTypeService.get().pipe(map(res => res.data));
   }
 
-  laodSeatingcapacities(): Observable<Seatingcapacity[]> {
-    return this.seatingcapacityService.get().pipe(map(res => res.data));
+  loadSeatingCapacities(): Observable<Seatingcapacity[]> {
+    return this.seatingCapacityService.get().pipe(map(res => res.data));
   }
 
   loadBranches(): Observable<Branch[]> {
@@ -88,7 +86,7 @@ export class VehiclefacadeService {
     return this.regexService.getDynamicRegexes('vehicles', model).pipe(map(res => res.data));
   }
 
-  searchVehicle(criteria: Record<string, any>): Observable<Vehicle[]> {
+  searchVehicles(criteria: Record<string, any>): Observable<Vehicle[]> {
     const normalized = normalizeSearchCriteria(criteria);
     return this.getVehicles(normalized);
   }
@@ -107,7 +105,7 @@ export class VehiclefacadeService {
     return this.vehicleService.update(vehicleData);
   }
 
-  deleteVehicle(vehicles: Vehicle[]): Observable<number[]> {
+  deleteVehicles(vehicles: Vehicle[]): Observable<number[]> {
     if (!vehicles || vehicles.length === 0) {
       return throwError(() => new Error('No vehicle selected'));
     }
@@ -129,7 +127,6 @@ export class VehiclefacadeService {
 
     return this.vehicleService.deactivate(vehicleIds);
   }
-
 
   // Private helpers
   private getVehicles(params?: any): Observable<Vehicle[]> {

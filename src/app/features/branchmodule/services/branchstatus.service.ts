@@ -7,7 +7,7 @@ import {ApiEndpoints} from '../../../core/api-endpoints';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 
 @Injectable({ providedIn: 'root' })
-export class BranchstatusService extends BaseHttpService <BranchStatus>{
+export class BranchStatusService extends BaseHttpService <BranchStatus>{
 
   constructor(protected override http: HttpClient) {
     super(http);

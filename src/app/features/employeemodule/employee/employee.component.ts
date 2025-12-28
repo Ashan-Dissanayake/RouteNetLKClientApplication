@@ -1,17 +1,16 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Employee} from '../model/employee';
 import {debounceTime, distinctUntilChanged, forkJoin, Subject, takeUntil} from 'rxjs';
-import {EmployeefacadeService} from '../employeefacade.service';
+import {EmployeeFacadeService} from '../employeefacade.service';
 import {CheckboxEvent, DataTableComponent} from '../../../shared/component/data-table/data-table.component';
 import {MatButton} from '@angular/material/button';
 import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
 import {MatIcon} from '@angular/material/icon';
 import {
-  EmployeeExportMeta,
-  EmployeeFilterMeta,
-  EmployeeFormMeta,
-  EmployeeTableMeta
+  EMPLOYEE_DATA_EXPORT_META,
+  EMPLOYEE_FILTER_FORM_META, EMPLOYEE_IMMUTABLE_CONTROLLERS_META, EMPLOYEE_MAIN_FORM_META,
+  EMPLOYEE_TABLE_META,
 } from '../employee.meta';
 import {DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {MatDivider} from '@angular/material/divider';
@@ -26,7 +25,6 @@ import {Employeestatus} from '../model/employeestatus';
 import {Employeetype} from '../model/employeetype';
 import {Gender} from '../model/gender';
 import {Branch} from '../../branchmodule/model/branch';
-import {FormUtils} from '../../../shared/component/form/form-util';
 import {exportToExcel} from '../../../shared/component/export/excel-export.util';
 import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
 
@@ -55,15 +53,16 @@ import {buildActionPanel} from '../../../shared/component/button/action-panel.fa
 export class EmployeeComponent implements OnInit, OnDestroy {
 
   // ===== Metadata & Configurations =====
-  protected readonly tableColumns = EmployeeTableMeta;
-  protected readonly employeeFilterMeta = EmployeeFilterMeta;
+  protected readonly tableColumns = EMPLOYEE_TABLE_META;
+  protected readonly filterFormMeta = EMPLOYEE_FILTER_FORM_META;
   protected readonly actionPanelConfig = buildActionPanel();
-  protected readonly employeeFormMeta = EmployeeFormMeta;
-  protected readonly employeeExportMeta = EmployeeExportMeta;
+  protected readonly mainFormMeta = EMPLOYEE_MAIN_FORM_META;
+  protected readonly immutableControllers = EMPLOYEE_IMMUTABLE_CONTROLLERS_META;
+  protected readonly exportMeta = EMPLOYEE_DATA_EXPORT_META;
 
   // ===== Form Controls =====
-  protected employeeFilterForm: FormGroup = new FormGroup({});
-  protected employeeForm: FormGroup = new FormGroup({});
+  protected filterForm: FormGroup = new FormGroup({});
+  protected mainForm: FormGroup = new FormGroup({});
 
   // --- Data ---
   protected employees!: Employee[];
@@ -83,8 +82,8 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   protected activeEmployee: Employee | null = null;
 
   constructor(
-    private formBuilder: FormbuilderService,
-    private employeefacadeService: EmployeefacadeService,
+    private formBuilderService: FormbuilderService,
+    private employeeFacadeService: EmployeeFacadeService,
     private dialogService: DialogService
   ) {
   }
@@ -102,21 +101,25 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   // ===== Initialization =====
   private initialize(): void {
     forkJoin({
-      departments: this.employeefacadeService.loadDepartments(),
-      designations: this.employeefacadeService.loadDesignations(),
-      employeeTypes: this.employeefacadeService.loadEmployeeType(),
-      employeeStatuses: this.employeefacadeService.loadEmployeestatus(),
-      genders: this.employeefacadeService.loadGender(),
-      branches: this.employeefacadeService.loadBranches(),
-      regexes:this.employeefacadeService.loadStaticRegexes()
+      departments: this.employeeFacadeService.loadDepartments(),
+      designations: this.employeeFacadeService.loadDesignations(),
+      employeeTypes: this.employeeFacadeService.loadEmployeeType(),
+      employeeStatuses: this.employeeFacadeService.loadEmployeeStatus(),
+      genders: this.employeeFacadeService.loadGenders(),
+      branches: this.employeeFacadeService.loadBranches(),
+      regexes:this.employeeFacadeService.loadStaticRegexes()
     }).subscribe({
-      next: data => this.handleMetadataLoad(data),
-      error: (err) => this.dialogService.showError('Failed to load employee metadata.', err)
+      next: data => this.loadMetaData(data),
+      error: (err) => this.dialogService.showError('Failed to load metadata.', err),
+      complete:()=>{
+        this.loadTable();
+        this.createMainForm();
+        this.createFilterForm();
+      }
     });
-    this.loadEmployeeTable();
   }
 
-  private handleMetadataLoad(data: any): void {
+  private loadMetaData(data: any): void {
     this.departments = data.departments;
     this.designations = data.designations;
     this.employeeTypes = data.employeeTypes;
@@ -127,16 +130,19 @@ export class EmployeeComponent implements OnInit, OnDestroy {
 
     this.dataInitialized = true;
 
-    this.initializeForms();
-    this.subscribeToFilterChanges();
+    this.createMainForm();
+    this.createFilterForm();
   }
 
-  private initializeForms(): void {
-    this.employeeFilterForm = this.formBuilder.build(this.employeeFilterMeta, {
+  private createFilterForm(): void {
+    this.filterForm = this.formBuilderService.build(this.filterFormMeta, {
       ssdepartment: this.departments
     });
+    this.onFilterFormChanged();
+  }
 
-    this.employeeForm = this.formBuilder.build(this.employeeFormMeta, {
+  private createMainForm(): void {
+    this.mainForm = this.formBuilderService.build(this.mainFormMeta, {
       gender: this.genders,
       branch: this.branches,
       department: this.departments,
@@ -150,126 +156,101 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     this.setEmail();
   }
 
-  // ===== Data Loading =====
-  private loadEmployeeTable(): void {
-    this.employeefacadeService.loadEmployees()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(data => this.employees = data);
-  }
-
-  // ===== Filtering =====
-  private subscribeToFilterChanges(): void {
-    this.employeeFilterForm.valueChanges
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        takeUntil(this.destroy$)
-      )
-      .subscribe((filters: Record<string, any>) => {
-        this.employeefacadeService.searchEmployees(filters)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe(data => (this.employees = data));
-      });
-  }
-
-  // ===== CRUD =====
-  protected openEmployeeForm(): void {
-    this.dialogService.showFormPopup({
-      heading: this.employeeForm.value.id ? 'Edit Employee' : 'Create Employee',
-      form: this.employeeForm,
-      meta: this.employeeFormMeta
-    }).subscribe(formData => {
-      if (formData) this.saveEmployee(formData);
-      else FormUtils.resetForm(this.employeeForm);
-    });
-  }
-
-  private saveEmployee(formData: any): void {
-    const operation$ = formData.id
-      ? this.employeefacadeService.updateEmployee(formData)
-      : this.employeefacadeService.createEmployee(formData);
-
-    operation$?.pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => {
-        this.dialogService.showSuccess('Employee saved successfully.');
-        this.loadEmployeeTable();
-        FormUtils.resetForm(this.employeeForm);
-      },
-      error: (err) =>{
-        console.log(err)
-        this.dialogService.showMessage({heading:'Failed to save employee.', message:err.errorMessage})
+  private setGender():void{
+    this.mainForm.controls['nic'].valueChanges.subscribe((nic) => {
+      const nicControl = this.mainForm.get('nic');
+      if (nicControl?.valid) {
+        const gender = this.employeeFacadeService.extractGenderFromNIC(nic);
+        if (gender) {
+          let bindedGender = this.genders.find((gen)=> gen.name.toLowerCase() == gender.toLowerCase());
+          this.mainForm.controls['gender'].setValue(bindedGender);
+        }
       }
     });
   }
 
-  protected editEmployee(row: Employee): void {
-    this.disableControllerOnEdit();
-    this.employeeForm.patchValue(row);
-    this.openEmployeeForm();
+  private setEmail():void{
+    this.mainForm.controls['callingname'].valueChanges.subscribe(()=>{
+      const callingName = this.mainForm.controls['callingname'].getRawValue();
+      const employeeNumber = this.mainForm.controls['number'].getRawValue();
+      const callingnameControl = this.mainForm.get('callingname');
+      if (callingnameControl?.valid){
+        const email = this.employeeFacadeService.generateEmail(callingName,employeeNumber);
+        if (email){
+          this.mainForm.controls['email'].setValue(email);
+        }
+      }
+    });
   }
 
-  protected deactivateSelectedEmployees() {
+  // ===== Data Loading =====
+  private loadTable(): void {
+    this.employeeFacadeService.loadEmployees()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => this.employees = data);
+  }
+
+  // ===== CRUD =====
+  private openMainForm(): void {
+    this.mainForm.value.id?
+    this.formBuilderService.setControlsState(this.mainForm,this.immutableControllers,true):
+    this.formBuilderService.setControlsState(this.mainForm,this.immutableControllers,false);
+    this.dialogService.showFormPopup({
+      heading: this.mainForm.value.id ? 'Edit Employee' : 'Create Employee',
+      form: this.mainForm,
+      meta: this.mainFormMeta
+    }).subscribe(formData => {
+      if (formData) this.save(formData);
+      else this.formBuilderService.resetForm(this.mainForm);
+    });
+  }
+
+  private save(formData: any): void {
+    const operation$ = formData.id
+      ? this.employeeFacadeService.updateEmployee(formData)
+      : this.employeeFacadeService.createEmployee(formData);
+    operation$?.pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.dialogService.showSuccess('Employee saved successfully.');
+      },
+      error: (err) =>{
+        this.dialogService.showMessage({heading:'Failed to save employee.', message:err.errorMessage})
+      },
+      complete:()=>{
+        this.loadTable();
+        this.formBuilderService.resetForm(this.mainForm);
+        this.formBuilderService.setControlsState(this.mainForm, this.immutableControllers, false);
+      }
+    });
+  }
+
+  private edit(row: Employee): void {
+    this.mainForm.patchValue(row);
+    this.openMainForm();
+  }
+
+  private deactivateSelectedRows():void {
     const toDeactivate = Array.from(this.selectedRows);
     this.dialogService.showConfirmation({
       heading: "Deactivation",
       message: "Are sure ?"
     }).subscribe(confirmed => {
       if (!confirmed) return;
-      this.employeefacadeService.deleteEmployees(toDeactivate)
+      this.employeeFacadeService.deleteEmployees(toDeactivate)
         ?.pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: () => {
-            this.dialogService.showSuccess('Selected employees deactivated.');
+          next: () => this.dialogService.showSuccess('Selected employees deactivated.'),
+          error: (err) => this.dialogService.showError('Failed to deactivate employees.', err),
+          complete:()=>{
             this.selectedRows.clear();
-            this.loadEmployeeTable();
-          },
-          error: (err) => this.dialogService.showError('Failed to deactivate employees.', err)
+            this.loadTable();
+          }
         });
     })
   }
 
-  private setGender(){
-    this.employeeForm.controls['nic'].valueChanges.subscribe((nic) => {
-      const nicControl = this.employeeForm.get('nic');
-      if (nicControl?.valid) {
-        const gender = this.employeefacadeService.extractGenderFromNIC(nic);
-        if (gender) {
-          let bindedGender = this.genders.find((gen)=> gen.name.toLowerCase() == gender.toLowerCase());
-          this.employeeForm.controls['gender'].setValue(bindedGender);
-        }
-      }
-    });
-  }
-
-  private setEmail(){
-   this.employeeForm.controls['callingname'].valueChanges.subscribe(()=>{
-     const callingName = this.employeeForm.controls['callingname'].getRawValue();
-     const employeeNumber = this.employeeForm.controls['number'].getRawValue();
-     const callingnameControl = this.employeeForm.get('callingname');
-     if (callingnameControl?.valid){
-       const email = this.employeefacadeService.generateEmail(callingName,employeeNumber);
-       if (email){
-         this.employeeForm.controls['email'].setValue(email);
-       }
-     }
-   });
-  }
-
-  protected disableControllerOnEdit(){
-    this.disableNumber();
-    this.disableDatePicker();
-  }
-
-  protected disableDatePicker(){
-    this.employeeForm.controls['doj'].disable({onlySelf:true})
-  }
-
-  protected disableNumber(){
-    this.employeeForm.controls['number'].disable({onlySelf:true})
-  }
-
   // ===== Export Operations =====
-  protected exportSelectedToPdf() {
+  protected toPdf() {
     if (this.selectedRows.size > 0) {
       this.dialogService.showPrintDialog({
         width:'1500px',
@@ -277,7 +258,7 @@ export class EmployeeComponent implements OnInit, OnDestroy {
         title: 'Employee Details',
         mode: 'table',
         data: Array.from(this.selectedRows),
-        columns: this.employeeExportMeta
+        columns: this.exportMeta
       }).subscribe((result) => {
         if (result) {
           this.selectedRows = new Set<Employee>();
@@ -288,12 +269,12 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     }
   }
 
-  protected exportSelectedToExcel(): void {
+  protected toExcel(): void {
     const selectedArray = Array.from(this.selectedRows);
 
     let isExported = exportToExcel(
       selectedArray,
-      this.employeeExportMeta,
+      this.exportMeta,
       'selected-employees.xlsx'
     );
 
@@ -303,13 +284,48 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     }
   }
 
+  // ===== Table Selection =====
+  protected onRowClick(row: any): void {
+    this.activeEmployee = row;
+  }
+
+  protected onCloseDetailView(): void {
+    this.activeEmployee = null;
+  }
+
+  protected onRowAction(action: string, row: any) {
+    if (action === 'edit') this.edit(row);
+  }
+
+  // ===== Filtering =====
+  private onFilterFormChanged(): void {
+    this.filterForm.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe((filters: Record<string, any>) => {
+        this.employeeFacadeService.searchEmployees(filters)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe(data => (this.employees = data));
+      });
+  }
+
+  // ===== Selection Handling =====
+  protected onRowCheckboxChanged(event: CheckboxEvent) {
+    if (event.checked) this.selectedRows.add(event.row);
+    else this.selectedRows.delete(event.row);
+  }
+
+  protected onSelectAll(checked: boolean) {
+    this.selectedRows.clear();
+    if (checked) this.employees.forEach(row => this.selectedRows.add(row));
+  }
+
   // ===== Action Panel =====
   private actionHandlers: Record<string, () => void> = {
-    'clear-search': () => this.employeeFilterForm.reset(),
-    'create': () => this.openEmployeeForm(),
-    'bulk-deactivate': () => this.deactivateSelectedEmployees(),
-    'export-pdf': () => this.exportSelectedToPdf(),
-    'export-excel': () => this.exportSelectedToExcel()
+    'clear-search': () => this.filterForm.reset(),
+    'create': () => this.openMainForm(),
+    'bulk-deactivate': () => this.deactivateSelectedRows(),
+    'export-pdf': () => this.toPdf(),
+    'export-excel': () => this.toExcel()
   };
 
   protected onActionTriggered(event: ButtonClickEvent) {
@@ -325,30 +341,6 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     } else {
       this.dialogService.showWarning(`Unhandled dropdown action: ${event.type}`);
     }
-  }
-
-  // ===== Table Selection =====
-  protected onRowClick(row: any): void {
-    this.activeEmployee = row;
-  }
-
-  protected closeBranchDetails(): void {
-    this.activeEmployee = null;
-  }
-
-  protected onRowAction(action: string, row: any) {
-    if (action === 'edit') this.editEmployee(row);
-  }
-
-  // Selection Handling
-  protected onRowCheckboxChanged(event: CheckboxEvent) {
-    if (event.checked) this.selectedRows.add(event.row);
-    else this.selectedRows.delete(event.row);
-  }
-
-  protected onSelectAll(checked: boolean) {
-    this.selectedRows.clear();
-    if (checked) this.employees.forEach(row => this.selectedRows.add(row));
   }
 
 

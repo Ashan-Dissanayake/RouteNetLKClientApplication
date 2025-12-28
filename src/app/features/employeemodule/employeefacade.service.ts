@@ -8,8 +8,8 @@ import {DepartmentService} from './services/department.service';
 import {Designation} from './model/designation';
 import {DesignationService} from './services/designation.service';
 import {Employeetype} from './model/employeetype';
-import {EmployeetypeService} from './services/employeetype.service';
-import {EmployeestatusService} from './services/employeestatus.service';
+import {EmployeeTypeService} from './services/employeetype.service';
+import {EmployeeStatusService} from './services/employeestatus.service';
 import {Employeestatus} from './model/employeestatus';
 import {GenderService} from './services/gender.service';
 import {Gender} from './model/gender';
@@ -22,14 +22,14 @@ import {normalizeSearchCriteria} from '../../core/search-criteria-normalizer';
 @Injectable({
   providedIn: 'root',
 })
-export class EmployeefacadeService {
+export class EmployeeFacadeService {
 
   constructor(
     private employeeService: EmployeeService,
     private departmentService: DepartmentService,
     private designationService: DesignationService,
-    private employeetypeService: EmployeetypeService,
-    private employeestatusService: EmployeestatusService,
+    private employeeTypeService: EmployeeTypeService,
+    private employeeStatusService: EmployeeStatusService,
     private genderService: GenderService,
     private branchService: BranchService,
     private regexService:RegexService
@@ -50,14 +50,14 @@ export class EmployeefacadeService {
   }
 
   loadEmployeeType(): Observable<Employeetype[]> {
-    return this.employeetypeService.get().pipe(map(res => res.data));
+    return this.employeeTypeService.get().pipe(map(res => res.data));
   }
 
-  loadEmployeestatus(): Observable<Employeestatus[]> {
-    return this.employeestatusService.get().pipe(map(res => res.data));
+  loadEmployeeStatus(): Observable<Employeestatus[]> {
+    return this.employeeStatusService.get().pipe(map(res => res.data));
   }
 
-  loadGender(): Observable<Gender[]> {
+  loadGenders(): Observable<Gender[]> {
     return this.genderService.get().pipe(map(res => res.data));
   }
 

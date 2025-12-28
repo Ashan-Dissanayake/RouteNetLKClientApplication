@@ -1,13 +1,12 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {
-  VehicleImmutableControllersMeta,
-  VehicleExportMeta,
-  VehicleFilterMeta,
-  VehicleFormMeta,
-  VehicleTableMeta
+  VEHICLE_DATA_EXPORT_META,
+  VEHICLE_FILTER_FORM_META, VEHICLE_IMMUTABLE_CONTROLLERS_META, VEHICLE_MAIN_FORM_META,
+  VEHICLE_TABLE_META
+
 } from '../vehicle.meta';
 import {Vehicle} from '../model/vehicle';
-import {VehiclefacadeService} from '../vehiclefacade.service';
+import {VehicleFacadeService} from '../vehiclefacade.service';
 import {debounceTime, distinctUntilChanged, filter, forkJoin, Subject, switchMap, takeUntil} from 'rxjs';
 import {CheckboxEvent, DataTableComponent} from '../../../shared/component/data-table/data-table.component';
 import {MatButton} from '@angular/material/button';
@@ -29,7 +28,6 @@ import {Fueltype} from '../model/fueltype';
 import {Seatingcapacity} from '../model/seatingcapacity';
 import {Employee} from '../../employeemodule/model/employee';
 import {Branch} from '../../branchmodule/model/branch';
-import {FormUtils} from '../../../shared/component/form/form-util';
 import {exportToExcel} from '../../../shared/component/export/excel-export.util';
 import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
 
@@ -55,26 +53,27 @@ import {buildActionPanel} from '../../../shared/component/button/action-panel.fa
   styleUrl: './vehicle.component.scss'
 })
 export class VehicleComponent implements OnInit,OnDestroy{
+
   // ===== Metadata & Configurations =====
-  protected readonly tableColumns = VehicleTableMeta;
-  protected readonly vehicleFilterMeta = VehicleFilterMeta;
+  protected readonly tableColumns = VEHICLE_TABLE_META;
+  protected readonly filterFormMeta = VEHICLE_FILTER_FORM_META;
   protected readonly actionPanelConfig = buildActionPanel();
-  protected readonly vehicleFormMeta = VehicleFormMeta;
-  protected readonly vehicleExportMeta = VehicleExportMeta;
-  protected readonly vehicleImmutableControllers = VehicleImmutableControllersMeta;
+  protected readonly mainFormMeta = VEHICLE_MAIN_FORM_META;
+  protected readonly immutableControllers = VEHICLE_IMMUTABLE_CONTROLLERS_META;
+  protected readonly exportMeta = VEHICLE_DATA_EXPORT_META;
 
   // ===== Form Controls =====
-  protected vehicleFilterForm: FormGroup = new FormGroup({});
-  protected vehicleForm: FormGroup = new FormGroup({});
+  protected filterForm: FormGroup = new FormGroup({});
+  protected mainForm: FormGroup = new FormGroup({});
 
   // --- Data ---
   protected vehicles!: Vehicle[];
-  protected servicetypes!: Servicetype[];
-  protected vehiclestatuses!: Vehiclestatus[];
+  protected serviceTypes!: Servicetype[];
+  protected vehicleStatuses!: Vehiclestatus[];
   protected makes!: Make[];
-  protected fueltypes!: Fueltype[];
-  protected conditionrates!: Conditionrate[];
-  protected seatingcapacities!: Seatingcapacity[];
+  protected fuelTypes!: Fueltype[];
+  protected conditionRates!: Conditionrate[];
+  protected seatingCapacities!: Seatingcapacity[];
   protected employees!: Employee[];
   protected branches!: Branch[];
   protected regexRules!: any;
@@ -87,8 +86,8 @@ export class VehicleComponent implements OnInit,OnDestroy{
   protected activeVehicle: Vehicle | null = null;
 
   constructor(
-    private vehicleFacadeService:VehiclefacadeService,
-    private formBuilder: FormbuilderService,
+    private vehicleFacadeService:VehicleFacadeService,
+    private formBuilderService: FormbuilderService,
     private dialogService: DialogService
   ) { }
 
@@ -105,52 +104,56 @@ export class VehicleComponent implements OnInit,OnDestroy{
   // ===== Initialization =====
   private initialize(): void {
     forkJoin({
-      servicetypes: this.vehicleFacadeService.loadServicetypes(),
-      vehiclestatuses: this.vehicleFacadeService.loadVehiclesatuses(),
-      conditionrates: this.vehicleFacadeService.loadConditionrates(),
+      serviceTypes: this.vehicleFacadeService.loadServiceTypes(),
+      vehicleStatuses: this.vehicleFacadeService.loadVehicleStatuses(),
+      conditionRates: this.vehicleFacadeService.loadConditionRates(),
       makes:this.vehicleFacadeService.loadMakes(),
-      fueltypes:this.vehicleFacadeService.loadFueltypes(),
-      seatingcapacities:this.vehicleFacadeService.laodSeatingcapacities(),
+      fuelTypes:this.vehicleFacadeService.loadFuelTypes(),
+      seatingCapacities:this.vehicleFacadeService.loadSeatingCapacities(),
       employees:this.vehicleFacadeService.loadEmployees(),
       branches:this.vehicleFacadeService.loadBranches(),
       regexes:this.vehicleFacadeService.loadStaticRegexes()
     }).subscribe({
-      next: data => this.handleMetadataLoad(data),
-      error: (err) => this.dialogService.showError('Failed to load vehicle metadata.', err)
+      next: data => this.loadMetaData(data),
+      error: (err) => this.dialogService.showError('Failed to load metadata.', err),
+      complete:()=>{
+        this.loadTable();
+        this.createMainForm();
+        this.createFilterForm();
+      }
     });
-    this.loadVehicleTable();
   }
 
-  private handleMetadataLoad(data: any): void {
-    this.servicetypes = data.servicetypes;
-    this.vehiclestatuses = data.vehiclestatuses;
+  private loadMetaData(data: any): void {
+    this.serviceTypes = data.serviceTypes;
+    this.vehicleStatuses = data.vehicleStatuses;
     this.makes = data.makes;
-    this.fueltypes = data.fueltypes;
-    this.conditionrates = data.conditionrates;
-    this.seatingcapacities = data.seatingcapacities;
+    this.fuelTypes = data.fuelTypes;
+    this.conditionRates = data.conditionRates;
+    this.seatingCapacities = data.seatingCapacities;
     this.employees = data.employees;
     this.branches = data.branches;
     this.regexRules = data.regexes;
 
     this.dataInitialized = true;
-
-    this.initializeForms();
-    this.subscribeToFilterChanges();
   }
 
-  private initializeForms(): void {
-    this.vehicleFilterForm = this.formBuilder.build(this.vehicleFilterMeta, {
-      sservicetype: this.servicetypes,
-      ssconditionrate:this.conditionrates
+  private createFilterForm(): void {
+    this.filterForm = this.formBuilderService.build(this.filterFormMeta, {
+      sservicetype: this.serviceTypes,
+      ssconditionrate:this.conditionRates
     });
+    this.onFilterFormChanged();
+  }
 
-    this.vehicleForm = this.formBuilder.build(this.vehicleFormMeta, {
-      servicetype: this.servicetypes,
-      vehiclestatus:this.vehiclestatuses,
+  private createMainForm(): void {
+    this.mainForm = this.formBuilderService.build(this.mainFormMeta, {
+      servicetype: this.serviceTypes,
+      vehiclestatus:this.vehicleStatuses,
       make:this.makes,
-      fueltype:this.fueltypes,
-      conditionrate:this.conditionrates,
-      seatingcapacity:this.seatingcapacities,
+      fueltype:this.fuelTypes,
+      conditionrate:this.conditionRates,
+      seatingcapacity:this.seatingCapacities,
       employee:this.employees,
       branch:this.branches,
       regexes: this.regexRules
@@ -158,103 +161,14 @@ export class VehicleComponent implements OnInit,OnDestroy{
     this.bindChassisAndEngineRegex();
   }
 
-  // ===== Data Loading =====
-  private loadVehicleTable(): void {
-    this.vehicleFacadeService.loadVehicles()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(data => this.vehicles = data);
-  }
-
-  // ===== Filtering =====
-  private subscribeToFilterChanges(): void {
-    this.vehicleFilterForm.valueChanges
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        takeUntil(this.destroy$)
-      )
-      .subscribe((filters: Record<string, any>) => {
-        this.vehicleFacadeService.searchVehicle(filters)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe(data => (this.vehicles = data));
-      });
-  }
-
-  // ===== CRUD =====
-  protected openVehicleForm(): void {
-    // this.vehicleForm.value.id?this.setFormControlsStateOnEdit():this.setFormControlsStateOnCreate();
-    this.vehicleForm.value.id?
-      FormUtils.setFormControlsState(this.vehicleForm,this.vehicleImmutableControllers,true):
-      FormUtils.setFormControlsState(this.vehicleForm,this.vehicleImmutableControllers,false);
-    this.dialogService.showFormPopup({
-      heading: this.vehicleForm.value.id ? 'Edit Vehicle' : 'Create Vehicle',
-      form: this.vehicleForm,
-      meta: this.vehicleFormMeta
-    }).subscribe(formData => {
-      if (formData) this.saveVehicle(formData);
-      else{
-        FormUtils.resetForm(this.vehicleForm);
-      }
-    });
-  }
-
-  private saveVehicle(formData: any): void {
-    const operation$ = formData.id
-      ? this.vehicleFacadeService.updateVehicle(formData)
-      : this.vehicleFacadeService.createVehicle(formData);
-
-    operation$?.pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => {
-        this.dialogService.showSuccess('Vehicle saved successfully.');
-        this.loadVehicleTable();
-        FormUtils.resetForm(this.vehicleForm);
-        // this.setFormControlsStateOnCreate();
-        FormUtils.setFormControlsState(this.vehicleForm,this.vehicleImmutableControllers,false);
-      },
-      error: (err) =>{
-        console.log(err)
-        this.dialogService.showMessage({heading:'Failed to save Vehicle.', message:err.errorMessage})
-      }
-    });
-  }
-
-  protected editVehicle(row: Vehicle): void {
-    //this.setFormControlsStateOnEdit();
-    const normalizedRow = FormUtils.normalizeObject(row,  [
-      { from: 'seatingcapacity.make', to: 'make', remove: false }
-    ]);
-    this.vehicleForm.patchValue(normalizedRow);
-    this.openVehicleForm();
-  }
-
-  protected deactivateSelectedVehicles() {
-    const toDeactivate = Array.from(this.selectedRows);
-    this.dialogService.showConfirmation({
-      heading: "Deactivation",
-      message: "Are sure ?"
-    }).subscribe(confirmed => {
-      if (!confirmed) return;
-      this.vehicleFacadeService.deleteVehicle(toDeactivate)
-        ?.pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: () => {
-            this.dialogService.showSuccess('Selected vehicles deactivated.');
-            this.selectedRows.clear();
-            this.loadVehicleTable();
-          },
-          error: (err) => this.dialogService.showError('Failed to deactivate vehicles.', err)
-        });
-    })
-  }
-
   private bindChassisAndEngineRegex(){
-    this.vehicleForm.controls['make'].valueChanges.pipe(
+    this.mainForm.controls['make'].valueChanges.pipe(
       takeUntil(this.destroy$),
       filter(make => !!make?.name),
       switchMap(make => this.vehicleFacadeService.loadDynamicRegexes(make.name))
     ).subscribe(data => {
-      const chassis = this.vehicleForm.get('chasisnumber');
-      const engine = this.vehicleForm.get('enginenumber');
+      const chassis = this.mainForm.get('chasisnumber');
+      const engine = this.mainForm.get('enginenumber');
 
       chassis?.setValidators([Validators.pattern(data['chasisnumber'].regex)]);
       chassis?.updateValueAndValidity({ emitEvent: false });
@@ -264,8 +178,77 @@ export class VehicleComponent implements OnInit,OnDestroy{
     });
   }
 
+  // ===== Data Loading =====
+  private loadTable(): void {
+    this.vehicleFacadeService.loadVehicles()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => this.vehicles = data);
+  }
+
+  // ===== CRUD =====
+  private openMainForm(): void {
+    this.mainForm.value.id?
+      this.formBuilderService.setControlsState(this.mainForm,this.immutableControllers,true):
+      this.formBuilderService.setControlsState(this.mainForm,this.immutableControllers,false);
+    this.dialogService.showFormPopup({
+      heading: this.mainForm.value.id ? 'Edit Vehicle' : 'Create Vehicle',
+      form: this.mainForm,
+      meta: this.mainFormMeta
+    }).subscribe(formData => {
+      if (formData) this.save(formData);
+      else{
+        this.formBuilderService.resetForm(this.mainForm);
+      }
+    });
+  }
+
+  private save(formData: any): void {
+    const operation$ = formData.id
+      ? this.vehicleFacadeService.updateVehicle(formData)
+      : this.vehicleFacadeService.createVehicle(formData);
+    operation$?.pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => this.dialogService.showSuccess('Vehicle saved successfully.'),
+      error: (err) =>this.dialogService.showMessage({heading:'Failed to save Vehicle.', message:err.errorMessage}),
+      complete:()=>{
+        this.loadTable();
+        this.createMainForm();
+        this.formBuilderService.resetForm(this.mainForm);
+        this.formBuilderService.setControlsState(this.mainForm, this.immutableControllers, false);
+      }
+    });
+  }
+
+  private edit(row: Vehicle): void {
+    //this.setFormControlsStateOnEdit();
+    const normalizedRow = this.formBuilderService.mapNestedValues(row,  [
+      { from: 'seatingcapacity.make', to: 'make', remove: false }
+    ]);
+    this.mainForm.patchValue(normalizedRow);
+    this.openMainForm();
+  }
+
+  private deactivateSelectedRows():void {
+    const toDeactivate = Array.from(this.selectedRows);
+    this.dialogService.showConfirmation({
+      heading: "Deactivation",
+      message: "Are sure ?"
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
+      this.vehicleFacadeService.deleteVehicles(toDeactivate)
+        ?.pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => this.dialogService.showSuccess('Selected vehicles deactivated.'),
+          error: (err) => this.dialogService.showError('Failed to deactivate vehicles.', err),
+          complete:()=>{
+            this.selectedRows.clear();
+            this.loadTable();
+          }
+        });
+    })
+  }
+
   // ===== Export Operations =====
-  protected exportSelectedToPdf() {
+  private toPdf():void {
     if (this.selectedRows.size > 0) {
       this.dialogService.showPrintDialog({
         width:'1500px',
@@ -273,7 +256,7 @@ export class VehicleComponent implements OnInit,OnDestroy{
         title: 'Vehicle Details',
         mode: 'table',
         data: Array.from(this.selectedRows),
-        columns: this.vehicleExportMeta
+        columns: this.exportMeta
       }).subscribe((result) => {
         if (result) {
           this.selectedRows = new Set<Vehicle>();
@@ -284,12 +267,12 @@ export class VehicleComponent implements OnInit,OnDestroy{
     }
   }
 
-  protected exportSelectedToExcel(): void {
+  private toExcel(): void {
     const selectedArray = Array.from(this.selectedRows);
 
     let isExported = exportToExcel(
       selectedArray,
-      this.vehicleExportMeta,
+      this.exportMeta,
       'selected-vehicles.xlsx'
     );
 
@@ -300,45 +283,56 @@ export class VehicleComponent implements OnInit,OnDestroy{
   }
 
   // ===== Table Selection =====
- protected onRowClick(row: any): void {
+  protected onRowClick(row: any): void {
     this.activeVehicle = row;
   }
 
- protected closeDetails(): void {
+  protected onCloseDetailView(): void {
     this.activeVehicle = null;
   }
 
- protected onRowAction(action: string, row: any) {
-    if (action === 'edit') this.editVehicle(row);
+  protected onRowAction(action: string, row: any) {
+    if (action === 'edit') this.edit(row);
   }
 
-  // Selection Handling
- protected onRowCheckboxChanged(event: CheckboxEvent<any>) {
+  // ===== Selection Handling =====
+  protected onRowCheckboxChanged(event: CheckboxEvent) {
     if (event.checked) this.selectedRows.add(event.row);
     else this.selectedRows.delete(event.row);
   }
 
- protected onSelectAll(checked: boolean) {
+  protected onSelectAll(checked: boolean) {
     this.selectedRows.clear();
     if (checked) this.vehicles.forEach(row => this.selectedRows.add(row));
   }
 
+  // ===== Filtering =====
+  private onFilterFormChanged(): void {
+    this.filterForm.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe((filters: Record<string, any>) => {
+        this.vehicleFacadeService.searchVehicles(filters)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe(data => (this.vehicles = data));
+      });
+  }
+
   // ===== Action Panel =====
- private actionHandlers: Record<string, () => void> = {
-    'clear-search': () => this.vehicleFilterForm.reset(),
-    'create': () => this.openVehicleForm(),
-    'bulk-deactivate': () => this.deactivateSelectedVehicles(),
-    'export-pdf': () => this.exportSelectedToPdf(),
-    'export-excel': () => this.exportSelectedToExcel()
+  private actionHandlers: Record<string, () => void> = {
+    'clear-search': () => this.filterForm.reset(),
+    'create': () => this.openMainForm(),
+    'bulk-deactivate': () => this.deactivateSelectedRows(),
+    'export-pdf': () => this.toPdf(),
+    'export-excel': () => this.toExcel()
   };
 
- protected onActionTriggered(event: ButtonClickEvent) {
+  protected onActionTriggered(event: ButtonClickEvent) {
     const handler = this.actionHandlers[event.type];
     if (handler) handler();
     else this.dialogService.showWarning(`No handler defined for action: ${event.type}`);
   }
 
- protected onDropdownOnlyClick(event: ButtonClickEvent) {
+  protected onDropdownOnlyClick(event: ButtonClickEvent) {
     const dropdownTypes = ['export-pdf', 'export-excel'];
     if (dropdownTypes.includes(event.type)) {
       this.actionHandlers[event.type]?.();

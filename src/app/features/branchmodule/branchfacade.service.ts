@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 import {Observable, throwError} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {BranchtypeService} from './services/branchtype.service';
-import {BranchstatusService} from './services/branchstatus.service';
+import {BranchTypeService} from './services/branchtype.service';
+import {BranchStatusService} from './services/branchstatus.service';
 import {RegexService} from '../../core/regex.service';
 import {BranchType} from './model/branchtype';
 import {BranchStatus} from './model/branchstatus';
@@ -20,8 +20,8 @@ import {normalizeSearchCriteria} from '../../core/search-criteria-normalizer';
 })export class BranchFacadeService {
 
   constructor(
-    private branchTypeService: BranchtypeService,
-    private branchStatusService: BranchstatusService,
+    private branchTypeService: BranchTypeService,
+    private branchStatusService: BranchStatusService,
     private districtService: DistrictService,
     private branchService: BranchService,
     private provinceService: ProvinceService,
@@ -86,7 +86,6 @@ import {normalizeSearchCriteria} from '../../core/search-criteria-normalizer';
     }
     return this.branchService.deactivate(branchIds);
   }
-
 
   // Private helpers
   private getBranches(params?: any): Observable<Branch[]> {

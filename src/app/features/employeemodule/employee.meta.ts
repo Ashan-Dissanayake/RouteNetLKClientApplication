@@ -1,8 +1,6 @@
-// define columns: keys must match fields (or nested paths) and labels shown in headers
 import {FormField} from '../../shared/models/formfieldata.model';
-import {ButtonAction} from '../../shared/component/button/button-panel/button-panel.component';
 
-export const EmployeeTableMeta = [
+export const EMPLOYEE_TABLE_META = [
   {key: 'number', label: 'Number'},
   {key: 'fullname', label: 'Full Name'},
   {key: 'nic', label: 'NIC'},
@@ -16,13 +14,13 @@ export const EmployeeTableMeta = [
   {key: 'actions', label: 'Actions'} // provide a template for this column below
 ];
 
-export const EmployeeFilterMeta: FormField[] = [
+export const EMPLOYEE_FILTER_FORM_META: FormField[] = [
   {name: 'ssname', type: 'text', label: 'Full Name', required: false, mode: "none"},
   {name: 'ssnumber', type: 'text', label: 'Number', required: false, mode: 'none'},
   {name: 'ssdepartment', type: 'select', label: 'Department', required: false, mode: 'options'},
 ] as FormField[];
 
-export const EmployeeFormMeta: FormField[] = [
+export const EMPLOYEE_MAIN_FORM_META: FormField[] = [
   {name: 'id', type: 'hidden', label: 'Employee id', required: false, mode: 'none'},
   {name: 'branch', type: 'select', label: 'Branch', required: true, mode: 'options'},
   {name: 'number', type: 'text', label: 'Employee Number', required: true, mode: 'regex'},
@@ -47,7 +45,11 @@ export const EmployeeFormMeta: FormField[] = [
   {name: 'employeestatus', type: 'select', label: 'Employee Status', required: true, mode: 'options'},
 ] as FormField[];
 
-export const EmployeeExportMeta = [
+export const EMPLOYEE_IMMUTABLE_CONTROLLERS_META = [
+  'doj','number',
+]
+
+export const EMPLOYEE_DATA_EXPORT_META = [
   { key: 'number', header: 'Number' },
   { key: 'fullname', header: 'FullName' },
   { key: 'email', header: 'District' },

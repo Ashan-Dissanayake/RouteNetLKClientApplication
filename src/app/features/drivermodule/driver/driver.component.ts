@@ -11,7 +11,6 @@ import {NgClass, NgForOf, NgIf} from '@angular/common';
 import {FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {RouteFamiliarityLevel,} from '../model/routefamiliaritylevel';
 import {CrewStatus} from '../model/crewstatus';
-import {FormbuilderService} from '../../../core/formbuilder.service';
 import {DialogService} from '../../../core/dialog.service';
 import {DriverFacadeService} from '../driverfacade.service';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
@@ -26,11 +25,10 @@ import {
 } from '../driver.meta';
 import {Employee} from '../../employeemodule/model/employee';
 import {LicenseCategory} from '../model/licensecategory';
-import {FormUtils} from '../../../shared/component/form/form-util';
 import {DriverMapper} from '../../../shared/mappers/DriverMapper';
 import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
 import {exportToExcel} from '../../../shared/component/export/excel-export.util';
-
+import {FormbuilderService} from '../../../core/formbuilder.service';
 
 @Component({
   selector: 'app-crew',
@@ -58,8 +56,8 @@ export class DriverComponent implements OnInit,OnDestroy {
   // ===== Metadata & Configurations =====
   protected readonly tableColumns = DRIVER_TABLE_META;
   protected readonly filterFormMeta = DRIVER_FILTER_FORM_META;
-  protected readonly mainFormMeta = DRIVER_MAIN_FORM_META;
   protected readonly actionPanelConfig = buildActionPanel({exclude: ['bulk-deactivate']});
+  protected readonly mainFormMeta = DRIVER_MAIN_FORM_META;
   protected readonly immutableControllers = DRIVER_IMMUTABLE_CONTROLLERS_META;
   protected readonly exportMeta = DRIVER_DATA_EXPORT_META;
 
@@ -75,16 +73,16 @@ export class DriverComponent implements OnInit,OnDestroy {
   protected employees!: Employee[];
   protected regexRules!: any;
 
-  private destroy$ = new Subject<void>();
-
   protected dataInitialized = false;
+
+  private destroy$ = new Subject<void>();
 
   protected selectedRows = new Set<Driver>();
   protected activeRow: Driver | null = null;
 
   constructor(
     private driverFacadeService:DriverFacadeService,
-    private formBuilder: FormbuilderService,
+    private formBuilderService: FormbuilderService,
     private dialogService: DialogService
   ) {
   }
@@ -108,13 +106,17 @@ export class DriverComponent implements OnInit,OnDestroy {
       employees:this.driverFacadeService.loadEmployeesByDesignation(),
       regexes:this.driverFacadeService.loadStaticRegexes()
     }).subscribe({
-      next: data => this.handleMetadataLoad(data),
-      error: (err) => this.dialogService.showError('Failed to load metadata.', err)
+      next: data => this.loadMetaData(data),
+      error: (err) => this.dialogService.showError('Failed to load metadata.', err),
+      complete:()=>{
+        this.loadTable();
+        this.createMainForm();
+        this.createFilterForm();
+      }
     });
-    this.loadDriverTable();
   }
 
-  private handleMetadataLoad(data: any): void {
+  private loadMetaData(data: any): void {
     this.crewStatuses = data.crewStatuses;
     this.routeFamiliarityLevels = data.routeFamiliarityLevels;
     this.employees = data.employees;
@@ -123,20 +125,20 @@ export class DriverComponent implements OnInit,OnDestroy {
 
     this.dataInitialized = true;
 
-    this.initializeMainForm();
-    this.initializeFilterForm();
+    this.createMainForm();
+    this.createFilterForm();
   }
 
-  private initializeFilterForm(): void {
-    this.filterForm = this.formBuilder.build(this.filterFormMeta, {
+  private createFilterForm(): void {
+    this.filterForm = this.formBuilderService.build(this.filterFormMeta, {
       sscrewstatus:this.crewStatuses,
       ssroutefamilitylevel:this.routeFamiliarityLevels,
     });
-    this.subscribeToFilterChanges();
+    this.onFilterFormChanged();
   }
 
-  private initializeMainForm(): void {
-    this.mainForm = this.formBuilder.build(this.mainFormMeta, {
+  private createMainForm(): void {
+    this.mainForm = this.formBuilderService.build(this.mainFormMeta, {
       employee:this.employees,
       licensecategory:this.licenseCategories,
       crewstatus:this.crewStatuses,
@@ -146,33 +148,31 @@ export class DriverComponent implements OnInit,OnDestroy {
     this.bindLicenseNumberRegex();
   }
 
+  private bindLicenseNumberRegex():void{
+    this.mainForm.controls['licensecategory'].valueChanges.pipe(
+      takeUntil(this.destroy$),
+      filter(licenseCategory => !!licenseCategory?.name),
+      switchMap(licenseCategory => this.driverFacadeService.loadDynamicRegexes(licenseCategory.name))
+    ).subscribe(data => {
+      const licenseNumber = this.mainForm.get('licensenumber');
+
+      licenseNumber?.setValidators([Validators.pattern(data['licensenumber'].regex)]);
+      licenseNumber?.updateValueAndValidity({ emitEvent: false });
+    });
+  }
+
   // ===== Data Loading =====
-  private loadDriverTable(): void {
+  private loadTable(): void {
     this.driverFacadeService.loadDrivers()
       .pipe(takeUntil(this.destroy$))
       .subscribe(data => this.drivers = data);
   }
 
-  // ===== Filtering =====
-  private subscribeToFilterChanges(): void {
-    this.filterForm.valueChanges
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        takeUntil(this.destroy$)
-      )
-      .subscribe((filters: Record<string, any>) => {
-        this.driverFacadeService.searchDriver(filters)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe(data => (this.drivers = data));
-      });
-  }
-
   // ===== CRUD =====
-  protected  openMainForm(): void {
+  private openMainForm(): void {
     this.mainForm.value.id?
-      FormUtils.setFormControlsState(this.mainForm,this.immutableControllers,true):
-      FormUtils.setFormControlsState(this.mainForm,this.immutableControllers,false);
+      this.formBuilderService.setControlsState(this.mainForm,this.immutableControllers,true):
+      this.formBuilderService.setControlsState(this.mainForm,this.immutableControllers,false);
     this.dialogService.showFormPopup({
       heading: this.mainForm.value.id ? 'Edit Driver' : 'Create Driver',
       form: this.mainForm,
@@ -180,7 +180,7 @@ export class DriverComponent implements OnInit,OnDestroy {
     }).subscribe(formData => {
       if (formData) this.save(formData);
       else{
-        FormUtils.resetForm(this.mainForm);
+        this.formBuilderService.resetForm(this.mainForm);
       }
     });
   }
@@ -194,41 +194,27 @@ export class DriverComponent implements OnInit,OnDestroy {
         this.dialogService.showSuccess('Driver saved successfully.');
       },
       error: (err) =>{
-        console.log(err)
-        this.dialogService.showMessage({heading:'Failed to save Vehicle.', message:err.errorMessage})
+        this.dialogService.showMessage({heading:'Failed to save Driver.', message:err.errorMessage})
       },
       complete:()=>{
-        this.loadDriverTable();
-        this.initializeMainForm();
-        FormUtils.resetForm(this.mainForm);
-        FormUtils.setFormControlsState(this.mainForm,this.immutableControllers,false);
+        this.loadTable();
+        this.createMainForm();
+        this.formBuilderService.resetForm(this.mainForm);
+        this.formBuilderService.setControlsState(this.mainForm, this.immutableControllers, false);
       }
     });
   }
 
-  private editRow(row: Driver): void {
+  private edit(row: Driver): void {
     this.employees = this.drivers.map(driver => driver.employee);
-    this.initializeMainForm();
+    this.createMainForm();
     const  mappedRow = DriverMapper.toForm(row);
     this.mainForm.patchValue(mappedRow);
     this.openMainForm();
   }
 
-  // ===== Table Selection =====
-  protected onRowClick(row: any): void {
-    this.activeRow = row;
-  }
-
-  protected closeDetails(): void {
-    this.activeRow = null;
-  }
-
-  protected onRowAction(action: string, row: any):void {
-    if (action === 'edit') this.editRow(row);
-  }
-
   // ===== Export Operations =====
-  protected exportSelectedToPdf():void {
+  private toPdf():void {
     if (this.selectedRows.size > 0) {
       this.dialogService.showPrintDialog({
         width:'1500px',
@@ -247,7 +233,7 @@ export class DriverComponent implements OnInit,OnDestroy {
     }
   }
 
-  protected exportSelectedToExcel(): void {
+  private toExcel(): void {
     const selectedArray = Array.from(this.selectedRows);
 
     let isExported = exportToExcel(
@@ -262,7 +248,20 @@ export class DriverComponent implements OnInit,OnDestroy {
     }
   }
 
-  // Selection Handling
+  // ===== Table Selection =====
+  protected onRowClick(row: any): void {
+    this.activeRow = row;
+  }
+
+  protected onCloseDetailView(): void {
+    this.activeRow = null;
+  }
+
+  protected onRowAction(action: string, row: any):void {
+    if (action === 'edit') this.edit(row);
+  }
+
+  // ===== Selection Handling =====
   protected onRowCheckboxChanged(event: CheckboxEvent):void {
     if (event.checked) this.selectedRows.add(event.row);
     else this.selectedRows.delete(event.row);
@@ -273,12 +272,23 @@ export class DriverComponent implements OnInit,OnDestroy {
     if (checked) this.drivers.forEach(row => this.selectedRows.add(row));
   }
 
+  // ===== Filtering =====
+  private onFilterFormChanged(): void {
+    this.filterForm.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe((filters: Record<string, any>) => {
+        this.driverFacadeService.searchDriver(filters)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe(data => (this.drivers = data));
+      });
+  }
+
   // ===== Action Panel =====
   private actionHandlers: Record<string, () => void> = {
     'clear-search': () => this.filterForm.reset(),
     'create': () => this.openMainForm(),
-    'export-pdf': () => this.exportSelectedToPdf(),
-    'export-excel': () => this.exportSelectedToExcel()
+    'export-pdf': () => this.toPdf(),
+    'export-excel': () => this.toExcel()
   };
 
   protected onActionTriggered(event: ButtonClickEvent):void {
@@ -296,16 +306,4 @@ export class DriverComponent implements OnInit,OnDestroy {
     }
   }
 
-  private bindLicenseNumberRegex():void{
-    this.mainForm.controls['licensecategory'].valueChanges.pipe(
-      takeUntil(this.destroy$),
-      filter(licenseCategory => !!licenseCategory?.name),
-      switchMap(licenseCategory => this.driverFacadeService.loadDynamicRegexes(licenseCategory.name))
-    ).subscribe(data => {
-      const licenseNumber = this.mainForm.get('licensenumber');
-
-      licenseNumber?.setValidators([Validators.pattern(data['licensenumber'].regex)]);
-      licenseNumber?.updateValueAndValidity({ emitEvent: false });
-    });
-  }
 }

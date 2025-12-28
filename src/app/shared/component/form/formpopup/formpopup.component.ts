@@ -6,7 +6,7 @@ import {NgFor, NgIf} from '@angular/common';
 import {FormField} from '../../../models/formfieldata.model';
 import {ButtonAction, ButtonClickEvent, ButtonPanelComponent} from '../../button/button-panel/button-panel.component';
 import {DialogService} from '../../../../core/dialog.service';
-import {FormUtils} from '../form-util';
+import {FormbuilderService} from '../../../../core/formbuilder.service';
 
 @Component({
   selector: 'app-formpopup',
@@ -34,7 +34,8 @@ export class FormpopupComponent {
   constructor(
     public dialogRef: MatDialogRef<FormpopupComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { form: FormGroup; meta: FormField[]; heading: string },
-    private dialogService:DialogService
+    private dialogService:DialogService,
+    private formBuilderService:FormbuilderService
   ) {}
 
 
@@ -42,7 +43,7 @@ export class FormpopupComponent {
     const form = this.data.form;
 
     if (!form.valid) {
-      const invalidControls = FormUtils.getInvalidControls(form);
+      const invalidControls = this.formBuilderService.getInvalidControls(form)
       const errorList = invalidControls.map(ctrl => `<li>${ctrl}</li>`).join('');
 
       this.dialogService.showMessage({
@@ -82,7 +83,7 @@ export class FormpopupComponent {
 
   private handleUpdate(form: FormGroup): void {
     const heading = 'Updating Branch';
-    const dirtyValues = FormUtils.getUpdatedValues(form);
+    const dirtyValues = this.formBuilderService.getUpdatedValues(form);
     const changedKeys = Object.keys(dirtyValues).filter(k => k !== 'id');
 
     if (changedKeys.length === 0) {
@@ -99,7 +100,7 @@ export class FormpopupComponent {
     const changeListHtml = changedKeys
       .map(key => `
       <li>
-        <strong>${FormUtils.formatLabel(key)}</strong>
+        <strong>${this.formBuilderService.formatLabel(key)}</strong>
       </li>
     `)
       .join('');
