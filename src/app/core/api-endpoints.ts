@@ -30,6 +30,7 @@ export const ApiEndpoints = {
 
     //Crew
     drivers:`${baseUrl}/drivers`,
+    conductors:`${baseUrl}/conductors`,
     allowedBusTypes:`${baseUrl}/allowedbustypes/list`,
     crewStatuses:`${baseUrl}/crewstatuses/list`,
     routeFamiliarityLevels:`${baseUrl}/routefamiliaritylevels/list`,
