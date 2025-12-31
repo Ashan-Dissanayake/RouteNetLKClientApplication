@@ -1,4 +1,4 @@
-import {Driver} from '../../features/drivermodule/model/driver';
+import {Driver} from '../../features/crew/model/driver';
 
 export  class DriverMapper{
   static fromForm(payload: any):Driver{
