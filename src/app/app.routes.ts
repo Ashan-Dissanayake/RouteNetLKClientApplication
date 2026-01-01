@@ -13,8 +13,11 @@ export const routes: Routes = [
       { path: 'vehicle', loadComponent: () => import('./features/vehiclemodule/vehicle/vehicle.component').
         then(m => m.VehicleComponent)
       },
-      { path: 'crew', loadComponent: () => import('./features/crew/driver/driver.component').
+      { path: 'driver', loadComponent: () => import('./features/crew/driver/driver.component').
         then(m => m.DriverComponent)
+      },
+      { path: 'conductor', loadComponent: () => import('./features/crew/conductor/conductor.component').
+        then(m => m.ConductorComponent)
       },
     ]
   },

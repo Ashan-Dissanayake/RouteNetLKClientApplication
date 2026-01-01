@@ -45,7 +45,7 @@ export class DriverFacadeService {
   }
 
   loadEmployeesByDesignation(): Observable<Employee[]> {
-    return this.employeeService.getByDesignation().pipe(map(res => res.data));
+    return this.employeeService.getByDesignationDriver().pipe(map(res => res.data));
   }
 
   loadLicenseCategories(): Observable<LicenseCategory[]> {

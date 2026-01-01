@@ -1,17 +1,13 @@
-import {Driver} from '../../features/crew/model/driver';
+import {Conductor} from '../../features/crew/model/conductor';
 
-export  class DriverMapper{
-  static fromForm(payload: any):Driver{
+export  class ConductorMapper{
+  static fromForm(payload: any):Conductor{
     return {
       id: payload.id,
       employee: payload.employee,
       number: payload.number,
-      licensenumber: payload.licensenumber,
-      dolicenseissued:payload.licenseDateRange.start,
-      dolicenseexpired: payload.licenseDateRange?.end,
       domedicalissued: payload.medicalDateRange?.start,
       domedicalexpired: payload.medicalDateRange?.end,
-      licensecategory: payload.licensecategory,
       crewstatus: payload.crewstatus,
       routefamiliaritylevel: payload.routefamiliaritylevel,
       allowedbustype: payload.allowedbustype // if exists
@@ -20,24 +16,18 @@ export  class DriverMapper{
 
 
   // Transform driver DTO into form patch object
-  static toForm(driver: any): any {
+  static toForm(conductor: any): any {
     return {
-      id: driver.id,
-      employee: driver.employee,
-      number: driver.number,
-      licensenumber: driver.licensenumber,
-      licensecategory: driver.licensecategory,
-      crewstatus: driver.crewstatus,
-      routefamiliaritylevel: driver.routefamiliaritylevel,
+      id: conductor.id,
+      employee: conductor.employee,
+      number: conductor.number,
+      crewstatus: conductor.crewstatus,
+      routefamiliaritylevel: conductor.routefamiliaritylevel,
 
       // Map separate dates into date-range group
-      licenseDateRange: {
-        start: driver.dolicenseissued ? new Date(driver.dolicenseissued) : null,
-        end: driver.dolicenseexpired ? new Date(driver.dolicenseexpired) : null,
-      },
       medicalDateRange: {
-        start: driver.domedicalissued ? new Date(driver.domedicalissued) : null,
-        end: driver.domedicalexpired ? new Date(driver.domedicalexpired) : null,
+        start: conductor.domedicalissued ? new Date(conductor.domedicalissued) : null,
+        end: conductor.domedicalexpired ? new Date(conductor.domedicalexpired) : null,
       }
     };
   }

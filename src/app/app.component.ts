@@ -65,7 +65,8 @@ export class AppComponent {
         { icon: 'person', label: 'User', route: '/admin/user' },
         { icon: 'account_tree', label: 'Branch', route: '/admin/branch' },
         { icon: 'directions_bus', label: 'Vehicle', route: '/admin/vehicle' },
-        { icon: 'groups', label: 'crew', route: '/admin/crew' },
+        { icon: 'groups', label: 'Driver', route: '/admin/driver' },
+        { icon: 'groups', label: 'Conductor', route: '/admin/conductor' },
       ],
       expanded: false
     },

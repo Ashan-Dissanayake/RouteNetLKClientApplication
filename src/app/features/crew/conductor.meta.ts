@@ -16,7 +16,7 @@ export const CONDUCTOR_FILTER_FORM_META: FormField[] = [
 ] as FormField[];
 
 export const CONDUCTOR_MAIN_FORM_META: FormField[] = [
-  {name: 'id', type: 'hidden', label: 'Vehicle id', required: false, mode: 'none'},
+  {name: 'id', type: 'hidden', label: 'Conductor id', required: false, mode: 'none'},
   {name: 'employee', type: 'select', label: 'Name', required: true, mode: 'options',optionLabelKey: 'callingname',},
   {name: 'number', type: 'text', label: 'Conductor Number', required: true, mode: 'regex'},
   {

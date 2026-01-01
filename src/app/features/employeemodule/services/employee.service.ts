@@ -21,8 +21,12 @@ export class EmployeeService extends BaseHttpService <Employee>{
     return  this.getAll(ApiEndpoints.employeesList);
   }
 
-  getByDesignation():Observable<ApiResponse<Employee>>{
+  getByDesignationDriver():Observable<ApiResponse<Employee>>{
     return  this.getAll(ApiEndpoints.employeesByDriver);
+  }
+
+  getByDesignationConductor():Observable<ApiResponse<Employee>>{
+    return  this.getAll(ApiEndpoints.employeesByConductor);
   }
 
 
