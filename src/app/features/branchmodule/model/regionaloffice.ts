@@ -1,4 +1,4 @@
-export  class Province{
+export  class RegionalOffice{
 
   id:number;
   name:string;
@@ -7,5 +7,6 @@ export  class Province{
     this.id = id;
     this.name = name;
   }
+
 
 }

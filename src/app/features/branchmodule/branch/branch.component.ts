@@ -6,8 +6,6 @@ import {debounceTime, distinctUntilChanged, forkJoin, Subject, takeUntil} from '
 import {Branch} from '../model/branch';
 import {BranchStatus} from '../model/branchstatus';
 import {BranchType} from '../model/branchtype';
-import {District} from '../model/district';
-import {Province} from '../model/province';
 import {ButtonClickEvent, ButtonPanelComponent } from '../../../shared/component/button/button-panel/button-panel.component';
 import {DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
@@ -26,6 +24,7 @@ import {
   BRANCH_MAIN_FORM_META,
   BRANCH_TABLE_META
 } from '../branch.meta';
+import {RegionalOffice} from '../model/regionaloffice';
 
 @Component({
   selector: 'app-branch',
@@ -66,8 +65,7 @@ export class BranchComponent implements OnInit, OnDestroy {
   protected branches!: Branch[];
   protected branchStatuses!: BranchStatus[];
   protected branchTypes!: BranchType[];
-  protected districts!: District[];
-  protected provinces!: Province[];
+  protected regionalOffices!: RegionalOffice[];
   protected regexRules!: any;
 
   protected dataInitialized = false;
@@ -101,8 +99,7 @@ export class BranchComponent implements OnInit, OnDestroy {
     forkJoin({
       branchStatuses: this.branchFacadeService.loadBranchStatuses(),
       branchTypes: this.branchFacadeService.loadBranchTypes(),
-      districts: this.branchFacadeService.loadDistricts(),
-      provinces: this.branchFacadeService.loadProvinces(),
+      regionalOffices: this.branchFacadeService.loadRegionalOffices(),
       regexes: this.branchFacadeService.loadStaticRegexes()
     }).subscribe({
       next: data => this.loadMetaData(data),
@@ -118,8 +115,7 @@ export class BranchComponent implements OnInit, OnDestroy {
   private loadMetaData(data: any): void {
     this.branchStatuses = data.branchStatuses;
     this.branchTypes = data.branchTypes;
-    this.districts = data.districts;
-    this.provinces = data.provinces;
+    this.regionalOffices = data.regionalOffices;
     this.regexRules = data.regexes;
   }
 
@@ -133,8 +129,8 @@ export class BranchComponent implements OnInit, OnDestroy {
   private createMainForm(): void {
     this.mainForm = this.formBuilderService.build(this.mainFormMeta, {
       branchtype: this.branchTypes,
+      regionaloffice: this.regionalOffices,
       branchstatus: this.branchStatuses,
-      branchcoverages: this.districts,
       regexes: this.regexRules
     });
 
@@ -144,8 +140,12 @@ export class BranchComponent implements OnInit, OnDestroy {
   private loadTable(): void {
     this.branchFacadeService.loadBranches()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(data => this.branches = data);
+      .subscribe(data => {
+        console.log(data)
+        this.branches = data
+      });
   }
+
 
   // ===== CRUD =====
   private openMainForm(): void {

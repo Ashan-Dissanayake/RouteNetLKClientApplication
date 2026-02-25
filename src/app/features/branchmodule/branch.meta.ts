@@ -9,8 +9,9 @@ export const BRANCH_TABLE_META= [
   { key: 'telephone', label: 'Telephone' },
   { key: 'docreated', label: 'Date of Created' },
   { key: 'branchtype.name', label: 'Branch Type' },
+  { key: 'regionaloffice.name', label: 'Regional Office' },
   { key: 'branchstatus.name', label: 'Branch Status' },
-  { key: 'actions', label: 'Actions' } // provide a template for this column below
+  { key: 'actions', label: 'Actions' }
 ];
 
 export const BRANCH_FILTER_FORM_META: FormField[] = [
@@ -27,15 +28,14 @@ export const BRANCH_MAIN_FORM_META:FormField[] = [
   { name: 'telephone', type: 'text', label: 'Telephone', required: true, mode: 'regex' },
   { name: 'email', type: 'text', label: 'Email', required: true, mode: 'none' },
   { name: 'docreated', type: 'date', label: 'Date of Created', required: true, mode: 'date',defaultValue:new Date(),disabled:true},
-  { name: 'branchcoverages', type: 'dualist', label: 'Branch Coverage', required: true, mode: 'options',referencePath: ['district']},
-  // { name: 'province', type: 'select', label: 'Province', required: true, mode: 'options'},
   { name: 'remarks', type: 'text', label: 'Remarks', required: false, mode: 'none'},
   { name: 'branchtype', type: 'select', label: 'Branch Type', required: true, mode: 'options'},
+  { name: 'regionaloffice', type: 'select', label: 'Regional Office', required: true, mode: 'options'},
   { name: 'branchstatus', type: 'select', label: 'Branch Status', required: true, mode: 'options' }
 ] as FormField[];
 
 export const BRANCH_DATA_EXPORT_META = [
   { key: 'code', header: 'Code' },
   { key: 'name', header: 'Name' },
-  { key: 'email', header: 'District' }
+  { key: 'email', header: 'Email' }
 ]

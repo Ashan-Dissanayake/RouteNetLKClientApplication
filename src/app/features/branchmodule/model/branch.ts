@@ -1,7 +1,5 @@
-import {Branchcoverage} from './branchcoverage';
 import {BranchStatus} from './branchstatus';
-import {BranchType} from './branchtype';
-import {District} from './district';
+import {RegionalOffice} from './regionaloffice';
 
 export class Branch {
 
@@ -13,9 +11,8 @@ export class Branch {
   docreated!: string;
   email!:string
   remarks!: string;
-  branchtype: BranchType | undefined;
   branchstatus!: BranchStatus;
-  branchcoverages!:Branchcoverage[];
+  regionaloffice!: RegionalOffice;
 
 }
 

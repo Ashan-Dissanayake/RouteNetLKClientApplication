@@ -6,14 +6,12 @@ import {BranchStatusService} from './services/branchstatus.service';
 import {RegexService} from '../../core/regex.service';
 import {BranchType} from './model/branchtype';
 import {BranchStatus} from './model/branchstatus';
-import {District} from './model/district';
-import {DistrictService} from './services/district.service';
 import {Regex} from '../../shared/models/regex.model';
 import {Branch} from './model/branch';
 import {BranchService} from './services/branch.service';
-import {Province} from './model/province';
-import {ProvinceService} from './services/province.service';
 import {normalizeSearchCriteria} from '../../core/search-criteria-normalizer';
+import {RegionalOfficeService} from './services/regionaloffice.service';
+import {RegionalOffice} from './model/regionaloffice';
 
 @Injectable({
   providedIn: 'root',
@@ -22,9 +20,8 @@ import {normalizeSearchCriteria} from '../../core/search-criteria-normalizer';
   constructor(
     private branchTypeService: BranchTypeService,
     private branchStatusService: BranchStatusService,
-    private districtService: DistrictService,
     private branchService: BranchService,
-    private provinceService: ProvinceService,
+    private regionalOfficeService: RegionalOfficeService,
     private regexService: RegexService
   ) {}
 
@@ -37,12 +34,8 @@ import {normalizeSearchCriteria} from '../../core/search-criteria-normalizer';
     return this.branchStatusService.get().pipe(map(res => res.data));
   }
 
-  loadDistricts():Observable<District[]>{
-    return this.districtService.get().pipe(map(res=>res.data));
-  }
-
-  loadProvinces():Observable<Province[]>{
-    return this.provinceService.get().pipe(map(res=>res.data));
+  loadRegionalOffices():Observable<RegionalOffice[]>{
+    return this.regionalOfficeService.get().pipe(map(res=>res.data));
   }
 
   loadStaticRegexes(): Observable<Regex> {
@@ -59,17 +52,15 @@ import {normalizeSearchCriteria} from '../../core/search-criteria-normalizer';
   }
 
   createBranch(branchData: any): Observable<Branch> {
-    const branch = this.normalizeBranchData(branchData);
-    const status = branch.branchstatus?.name?.toLowerCase();
+    const status = branchData.branchstatus?.name?.toLowerCase();
     if (status === 'active') {
-      return this.branchService.save(branch);
+      return this.branchService.save(branchData);
     }
     return throwError(() => new Error('Branch should be active'));
   }
 
   updateBranch(branchData: any): Observable<Branch> {
-    const branch = this.normalizeBranchData(branchData);
-    return this.branchService.update(branch);
+    return this.branchService.update(branchData);
   }
 
   deleteBranches(branches: Branch[]): Observable<number[]> {
@@ -90,16 +81,6 @@ import {normalizeSearchCriteria} from '../../core/search-criteria-normalizer';
   // Private helpers
   private getBranches(params?: any): Observable<Branch[]> {
     return this.branchService.get(params).pipe(map(res => res.data));
-  }
-
-  private normalizeBranchData(branchData: any): any {
-    const normalized = { ...branchData };
-    normalized.branchcoverages = (normalized.branchcoverages || []).map((coverage: any) => ({
-      district: coverage.district
-        ? { id: coverage.district.id, name: coverage.district.name }
-        : { id: coverage.id, name: coverage.name }
-    }));
-    return normalized;
   }
 
 }

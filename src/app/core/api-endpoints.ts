@@ -15,7 +15,7 @@ export const ApiEndpoints = {
     branches: `${baseUrl}/branches`,
     brancheslist: `${baseUrl}/branches/list`,
     branchesdeactivate: `${baseUrl}/branches/deactivate`,
-    provinces:`${baseUrl}/provinces/list`,
+    regionaloffice:`${baseUrl}/regionaloffices/list`,
 
     //Employee
     genders:`${baseUrl}/genders/list`,
