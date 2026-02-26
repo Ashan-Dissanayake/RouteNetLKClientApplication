@@ -1,4 +1,4 @@
-export class Servicetype{
+export class Bustype{
   id!:number;
   name!:string
 

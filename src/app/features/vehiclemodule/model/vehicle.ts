@@ -1,26 +1,19 @@
 import {Fueltype} from './fueltype';
 import {Conditionrate} from './conditionrate';
-import {Servicetype} from './servicetype';
 import {Vehiclestatus} from './vehiclestatus';
 import {Branch} from '../../branchmodule/model/branch';
-import {Employee} from '../../employeemodule/model/employee';
-import {Seatingcapacity} from './seatingcapacity';
+import {Model} from './model';
+import {Bustype} from './bustype';
 
 export class Vehicle{
   id!:number;
-  code!:string;
+  branch!:Branch;
   number!:string;
-  seatingcapacity!:Seatingcapacity;
-  yom!:string;
-  dob!:string;
+  model!:Model;
+  bustype!:Bustype;
   mileage!:number;
-  chasisnumber!:string;
-  enginenumber!:string;
   fueltype!:Fueltype;
   conditionrate!:Conditionrate;
-  remarks!:string;
-  servicetype!:Servicetype;
   vehiclestatus!:Vehiclestatus;
-  employee!:Employee;
-  branch!:Branch;
+  remarks!:string;
 }

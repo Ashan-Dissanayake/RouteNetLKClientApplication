@@ -84,6 +84,10 @@
         <span class="value">{{ row.code || '-' }}</span>
       </div>
       <div class="info-item">
+        <span class="label">Regional Office</span>
+        <span class="value">{{ row.regionaloffice.name || '-' }}</span>
+      </div>
+      <div class="info-item">
         <span class="label">Contact</span>
         <span class="value">{{ row.telephone || '-' }}</span>
       </div>
@@ -99,31 +103,6 @@
         <span class="label">Type</span>
         <span class="value">{{ row.branchtype?.name || '-' }}</span>
       </div>
-    </div>
-
-    <mat-divider></mat-divider>
-
-    <!-- Coverage Areas -->
-    <div class="coverage-section">
-      <h3 class="section-title">
-        <mat-icon color="primary" class="section-icon">map</mat-icon>
-        Coverage Areas
-      </h3>
-
-      <ng-container *ngIf="row.branchcoverages?.length; else noCoverage">
-        <div class="coverage-grid">
-          <div
-            class="coverage-card"
-            *ngFor="let coverage of row.branchcoverages">
-            <mat-icon color="accent">location_on</mat-icon>
-            <div class="district-name">{{ coverage.district?.name }}</div>
-          </div>
-        </div>
-      </ng-container>
-
-      <ng-template #noCoverage>
-        <p class="no-coverage">No coverage areas assigned.</p>
-      </ng-template>
     </div>
     <mat-divider></mat-divider>
   </div>

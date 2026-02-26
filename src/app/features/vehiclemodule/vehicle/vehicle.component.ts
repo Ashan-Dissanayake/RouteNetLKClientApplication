@@ -7,7 +7,7 @@ import {
 } from '../vehicle.meta';
 import {Vehicle} from '../model/vehicle';
 import {VehicleFacadeService} from '../vehiclefacade.service';
-import {debounceTime, distinctUntilChanged, filter, forkJoin, Subject, switchMap, takeUntil} from 'rxjs';
+import {debounceTime, distinctUntilChanged, forkJoin, Subject, takeUntil} from 'rxjs';
 import {CheckboxEvent, DataTableComponent} from '../../../shared/component/data-table/data-table.component';
 import {MatButton} from '@angular/material/button';
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
@@ -15,8 +15,7 @@ import {MatIcon} from '@angular/material/icon';
 import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
 import {NgClass, NgForOf, NgIf} from '@angular/common';
 import {MatDivider} from '@angular/material/divider';
-import {FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {Servicetype} from '../model/servicetype';
+import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Conditionrate} from '../model/conditionrate';
 import {FormbuilderService} from '../../../core/formbuilder.service';
 import {DialogService} from '../../../core/dialog.service';
@@ -25,11 +24,11 @@ import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-fiel
 import {Vehiclestatus} from '../model/vehiclestatus';
 import {Make} from '../model/make';
 import {Fueltype} from '../model/fueltype';
-import {Seatingcapacity} from '../model/seatingcapacity';
-import {Employee} from '../../employeemodule/model/employee';
 import {Branch} from '../../branchmodule/model/branch';
 import {exportToExcel} from '../../../shared/component/export/excel-export.util';
 import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
+import {Model} from '../model/model';
+import {Bustype} from '../model/bustype';
 
 @Component({
   selector: 'app-vehicle',
@@ -68,13 +67,12 @@ export class VehicleComponent implements OnInit,OnDestroy{
 
   // --- Data ---
   protected vehicles!: Vehicle[];
-  protected serviceTypes!: Servicetype[];
   protected vehicleStatuses!: Vehiclestatus[];
   protected makes!: Make[];
+  protected models!: Model[];
   protected fuelTypes!: Fueltype[];
+  protected busTypes!: Bustype[];
   protected conditionRates!: Conditionrate[];
-  protected seatingCapacities!: Seatingcapacity[];
-  protected employees!: Employee[];
   protected branches!: Branch[];
   protected regexRules!: any;
 
@@ -104,13 +102,12 @@ export class VehicleComponent implements OnInit,OnDestroy{
   // ===== Initialization =====
   private initialize(): void {
     forkJoin({
-      serviceTypes: this.vehicleFacadeService.loadServiceTypes(),
       vehicleStatuses: this.vehicleFacadeService.loadVehicleStatuses(),
       conditionRates: this.vehicleFacadeService.loadConditionRates(),
       makes:this.vehicleFacadeService.loadMakes(),
+      models:this.vehicleFacadeService.loadModels(),
       fuelTypes:this.vehicleFacadeService.loadFuelTypes(),
-      seatingCapacities:this.vehicleFacadeService.loadSeatingCapacities(),
-      employees:this.vehicleFacadeService.loadEmployees(),
+      busTypes:this.vehicleFacadeService.loadBusTypes(),
       branches:this.vehicleFacadeService.loadBranches(),
       regexes:this.vehicleFacadeService.loadStaticRegexes()
     }).subscribe({
@@ -125,13 +122,12 @@ export class VehicleComponent implements OnInit,OnDestroy{
   }
 
   private loadMetaData(data: any): void {
-    this.serviceTypes = data.serviceTypes;
     this.vehicleStatuses = data.vehicleStatuses;
     this.makes = data.makes;
     this.fuelTypes = data.fuelTypes;
+    this.busTypes = data.busTypes;
     this.conditionRates = data.conditionRates;
-    this.seatingCapacities = data.seatingCapacities;
-    this.employees = data.employees;
+    this.models = data.models;
     this.branches = data.branches;
     this.regexRules = data.regexes;
 
@@ -140,43 +136,25 @@ export class VehicleComponent implements OnInit,OnDestroy{
 
   private createFilterForm(): void {
     this.filterForm = this.formBuilderService.build(this.filterFormMeta, {
-      sservicetype: this.serviceTypes,
-      ssconditionrate:this.conditionRates
+      ssconditionrate:this.conditionRates,
+      ssbustype:this.busTypes,
     });
     this.onFilterFormChanged();
   }
 
   private createMainForm(): void {
     this.mainForm = this.formBuilderService.build(this.mainFormMeta, {
-      servicetype: this.serviceTypes,
       vehiclestatus:this.vehicleStatuses,
       make:this.makes,
       fueltype:this.fuelTypes,
+      bustype:this.busTypes,
       conditionrate:this.conditionRates,
-      seatingcapacity:this.seatingCapacities,
-      employee:this.employees,
+      model:this.models,
       branch:this.branches,
       regexes: this.regexRules
     });
-    this.bindChassisAndEngineRegex();
   }
 
-  private bindChassisAndEngineRegex(){
-    this.mainForm.controls['make'].valueChanges.pipe(
-      takeUntil(this.destroy$),
-      filter(make => !!make?.name),
-      switchMap(make => this.vehicleFacadeService.loadDynamicRegexes(make.name))
-    ).subscribe(data => {
-      const chassis = this.mainForm.get('chasisnumber');
-      const engine = this.mainForm.get('enginenumber');
-
-      chassis?.setValidators([Validators.pattern(data['chasisnumber'].regex)]);
-      chassis?.updateValueAndValidity({ emitEvent: false });
-
-      engine?.setValidators([Validators.pattern(data['enginenumber'].regex)]);
-      engine?.updateValueAndValidity({ emitEvent: false });
-    });
-  }
 
   // ===== Data Loading =====
   private loadTable(): void {

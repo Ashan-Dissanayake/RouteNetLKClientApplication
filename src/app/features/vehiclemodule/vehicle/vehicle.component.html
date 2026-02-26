@@ -57,7 +57,7 @@
       <div class="title-section">
         <mat-icon color="primary" class="vehicle-icon">directions_bus</mat-icon>
         <div>
-          <h2 class="vehicle-title">{{ row.seatingcapacity.make.name }}</h2>
+          <h2 class="vehicle-title">{{ row.model.name }}</h2>
           <p class="vehicle-subtitle">Number: {{ row.number }}</p>
           <p class="vehicle-subtitle">Branch: {{ row.branch.name }}</p>
         </div>
@@ -68,7 +68,7 @@
         [ngClass]="{
         'available': row.vehiclestatus.name === 'Available',
         'in-service': row.vehiclestatus.name === 'In Service',
-        'under-maintenance': row.vehiclestatus.name === 'Under Maintenance',
+        'under-maintenance': row.vehiclestatus.name === 'Maintenance',
         'out-of-service': row.vehiclestatus.name === 'Out of Service',
         'decommissioned': row.vehiclestatus.name === 'Decommissioned',
         'reserved': row.vehiclestatus.name === 'Reserved',
@@ -81,20 +81,8 @@
     <!-- General Info -->
     <div class="info-grid">
       <div class="info-item">
-        <span class="label">Code</span>
-        <span class="value">{{ row.code || '-' }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">Seating Capacity</span>
-        <span class="value">{{ row.seatingcapacity.amount || '-' }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">Year of Made</span>
-        <span class="value">{{ row.yom || '-' }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">Date of Buy</span>
-        <span class="value">{{ row.dob || '-' }}</span>
+        <span class="label">Bus Type</span>
+        <span class="value">{{ row.bustype.name || '-' }}</span>
       </div>
       <div class="info-item">
         <span class="label">Mileage (KM)</span>
@@ -105,20 +93,8 @@
         <span class="value">{{ row.conditionrate.name || '-' }}</span>
       </div>
       <div class="info-item">
-        <span class="label">Chasis Number</span>
-        <span class="value">{{ row.chasisnumber || '-' }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">Engine Number</span>
-        <span class="value">{{ row.enginenumber || '-' }}</span>
-      </div>
-      <div class="info-item">
         <span class="label">Fuel Type</span>
         <span class="value">{{ row.fueltype.name || '-' }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">Service Type</span>
-        <span class="value">{{ row.servicetype.name || '-' }}</span>
       </div>
       <div class="info-item">
         <span class="label">Remarks</span>

@@ -4,20 +4,19 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../core/api-endpoints';
-import {Vehicle} from '../model/vehicle';
-import {Department} from '../../employeemodule/model/department';
-import {Servicetype} from '../model/servicetype';
-import {Seatingcapacity} from '../model/seatingcapacity';
+import {Make} from '../model/make';
+import {Model} from '../model/model';
+import {Bustype} from '../model/bustype';
 
 @Injectable({ providedIn: 'root' })
-export class SeatingcapacityService extends BaseHttpService <Seatingcapacity>{
+export class BustypeService extends BaseHttpService <Bustype>{
 
   constructor(protected override http: HttpClient) {
     super(http);
   }
 
-  get():Observable<ApiResponse<Seatingcapacity>>{
-    return  this.getAll(ApiEndpoints.seatingcapacity);
+  get():Observable<ApiResponse<Bustype>>{
+    return  this.getAll(ApiEndpoints.bustype);
   }
 
 }
