@@ -2,7 +2,7 @@ import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {FormbuilderService} from '../../../core/formbuilder.service';
 import {BranchFacadeService} from '../branchfacade.service';
-import {debounceTime, distinctUntilChanged, forkJoin, Subject, takeUntil} from 'rxjs';
+import {debounceTime, distinctUntilChanged, filter, forkJoin, Subject, switchMap, takeUntil} from 'rxjs';
 import {Branch} from '../model/branch';
 import {BranchStatus} from '../model/branchstatus';
 import {BranchType} from '../model/branchtype';
@@ -25,6 +25,7 @@ import {
   BRANCH_TABLE_META
 } from '../branch.meta';
 import {RegionalOffice} from '../model/regionaloffice';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-branch',
@@ -76,6 +77,8 @@ export class BranchComponent implements OnInit, OnDestroy {
   @ViewChild('printSection', {static: false}) printSectionRef!: ElementRef;
 
   private destroy$ = new Subject<void>();
+  private lastGeneratedBranch: string | null = null;
+
 
   constructor(
     private formBuilderService: FormbuilderService,
@@ -133,7 +136,10 @@ export class BranchComponent implements OnInit, OnDestroy {
       branchstatus: this.branchStatuses,
       regexes: this.regexRules
     });
+   // this.setEmail();
+   // this.setBranchCode();
 
+    this.initAutoGenerate();
   }
 
   // ===== Data Loading =====
@@ -199,6 +205,61 @@ export class BranchComponent implements OnInit, OnDestroy {
     })
   }
 
+  private initAutoGenerate(): void {
+    const nameControl = this.mainForm.get('name');
+
+    nameControl?.valueChanges
+      .pipe(
+        debounceTime(500),
+        filter(() => nameControl.valid),
+        map(name => name?.trim()),
+        distinctUntilChanged(),
+        filter(name => name !== this.lastGeneratedBranch),
+        filter(() => !this.mainForm.get('code')?.value),
+        switchMap(name =>
+          this.branchFacadeService.loadBranchCode(name)
+        )
+      )
+      .subscribe(code => {
+        this.mainForm.patchValue(
+          {
+            code,
+            email: this.branchFacadeService.generateEmail(code)
+          },
+          { emitEvent: false }
+        );
+
+        this.lastGeneratedBranch = nameControl.value;
+      });
+  }
+  /*
+  private setBranchCode():void{
+    this.mainForm.controls['name'].valueChanges.subscribe(()=>{
+      const  branchName = this.mainForm.controls['name'].getRawValue();
+      const nameControl = this.mainForm.get('name');
+      if (nameControl?.valid){
+        this.branchFacadeService.loadBranchCode(branchName).subscribe({
+          next:(code)=>{
+              this.mainForm.controls['code'].setValue(code);
+          }
+        })
+      }
+    })
+  }
+
+  private setEmail():void{
+    this.mainForm.controls['code'].valueChanges.subscribe(()=>{
+      const code = this.mainForm.controls['code'].getRawValue();
+      const codeControl = this.mainForm.get('code');
+      if (codeControl?.valid){
+        const email = this.branchFacadeService.generateEmail(code);
+        if (email){
+          this.mainForm.controls['email'].setValue(email);
+        }
+      }
+    });
+  }
+**/
   // ===== Export Operations =====
   private toPdf() {
     if (this.selectedRows.size > 0) {

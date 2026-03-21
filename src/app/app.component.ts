@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import {Component, inject, OnInit, ViewChild} from '@angular/core';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -51,6 +51,7 @@ const formats: MatDateFormats = {
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
+
   @ViewChild('sidenav') sidenav!: MatSidenav;
   isMobile = false;
   isCollapsed = false;

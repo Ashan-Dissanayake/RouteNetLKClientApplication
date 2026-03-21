@@ -3,25 +3,25 @@
 </div>
 
 <!-- ===== Action Panel ===== -->
-  <app-button-panel
-    [buttons]="actionPanelConfig"
-    (actionClicked)="onActionTriggered($event)"
-    (dropdownClicked)="onDropdownOnlyClick($event)"
-    [contextData]="{ selectedRows: this.selectedRows }"
-  >
-  </app-button-panel>
+<app-button-panel
+  [buttons]="actionPanelConfig"
+  (actionClicked)="onActionTriggered($event)"
+  (dropdownClicked)="onDropdownOnlyClick($event)"
+  [contextData]="{ selectedRows: this.selectedRows }"
+>
+</app-button-panel>
 
-  <!-- ===== Filter Section ===== -->
-  <div *ngIf="filterForm && dataInitialized" id="serverSearch">
-    <form [formGroup]="filterForm">
-      <dynamic-field
-        *ngFor="let field of filterFormMeta"
-        [formInstance]="filterForm"
-        [field]="field"
-      >
-      </dynamic-field>
-    </form>
-  </div>
+<!-- ===== Filter Section ===== -->
+<div *ngIf="filterForm && dataInitialized" id="serverSearch">
+  <form [formGroup]="filterForm">
+    <dynamic-field
+      *ngFor="let field of filterFormMeta"
+      [formInstance]="filterForm"
+      [field]="field"
+    >
+    </dynamic-field>
+  </form>
+</div>
 
 <!-- ===== Main Table with Side View ===== -->
 <app-side-view

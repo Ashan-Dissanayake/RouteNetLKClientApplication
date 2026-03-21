@@ -12,6 +12,7 @@ import {BranchService} from './services/branch.service';
 import {normalizeSearchCriteria} from '../../core/search-criteria-normalizer';
 import {RegionalOfficeService} from './services/regionaloffice.service';
 import {RegionalOffice} from './model/regionaloffice';
+import {NumberService} from '../../core/number.service';
 
 @Injectable({
   providedIn: 'root',
@@ -22,7 +23,8 @@ import {RegionalOffice} from './model/regionaloffice';
     private branchStatusService: BranchStatusService,
     private branchService: BranchService,
     private regionalOfficeService: RegionalOfficeService,
-    private regexService: RegexService
+    private regexService: RegexService,
+    private numberService:NumberService
   ) {}
 
   // Load data
@@ -82,5 +84,18 @@ import {RegionalOffice} from './model/regionaloffice';
   private getBranches(params?: any): Observable<Branch[]> {
     return this.branchService.get(params).pipe(map(res => res.data));
   }
+
+  generateEmail(branchCode: string): string | null {
+    if (!branchCode) return null;
+
+    const clearCode = branchCode.trim().toLowerCase().replace(/\s+/g, '.').substring(0,3); // handle spaces
+
+    return `${clearCode}@sltb.lk`;
+  }
+
+  loadBranchCode(branchName:string): Observable<string> {
+    return this.numberService.getGeneratedNumber(branchName).pipe(map(res => res.data));
+  }
+
 
 }
