@@ -23,13 +23,12 @@ export const EMPLOYEE_FILTER_FORM_META: FormField[] = [
 export const EMPLOYEE_MAIN_FORM_META: FormField[] = [
   {name: 'id', type: 'hidden', label: 'Employee id', required: false, mode: 'none'},
   {name: 'branch', type: 'select', label: 'Branch', required: true, mode: 'options'},
-  {name: 'number', type: 'text', label: 'Employee Number', required: true, mode: 'regex'},
   {name: 'fullname', type: 'text', label: 'Full Name', required: true, mode: 'regex'},
   {name: 'callingname', type: 'text', label: 'Calling Name', required: true, mode: 'regex'},
   {name: 'nic', type: 'text', label: 'NIC', required: true, mode: 'regex'},
   {name: 'gender', type: 'select', label: 'Gender', required: true, mode: 'options',disabled:true},
   {name: 'mobile', type: 'text', label: 'Mobile', required: true, mode: 'regex'},
-  {name: 'email', type: 'text', label: 'Email Address', required: true, mode: 'none',disabled:true},
+  //{name: 'email', type: 'text', label: 'Email Address', required: true, mode: 'none',disabled:true},
   {name: 'address', type: 'text', label: 'Address', required: true, mode: 'regex'},
   {name: 'emergencycontact', type: 'text', label: 'Emergency Contact', required: true, mode: 'regex'},
   {name: 'image', type: 'file', label: 'Image', required: false, mode: 'none'},
@@ -46,7 +45,7 @@ export const EMPLOYEE_MAIN_FORM_META: FormField[] = [
 ] as FormField[];
 
 export const EMPLOYEE_IMMUTABLE_CONTROLLERS_META = [
-  'doj','number',
+  'doj'
 ]
 
 export const EMPLOYEE_DATA_EXPORT_META = [

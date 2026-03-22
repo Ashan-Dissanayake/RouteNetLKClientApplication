@@ -94,7 +94,7 @@ import {NumberService} from '../../core/number.service';
   }
 
   loadBranchCode(branchName:string): Observable<string> {
-    return this.numberService.getGeneratedNumber(branchName).pipe(map(res => res.data));
+    return this.numberService.getGeneratedBranchCode(branchName).pipe(map(res => res.data));
   }
 
 

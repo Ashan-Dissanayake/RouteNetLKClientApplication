@@ -19,18 +19,20 @@ export const ApiEndpoints = {
     branchcode:`${baseUrl}/number-generator/branch`,
 
     //Employee
-    genders:`${baseUrl}/genders/list`,
-    departments:`${baseUrl}/departments/list`,
-    designations:`${baseUrl}/designations/list`,
-    employeetypes:`${baseUrl}/employeetypes/list`,
-    employeestatuses:`${baseUrl}/employeestatuses/list`,
+    genders:`${baseUrl}/genders/summaries`,
+    departments:`${baseUrl}/departments/summaries`,
+    designations:`${baseUrl}/designations/summaries`,
+    employeetypes:`${baseUrl}/employee-types/summaries`,
+    employeestatuses:`${baseUrl}/employee-statuses/summaries`,
     employees:`${baseUrl}/employees`,
-    employeesByDriver:`${baseUrl}/employees/list/driver`,
-    employeesByConductor:`${baseUrl}/employees/list/conductor`,
-    employeesList:`${baseUrl}/employees/list`,
+    employeesByDriver:`${baseUrl}/employees/summaries/driver`,
+    employeesByConductor:`${baseUrl}/employees/summaries/conductor`,
+    employeesList:`${baseUrl}/employees/summaries`,
     employeesdeactivate: `${baseUrl}/employees/deactivate`,
+    employeenumber:`${baseUrl}/number-generator/employee`,
 
-    //Crew
+
+  //Crew
     drivers:`${baseUrl}/drivers`,
     conductors:`${baseUrl}/conductors`,
     allowedBusTypes:`${baseUrl}/allowedbustypes/list`,

@@ -13,8 +13,12 @@ export class NumberService extends BaseHttpService<any>{
     super(http);
   }
 
-  getGeneratedNumber(branchName: string): Observable<ApiResponse<string,false>> {
+  getGeneratedBranchCode(branchName: string): Observable<ApiResponse<string,false>> {
     return this.getObject<string>(`${ApiEndpoints.branchcode}/${branchName}`);
   }
+
+  // getGeneratedEmployeeNumber(): Observable<ApiResponse<string,false>> {
+  //   return this.getObject<string>(ApiEndpoints.employeenumber);
+  // }
 
 }

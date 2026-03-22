@@ -18,6 +18,7 @@ import {BranchService} from '../branchmodule/services/branch.service';
 import {Regex} from '../../shared/models/regex.model';
 import {RegexService} from '../../core/regex.service';
 import {normalizeSearchCriteria} from '../../core/search-criteria-normalizer';
+import {NumberService} from '../../core/number.service';
 
 @Injectable({
   providedIn: 'root',
@@ -32,7 +33,8 @@ export class EmployeeFacadeService {
     private employeeStatusService: EmployeeStatusService,
     private genderService: GenderService,
     private branchService: BranchService,
-    private regexService:RegexService
+    private regexService:RegexService,
+    private numberService:NumberService
   ) {
   }
 
@@ -68,6 +70,11 @@ export class EmployeeFacadeService {
   loadStaticRegexes(): Observable<Regex> {
     return this.regexService.getStaticRegexes('employees').pipe(map(res => res.data));
   }
+
+  // loadEmployeeNumber(): Observable<string> {
+  //   return this.numberService.getGeneratedEmployeeNumber().pipe(map(res => res.data));
+  // }
+
 
   searchEmployees(criteria: Record<string, any>): Observable<Employee[]> {
     const normalized = normalizeSearchCriteria(criteria);
@@ -117,15 +124,6 @@ export class EmployeeFacadeService {
     }
 
     return null;
-  }
-
-  generateEmail(callingName: string, employeeNumber: string): string | null {
-    if (!callingName || !employeeNumber) return null;
-
-    const cleanName = callingName.trim().toLowerCase().replace(/\s+/g, '.'); // handle spaces
-    const cleanEmpNo = employeeNumber.trim().toUpperCase();
-
-    return `${cleanName}.${cleanEmpNo}@sltb.lk`;
   }
 
   // Private helpers

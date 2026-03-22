@@ -151,36 +151,7 @@ export class EmployeeComponent implements OnInit, OnDestroy {
       employeestatus: this.employeeStatuses,
       regexes: this.regexRules
     });
-
     this.setGender();
-    this.setEmail();
-  }
-
-  private setGender():void{
-    this.mainForm.controls['nic'].valueChanges.subscribe((nic) => {
-      const nicControl = this.mainForm.get('nic');
-      if (nicControl?.valid) {
-        const gender = this.employeeFacadeService.extractGenderFromNIC(nic);
-        if (gender) {
-          let bindedGender = this.genders.find((gen)=> gen.name.toLowerCase() == gender.toLowerCase());
-          this.mainForm.controls['gender'].setValue(bindedGender);
-        }
-      }
-    });
-  }
-
-  private setEmail():void{
-    this.mainForm.controls['callingname'].valueChanges.subscribe(()=>{
-      const callingName = this.mainForm.controls['callingname'].getRawValue();
-      const employeeNumber = this.mainForm.controls['number'].getRawValue();
-      const callingnameControl = this.mainForm.get('callingname');
-      if (callingnameControl?.valid){
-        const email = this.employeeFacadeService.generateEmail(callingName,employeeNumber);
-        if (email){
-          this.mainForm.controls['email'].setValue(email);
-        }
-      }
-    });
   }
 
   // ===== Data Loading =====
@@ -247,6 +218,19 @@ export class EmployeeComponent implements OnInit, OnDestroy {
           }
         });
     })
+  }
+
+  private setGender():void{
+    this.mainForm.controls['nic'].valueChanges.subscribe((nic) => {
+      const nicControl = this.mainForm.get('nic');
+      if (nicControl?.valid) {
+        const gender = this.employeeFacadeService.extractGenderFromNIC(nic);
+        if (gender) {
+          let bindedGender = this.genders.find((gen)=> gen.name.toLowerCase() == gender.toLowerCase());
+          this.mainForm.controls['gender'].setValue(bindedGender);
+        }
+      }
+    });
   }
 
   // ===== Export Operations =====
