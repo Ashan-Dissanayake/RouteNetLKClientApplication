@@ -42,12 +42,12 @@ export const ApiEndpoints = {
 
   //Vehicle
     vehicles:`${baseUrl}/vehicles`,
-    conditionrate:`${baseUrl}/conditionrates/list`,
-    fueltype:`${baseUrl}/fueltypes/list`,
-    vehiclestatus:`${baseUrl}/vehiclestatuses/list`,
-    make:`${baseUrl}/makes/list`,
-    model:`${baseUrl}/models/list`,
-    bustype:`${baseUrl}/bustypes/list`,
+    conditionrate:`${baseUrl}/condition-rates/summaries`,
+    fueltype:`${baseUrl}/fuel-types/summaries`,
+    vehiclestatus:`${baseUrl}/vehicle-statuses/summaries`,
+    make:`${baseUrl}/makes/summaries`,
+    model:`${baseUrl}/models/summaries`,
+    bustype:`${baseUrl}/bus-types/summaries`,
     vehicledeactivate: `${baseUrl}/vehicles/deactivate`,
 
 

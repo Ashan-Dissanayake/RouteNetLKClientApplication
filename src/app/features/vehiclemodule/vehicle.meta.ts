@@ -20,7 +20,6 @@ export const VEHICLE_MAIN_FORM_META: FormField[] = [
   {name: 'id', type: 'hidden', label: 'Vehicle id', required: false, mode: 'none'},
   {name: 'branch', type: 'select', label: 'Branch', required: true, mode: 'options'},
   {name: 'number', type: 'text', label: 'Number Plate', required: true, mode: 'regex'},
-  {name: 'make', type: 'select', label: 'Make', required: true, mode: 'options'},
   {name: 'model', type: 'select', label: 'Model', required: true, mode: 'options'},
   {name: 'bustype', type: 'select', label: 'Bus Type', required: true, mode: 'options'},
   {name: 'mileage', type: 'text', label: 'Mileage', required: true, mode: 'none'},
@@ -31,7 +30,7 @@ export const VEHICLE_MAIN_FORM_META: FormField[] = [
 ] as FormField[];
 
 export const VEHICLE_IMMUTABLE_CONTROLLERS_META = [
-  'make', 'model', 'number','mileage','branch','bustype'
+  'model', 'number','mileage','bustype'
 ]
 
 export const VEHICLE_DATA_EXPORT_META = [
