@@ -35,10 +35,10 @@ export const ApiEndpoints = {
   //Crew
     drivers:`${baseUrl}/drivers`,
     conductors:`${baseUrl}/conductors`,
-    allowedBusTypes:`${baseUrl}/allowedbustypes/list`,
-    crewStatuses:`${baseUrl}/crewstatuses/list`,
-    routeFamiliarityLevels:`${baseUrl}/routefamiliaritylevels/list`,
-    licenseCategories:`${baseUrl}/licensecategories/list`,
+    // allowedBusTypes:`${baseUrl}/allowedbustypes/summaries`,
+    crewStatuses:`${baseUrl}/crew-statuses/summaries`,
+    routeFamiliarityLevels:`${baseUrl}/route-familiarity-levels/summaries`,
+    licenseCategories:`${baseUrl}/license-categories/summaries`,
 
   //Vehicle
     vehicles:`${baseUrl}/vehicles`,

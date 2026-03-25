@@ -21,7 +21,7 @@ export const DRIVER_FILTER_FORM_META: FormField[] = [
 export const DRIVER_MAIN_FORM_META: FormField[] = [
   {name: 'id', type: 'hidden', label: 'Vehicle id', required: false, mode: 'none'},
   {name: 'employee', type: 'select', label: 'Name', required: true, mode: 'options',optionLabelKey: 'callingname',},
-  {name: 'number', type: 'text', label: 'Driver Number', required: true, mode: 'regex'},
+  // {name: 'number', type: 'text', label: 'Driver Number', required: true, mode: 'regex'},
   {name: 'licensecategory', type: 'select', label: 'License Category', required: true, mode: 'options'},
   {name: 'licensenumber', type: 'text', label: 'License Number', required: true, mode: 'regex'},
   {

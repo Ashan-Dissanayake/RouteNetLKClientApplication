@@ -18,7 +18,6 @@ export const CONDUCTOR_FILTER_FORM_META: FormField[] = [
 export const CONDUCTOR_MAIN_FORM_META: FormField[] = [
   {name: 'id', type: 'hidden', label: 'Conductor id', required: false, mode: 'none'},
   {name: 'employee', type: 'select', label: 'Name', required: true, mode: 'options',optionLabelKey: 'callingname',},
-  {name: 'number', type: 'text', label: 'Conductor Number', required: true, mode: 'regex'},
   {
     name: 'medicalDateRange',
     type: 'date-range',
@@ -33,7 +32,7 @@ export const CONDUCTOR_MAIN_FORM_META: FormField[] = [
 ] as FormField[];
 
 export const CONDUCTOR_IMMUTABLE_CONTROLLERS_META = [
-  'employee','number','crewstatus',
+  'employee','number'
 ]
 
 export const CONDUCTOR_DATA_EXPORT_META = [
