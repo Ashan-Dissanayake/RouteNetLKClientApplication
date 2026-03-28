@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {PERMIT_FILTER_FORM_META, PERMIT_TABLE_META} from '../permit.meta';
+import {PERMIT_FILTER_FORM_META, PERMIT_MAIN_FORM_META, PERMIT_TABLE_META} from '../permit.meta';
 import {PermitFacadeService} from '../permitfacade.service';
 import {Observable, Subject, take, takeUntil} from 'rxjs';
 import {DialogService} from '../../../core/dialog.service';
@@ -50,23 +50,26 @@ import {FormbuilderService} from '../../../core/formbuilder.service';
 })
 export class PermitComponent implements OnInit, OnDestroy{
 
+  // ===== Meta Data =====
   protected readonly tableColumns = PERMIT_TABLE_META;
   protected readonly actionPanelConfig = buildActionPanel();
   protected readonly filterFormMeta = PERMIT_FILTER_FORM_META;
-
+  protected readonly mainFormMeta = PERMIT_MAIN_FORM_META;
 
   // ===== Reactive State =====
-  permits$: Observable<Permit[]>;
-  metadata$: Observable<any>;
-  loading$: Observable<boolean>;
-  error$: Observable<any>;
-
+  protected permits$: Observable<Permit[]>;
+  protected metadata$: Observable<any>;
+  protected loading$: Observable<boolean>;
+  protected error$: Observable<any>;
   private destroy$ = new Subject<void>();
+
+  // ===== UI State =====
   protected activePermit: Permit | null = null;
+  protected selectedRows = new Set<Permit>();
 
   // ===== Forms =====
   protected filterForm: FormGroup = new FormGroup({});
-  selectedRows: any;
+  protected mainForm: FormGroup = new FormGroup({});
 
   constructor(
     private permitFacade:PermitFacadeService,
@@ -86,6 +89,7 @@ export class PermitComponent implements OnInit, OnDestroy{
     this.metadata$.pipe(takeUntil(this.destroy$)).subscribe(metadata => {
       console.log(metadata)
       this.createFilterForm(metadata);
+      this.createMainForm(metadata);
     });
   }
 
@@ -103,13 +107,23 @@ export class PermitComponent implements OnInit, OnDestroy{
   }
 
   // ===== Form creation =====
-
   private createFilterForm(metadata: any): void {
     this.filterForm = this.formBuilderService.build(this.filterFormMeta, {
       sspermitstatus: metadata.permitStatuses,
       ssroute: metadata.routes
     });
     this.onFilterFormChanged();
+  }
+
+  private createMainForm(metadata: any): void {
+    this.mainForm = this.formBuilderService.build(this.mainFormMeta, {
+      vehicle: metadata.vehicles,
+      branch: metadata.branches,
+      permitestatus: metadata.permitStatuses,
+      servicetype: metadata.serviceTypes,
+      route: metadata.routes,
+      regexes: metadata.regexes
+    });
   }
 
   // ===== Filtering =====
@@ -130,9 +144,6 @@ export class PermitComponent implements OnInit, OnDestroy{
     this.activePermit = row;
   }
 
-  protected onRowAction(action: string, row: Permit) {
-  }
-
   protected onRowCheckboxChanged(event: CheckboxEvent) {
     if (event.checked) this.selectedRows.add(event.row);
     else this.selectedRows.delete(event.row);
@@ -147,11 +158,46 @@ export class PermitComponent implements OnInit, OnDestroy{
     }
   }
 
+  // ===== CRUD =====
+  private openMainForm(): void {
+    // this.mainForm.value.id
+    //   ? this.formBuilderService.setControlsState(this.mainForm, this.immutableControllers, true)
+    //   : this.formBuilderService.setControlsState(this.mainForm, this.immutableControllers, false);
+    this.dialogService.showFormPopup({
+      heading: this.mainForm.value.id ? 'Edit Permit' : 'Create Permit',
+      form: this.mainForm,
+      meta: this.mainFormMeta
+    }).subscribe(formData => {
+      if (formData) this.save(formData);
+      else this.formBuilderService.resetForm(this.mainForm);
+    });
+  }
+
+  private save(formData: any): void {
+    const operation$ = formData.id
+      ? this.permitFacade.updatePermit(formData)
+      : this.permitFacade.createPermit(formData);
+
+    operation$?.pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => this.dialogService.showSuccess('Permit saved successfully.'),
+      error: (err) => this.dialogService.showMessage({ heading: 'Failed to save Permit', message: err.errorMessage }),
+      complete: () => {
+        this.permitFacade.reloadPermits();
+        this.formBuilderService.resetForm(this.mainForm);
+        // this.formBuilderService.setControlsState(this.mainForm, this.immutableControllers, false);
+      }
+    });
+  }
+
+  private edit(row: Permit): void {
+    this.mainForm.patchValue(row);
+    this.openMainForm();
+  }
+
   // ===== Action Panel =====
   protected actionHandlers: Record<string, () => void> = {
     'clear-search': () => this.filterForm.reset(),
-    'create': () => console.log("open main form"),
-    'bulk-deactivate': () => console.log("bulk deactivate"),
+    'create': () => this.openMainForm(),
     'export-pdf': () => console.log("topdf"),
     'export-excel': () => console.log("toexcel")
   };
@@ -171,7 +217,6 @@ export class PermitComponent implements OnInit, OnDestroy{
   }
 
   // ===== TrackBy for optimization =====
-  protected trackByPermitId(index: number, permit: Permit): number { return permit.id!; }
   protected trackByField(index: number, field: any): string { return field.name; }
 
 }

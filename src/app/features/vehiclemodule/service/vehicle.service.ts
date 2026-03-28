@@ -17,6 +17,10 @@ export class VehicleService extends BaseHttpService <Vehicle>{
     return  this.getAll(ApiEndpoints.vehicles,params);
   }
 
+  getSummary():Observable<ApiResponse<Vehicle>>{
+    return  this.getAll(ApiEndpoints.vehiclessummaries);
+  }
+
   save(vehicle:Vehicle):Observable<Vehicle>{
     return this.post(ApiEndpoints.vehicles,vehicle);
   }

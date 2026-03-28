@@ -6,10 +6,7 @@ import { BaseHttpService } from '../../../core/basehttp.service';
 import { ApiResponse } from '../../../shared/models/apiresponse.model';
 import { Branch } from '../entity/branch';
 
-/**
- * BranchService - Concrete implementation extending BaseHttpService<Branch>
- * This service gets its own DI registration via @Injectable
- */
+
 @Injectable({ providedIn: 'root' })
 export class BranchService extends BaseHttpService<Branch> {
 

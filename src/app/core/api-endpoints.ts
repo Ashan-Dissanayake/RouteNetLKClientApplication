@@ -42,6 +42,7 @@ export const ApiEndpoints = {
 
   //Vehicle
     vehicles:`${BASE_URL}/vehicles`,
+    vehiclessummaries:`${BASE_URL}/vehicles/summaries`,
     conditionrate:`${BASE_URL}/condition-rates/summaries`,
     fueltype:`${BASE_URL}/fuel-types/summaries`,
     vehiclestatus:`${BASE_URL}/vehicle-statuses/summaries`,

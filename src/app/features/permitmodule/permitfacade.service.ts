@@ -12,6 +12,10 @@ import {PermitStatusService} from './service/permitstatus.service';
 import {RegexService} from '../../core/regex.service';
 import {Regex} from '../../shared/models/regex.model';
 import {ServiceTypeService} from './service/servicetype.service';
+import {BranchService} from '../branchmodule/services/branch.service';
+import {VehicleService} from '../vehiclemodule/service/vehicle.service';
+import {Vehicle} from '../vehiclemodule/entity/vehicle';
+import {Branch} from '../branchmodule/entity/branch';
 
 @Injectable({
   providedIn: 'root',
@@ -35,6 +39,8 @@ export class PermitFacadeService {
     private routeService:RouteService,
     private permitStatusService:PermitStatusService,
     private serviceTypeService:ServiceTypeService,
+    private branchService:BranchService,
+    private vehicleService:VehicleService,
     private regexService: RegexService,
   ) {}
 
@@ -48,6 +54,8 @@ export class PermitFacadeService {
       permitStatuses:this.loadPermitStatuses(),
       serviceTypes:this.loadServiceTypes(),
       routes:this.loadRoutes(),
+      vehicles:this.loadVehicles(),
+      branches:this.loadBranches(),
       regexes: this.loadStaticRegexes(),
     }).pipe(
       tap(metadata => this.metadataSubject.next(metadata)),
@@ -58,7 +66,6 @@ export class PermitFacadeService {
   }
 
   reloadPermits(): void { this.refreshPermits(); }
-
 
   loadPermits(params?:any):Observable<Permit[]>{
       this.loadingSubject.next(true);
@@ -83,11 +90,25 @@ export class PermitFacadeService {
       });
   }
 
+  createPermit(permitData: Permit): Observable<Permit> {
+      return this.permitService.save(permitData);
+  }
+
+  updatePermit(permitData: Permit): Observable<Permit> {
+    return this.permitService.update(permitData);
+  }
+
+  savePermit(permitData: Permit): Observable<Permit> {
+    return permitData.id ? this.createPermit(permitData) : this.updatePermit(permitData);
+  }
+
   // ===== Metadata Loading =====
   loadPermitStatuses(): Observable<PermitStatus[]> { return this.permitStatusService.get().pipe(map(res => res.data)); }
   loadServiceTypes(): Observable<ServiceType[]> { return this.serviceTypeService.get().pipe(map(res => res.data)); }
   loadRoutes(): Observable<Route[]> { return this.routeService.get().pipe(map(res => res.data)); }
   loadStaticRegexes(): Observable<Regex> { return this.regexService.getStaticRegexes('permits').pipe(map(res => res.data)); }
+  loadVehicles(): Observable<Vehicle[]> {return this.vehicleService.getSummary().pipe(map(res => res.data));}
+  loadBranches(): Observable<Branch[]> {return this.branchService.getSummary().pipe(map(res => res.data));}
 
   // ===== Private Helpers =====
   private refreshPermits(): void {
@@ -95,4 +116,5 @@ export class PermitFacadeService {
       .pipe(finalize(() => this.loadingSubject.next(false)))
       .subscribe();
   }
+
 }

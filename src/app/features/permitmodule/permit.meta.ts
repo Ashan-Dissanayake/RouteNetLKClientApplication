@@ -18,3 +18,19 @@ export const PERMIT_FILTER_FORM_META: FormField[] = [
   {name: 'sspermitstatus', type: 'select', label: 'Status', required: false, mode: 'options'},
   {name: 'ssroute', type: 'select', label: 'Route', required: false, mode: 'options'}
 ] as FormField[];
+
+export const PERMIT_MAIN_FORM_META: FormField[] = [
+  {name: 'id', type: 'hidden', label: 'permit id', required: false, mode: 'none'},
+  {name: 'branch', type: 'select', label: 'Branch', required: true, mode: 'options'},
+  {name: 'vehicle', type: 'select', label: 'Vehicle', required: true, mode: 'options',optionLabelKey: 'number'},
+  {name: 'route', type: 'select', label: 'Route', required: true, mode: 'options'},
+  {name: 'number', type: 'text', label: 'Permit Number', required: true, mode: 'regex'},
+  {name: 'doissued', type: 'date', label: 'Issued Date', required: true, mode: 'date',
+    dateConfig:{ maxDate:new Date() }
+  },
+  {name: 'doexpired', type: 'date', label: 'Exp Date', required: true, mode: 'date',
+    dateConfig:{ minDate:new Date()}
+  },
+  {name: 'servicetype', type: 'select', label: 'Service Type', required: true, mode: 'options'},
+  {name: 'permitestatus', type: 'select', label: 'Permit Status', required: true, mode: 'options'}
+] as FormField[];
