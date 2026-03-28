@@ -94,12 +94,8 @@ export class PermitFacadeService {
       return this.permitService.save(permitData);
   }
 
-  updatePermit(permitData: Permit): Observable<Permit> {
-    return this.permitService.update(permitData);
-  }
-
-  savePermit(permitData: Permit): Observable<Permit> {
-    return permitData.id ? this.createPermit(permitData) : this.updatePermit(permitData);
+  transferPermit(permitId:number): Observable<Permit>{
+    return this.permitService.transferPermit(permitId);
   }
 
   // ===== Metadata Loading =====

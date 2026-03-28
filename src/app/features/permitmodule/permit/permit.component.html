@@ -52,11 +52,12 @@
     (rowClick)="onRowClick($event)"
     (checkBoxClick)="onRowCheckboxChanged($event)"
     (selectAllClick)="onSelectAll($event)"
+    (actionClick)="onRowAction($event.action, $event.row)"
   >
     <!-- Row Actions -->
     <ng-template tableCell="actions" let-row let-action="action">
-      <button mat-button (click)="action('edit', row); $event.stopPropagation()">
-        <mat-icon>mode_edit</mat-icon>
+      <button mat-button (click)="action('transfer', row); $event.stopPropagation()">
+        <mat-icon>outbound</mat-icon>
       </button>
     </ng-template>
   </app-data-table>

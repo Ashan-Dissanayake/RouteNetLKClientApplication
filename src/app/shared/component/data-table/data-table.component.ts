@@ -95,7 +95,6 @@ export class DataTableComponent<T = any> implements OnChanges, AfterViewInit {
   }
 
   onRowClicked(row: T) {
-
     this.rowClick.emit(row);
   }
 

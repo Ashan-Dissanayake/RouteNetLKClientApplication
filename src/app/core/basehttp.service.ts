@@ -2,11 +2,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../shared/models/apiresponse.model';
 
-/**
- * Abstract base class for HTTP services.
- * Each concrete service should extend this class with a specific model type.
- * DO NOT add @Injectable decorator here - concrete services handle their own injection.
- */
 export abstract class BaseHttpService<T> {
   constructor(protected http: HttpClient) { }
 
@@ -46,8 +41,17 @@ export abstract class BaseHttpService<T> {
     return this.http.post<T>(url, data);
   }
 
+
   put(url: string, data: T): Observable<T> {
     return this.http.put<T>(url, data);
+  }
+
+  postById(url: string, id: number, body?: any): Observable<T> {
+    return this.http.post<T>(`${url}/${id}`, body ?? {});
+  }
+
+  putById(url: string, id: number): Observable<T> {
+    return this.http.put<T>(`${url}/${id}`, {});
   }
 
   delete(url: string, id: number): Observable<T> {

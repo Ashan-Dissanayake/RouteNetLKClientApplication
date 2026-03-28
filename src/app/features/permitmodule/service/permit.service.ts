@@ -25,4 +25,7 @@ export class PermitService extends BaseHttpService <Permit>{
     return this.put(ApiEndpoints.PERMIT,permit);
   }
 
+  transferPermit(permitId: number): Observable<Permit> {
+    return this.putById(ApiEndpoints.PERMIT_TRANSFER, permitId);
+  }
 }

@@ -56,5 +56,6 @@ export const ApiEndpoints = {
     PERMIT_STATUS:`${BASE_URL}/permit-statuses/summaries`,
     ROUTE:`${BASE_URL}/routes/summaries`,
     PERMIT:`${BASE_URL}/permits`,
+    PERMIT_TRANSFER:`${BASE_URL}/permits/transfer`,
 
 } as const;

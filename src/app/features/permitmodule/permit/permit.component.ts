@@ -1,5 +1,9 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {PERMIT_FILTER_FORM_META, PERMIT_MAIN_FORM_META, PERMIT_TABLE_META} from '../permit.meta';
+import {
+  PERMIT_FILTER_FORM_META,
+  PERMIT_MAIN_FORM_META,
+  PERMIT_TABLE_META
+} from '../permit.meta';
 import {PermitFacadeService} from '../permitfacade.service';
 import {Observable, Subject, take, takeUntil} from 'rxjs';
 import {DialogService} from '../../../core/dialog.service';
@@ -160,9 +164,6 @@ export class PermitComponent implements OnInit, OnDestroy{
 
   // ===== CRUD =====
   private openMainForm(): void {
-    // this.mainForm.value.id
-    //   ? this.formBuilderService.setControlsState(this.mainForm, this.immutableControllers, true)
-    //   : this.formBuilderService.setControlsState(this.mainForm, this.immutableControllers, false);
     this.dialogService.showFormPopup({
       heading: this.mainForm.value.id ? 'Edit Permit' : 'Create Permit',
       form: this.mainForm,
@@ -174,28 +175,37 @@ export class PermitComponent implements OnInit, OnDestroy{
   }
 
   private save(formData: any): void {
-    const operation$ = formData.id
-      ? this.permitFacade.updatePermit(formData)
-      : this.permitFacade.createPermit(formData);
-
+    const operation$ = this.permitFacade.createPermit(formData);
     operation$?.pipe(takeUntil(this.destroy$)).subscribe({
       next: () => this.dialogService.showSuccess('Permit saved successfully.'),
       error: (err) => this.dialogService.showMessage({ heading: 'Failed to save Permit', message: err.errorMessage }),
       complete: () => {
         this.permitFacade.reloadPermits();
         this.formBuilderService.resetForm(this.mainForm);
-        // this.formBuilderService.setControlsState(this.mainForm, this.immutableControllers, false);
       }
     });
   }
 
-  private edit(row: Permit): void {
-    this.mainForm.patchValue(row);
-    this.openMainForm();
+  private transferPermit(row:Permit): void {
+    this.dialogService.showConfirmation({
+      heading:"Permit Transfer",
+      message:"Are you sure to TRANSFERRED this Permit-"+row.number
+    }).subscribe(confirmed=>{
+      if (!confirmed) return;
+      this.permitFacade.transferPermit(row.id)
+        ?.pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => this.dialogService.showSuccess('Transferred.'),
+          error: (err) => this.dialogService.showError('Failed to transferred.', err),
+          complete:()=>{
+            this.reload();
+          }
+        });
+    })
   }
 
   // ===== Action Panel =====
-  protected actionHandlers: Record<string, () => void> = {
+  protected actionHandlers: Record<string,  (row?: Permit) => void> = {
     'clear-search': () => this.filterForm.reset(),
     'create': () => this.openMainForm(),
     'export-pdf': () => console.log("topdf"),
@@ -207,6 +217,7 @@ export class PermitComponent implements OnInit, OnDestroy{
     if (handler) handler();
     else this.dialogService.showWarning(`No handler defined for action: ${event.type}`);
   }
+
   protected onDropdownOnlyClick(event: ButtonClickEvent) {
     const dropdownTypes = ['export-pdf', 'export-excel'];
     if (dropdownTypes.includes(event.type)) {
@@ -214,6 +225,10 @@ export class PermitComponent implements OnInit, OnDestroy{
     } else {
       this.dialogService.showWarning(`Unhandled dropdown action: ${event.type}`);
     }
+  }
+
+  protected onRowAction(action: string, row: any) {
+    if (action === 'transfer') this.transferPermit(row);
   }
 
   // ===== TrackBy for optimization =====

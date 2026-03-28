@@ -6,7 +6,7 @@ import {Vehicle} from '../../vehiclemodule/entity/vehicle';
 
 export class Permit{
   id!:number;
-  name!:string;
+  number!:string;
   doissued!:string;
   doexpired!:string;
   branch!:Branch;
