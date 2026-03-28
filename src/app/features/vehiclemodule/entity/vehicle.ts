@@ -1,7 +1,7 @@
 import {Fueltype} from './fueltype';
 import {Conditionrate} from './conditionrate';
 import {Vehiclestatus} from './vehiclestatus';
-import {Branch} from '../../branchmodule/model/branch';
+import {Branch} from '../../branchmodule/entity/branch';
 import {Model} from './model';
 import {Bustype} from './bustype';
 

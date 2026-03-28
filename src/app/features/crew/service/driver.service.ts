@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
 import {BaseHttpService} from '../../../core/basehttp.service';
-import {Driver} from '../model/driver';
+import {Driver} from '../entity/driver';
 import {HttpClient} from '@angular/common/http';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 import {Observable} from 'rxjs';
 import {ApiEndpoints} from '../../../core/api-endpoints';
-import {Vehicle} from '../../vehiclemodule/model/vehicle';
+import {Vehicle} from '../../vehiclemodule/entity/vehicle';
 
 
 @Injectable({ providedIn: 'root' })

@@ -3,52 +3,57 @@
   Centralize API endpoints for better maintainabilit
  */
 
-const baseUrl = 'http://localhost:8080';
+const BASE_URL = 'http://localhost:8080';
 
 export const ApiEndpoints = {
 
-    regexes: `${baseUrl}/regexes`,
+    regexes: `${BASE_URL}/regexes`,
 
   //Branch
-    branchstatuses:`${baseUrl}/branch-statuses/summaries`,
-    branchtypes:`${baseUrl}/branch-types/summaries`,
-    branches: `${baseUrl}/branches`,
-    brancheslist: `${baseUrl}/branches/summaries`,
-    branchesdeactivate: `${baseUrl}/branches`,
-    regionaloffice:`${baseUrl}/regional-offices/summaries`,
-    branchcode:`${baseUrl}/number-generator/branch`,
+    branchstatuses:`${BASE_URL}/branch-statuses/summaries`,
+    branchtypes:`${BASE_URL}/branch-types/summaries`,
+    branches: `${BASE_URL}/branches`,
+    brancheslist: `${BASE_URL}/branches/summaries`,
+    branchesdeactivate: `${BASE_URL}/branches`,
+    regionaloffice:`${BASE_URL}/regional-offices/summaries`,
+    branchcode:`${BASE_URL}/number-generator/branch`,
 
     //Employee
-    genders:`${baseUrl}/genders/summaries`,
-    departments:`${baseUrl}/departments/summaries`,
-    designations:`${baseUrl}/designations/summaries`,
-    employeetypes:`${baseUrl}/employee-types/summaries`,
-    employeestatuses:`${baseUrl}/employee-statuses/summaries`,
-    employees:`${baseUrl}/employees`,
-    employeesByDriver:`${baseUrl}/employees/summaries/driver`,
-    employeesByConductor:`${baseUrl}/employees/summaries/conductor`,
-    employeesList:`${baseUrl}/employees/summaries`,
-    employeesdeactivate: `${baseUrl}/employees/deactivate`,
-    employeenumber:`${baseUrl}/number-generator/employee`,
+    genders:`${BASE_URL}/genders/summaries`,
+    departments:`${BASE_URL}/departments/summaries`,
+    designations:`${BASE_URL}/designations/summaries`,
+    employeetypes:`${BASE_URL}/employee-types/summaries`,
+    employeestatuses:`${BASE_URL}/employee-statuses/summaries`,
+    employees:`${BASE_URL}/employees`,
+    employeesByDriver:`${BASE_URL}/employees/summaries/driver`,
+    employeesByConductor:`${BASE_URL}/employees/summaries/conductor`,
+    employeesList:`${BASE_URL}/employees/summaries`,
+    employeesdeactivate: `${BASE_URL}/employees/deactivate`,
+    employeenumber:`${BASE_URL}/number-generator/employee`,
 
 
   //Crew
-    drivers:`${baseUrl}/drivers`,
-    conductors:`${baseUrl}/conductors`,
-    // allowedBusTypes:`${baseUrl}/allowedbustypes/summaries`,
-    crewStatuses:`${baseUrl}/crew-statuses/summaries`,
-    routeFamiliarityLevels:`${baseUrl}/route-familiarity-levels/summaries`,
-    licenseCategories:`${baseUrl}/license-categories/summaries`,
+    drivers:`${BASE_URL}/drivers`,
+    conductors:`${BASE_URL}/conductors`,
+
+    crewStatuses:`${BASE_URL}/crew-statuses/summaries`,
+    routeFamiliarityLevels:`${BASE_URL}/route-familiarity-levels/summaries`,
+    licenseCategories:`${BASE_URL}/license-categories/summaries`,
 
   //Vehicle
-    vehicles:`${baseUrl}/vehicles`,
-    conditionrate:`${baseUrl}/condition-rates/summaries`,
-    fueltype:`${baseUrl}/fuel-types/summaries`,
-    vehiclestatus:`${baseUrl}/vehicle-statuses/summaries`,
-    make:`${baseUrl}/makes/summaries`,
-    model:`${baseUrl}/models/summaries`,
-    bustype:`${baseUrl}/bus-types/summaries`,
-    vehicledeactivate: `${baseUrl}/vehicles/deactivate`,
+    vehicles:`${BASE_URL}/vehicles`,
+    conditionrate:`${BASE_URL}/condition-rates/summaries`,
+    fueltype:`${BASE_URL}/fuel-types/summaries`,
+    vehiclestatus:`${BASE_URL}/vehicle-statuses/summaries`,
+    make:`${BASE_URL}/makes/summaries`,
+    model:`${BASE_URL}/models/summaries`,
+    bustype:`${BASE_URL}/bus-types/summaries`,
+    vehicledeactivate: `${BASE_URL}/vehicles/deactivate`,
 
+    //permit
+    SERVICE_TYPE:`${BASE_URL}/service-types/summaries`,
+    PERMIT_STATUS:`${BASE_URL}/permit-statuses/summaries`,
+    ROUTE:`${BASE_URL}/routes/summaries`,
+    PERMIT:`${BASE_URL}/permits`,
 
 } as const;

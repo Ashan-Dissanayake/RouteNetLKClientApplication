@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { ApiEndpoints } from '../../../core/api-endpoints';
 import { BaseHttpService } from '../../../core/basehttp.service';
 import { ApiResponse } from '../../../shared/models/apiresponse.model';
-import { RegionalOffice } from '../model/regionaloffice';
+import { RegionalOffice } from '../entity/regionaloffice';
 
 
 

@@ -4,7 +4,7 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../core/api-endpoints';
-import {CrewStatus} from '../model/crewstatus';
+import {CrewStatus} from '../entity/crewstatus';
 
 
 @Injectable({ providedIn: 'root' })

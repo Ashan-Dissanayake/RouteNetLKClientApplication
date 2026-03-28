@@ -7,10 +7,10 @@ import {
 } from '../conductor.meta';
 import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {Conductor} from '../model/conductor';
-import {RouteFamiliarityLevel} from '../model/routefamiliaritylevel';
-import {CrewStatus} from '../model/crewstatus';
-import {Employee} from '../../employeemodule/model/employee';
+import {Conductor} from '../entity/conductor';
+import {RouteFamiliarityLevel} from '../entity/routefamiliaritylevel';
+import {CrewStatus} from '../entity/crewstatus';
+import {Employee} from '../../employeemodule/entity/employee';
 import {debounceTime, distinctUntilChanged, forkJoin, Subject, takeUntil} from 'rxjs';
 import {ConductorFacadeService} from '../conductorfacade.service';
 import {FormbuilderService} from '../../../core/formbuilder.service';

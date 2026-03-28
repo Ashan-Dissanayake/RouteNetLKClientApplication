@@ -19,6 +19,9 @@ export const routes: Routes = [
       { path: 'conductor', loadComponent: () => import('./features/crew/conductor/conductor.component').
         then(m => m.ConductorComponent)
       },
+      { path: 'permit', loadComponent: () => import('./features/permitmodule/permit/permit.component').
+        then(m => m.PermitComponent)
+      },
     ]
   },
 ];

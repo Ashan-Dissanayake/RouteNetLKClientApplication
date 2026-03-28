@@ -4,18 +4,17 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../core/api-endpoints';
-import {Make} from '../model/make';
-import {Model} from '../model/model';
+import {Fueltype} from '../entity/fueltype';
 
 @Injectable({ providedIn: 'root' })
-export class ModelService extends BaseHttpService <Model>{
+export class FueltypeService extends BaseHttpService <Fueltype>{
 
   constructor(protected override http: HttpClient) {
     super(http);
   }
 
-  get():Observable<ApiResponse<Model>>{
-    return  this.getAll(ApiEndpoints.model);
+  get():Observable<ApiResponse<Fueltype>>{
+    return  this.getAll(ApiEndpoints.fueltype);
   }
 
 }

@@ -4,17 +4,19 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../core/api-endpoints';
-import {Designation} from '../entity/designation';
+import {ServiceType} from '../entity/servicetype';
+import {PermitStatus} from '../entity/permitstatus';
+import {Route} from '../entity/route';
 
 @Injectable({ providedIn: 'root' })
-export class DesignationService extends BaseHttpService <Designation>{
+export class RouteService extends BaseHttpService <Route>{
 
   constructor(protected override http: HttpClient) {
     super(http);
   }
 
-  get():Observable<ApiResponse<Designation>>{
-    return  this.getAll(ApiEndpoints.designations);
+  get():Observable<ApiResponse<Route>>{
+    return  this.getAll(ApiEndpoints.ROUTE);
   }
 
 }

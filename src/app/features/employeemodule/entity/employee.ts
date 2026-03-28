@@ -2,7 +2,7 @@ import {Gender} from './gender';
 import {Employeestatus} from './employeestatus';
 import {Employeetype} from './employeetype';
 import {Designation} from './designation';
-import {Branch} from '../../branchmodule/model/branch';
+import {Branch} from '../../branchmodule/entity/branch';
 import {Department} from './department';
 
 export class Employee{

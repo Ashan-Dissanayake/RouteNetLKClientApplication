@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Driver} from '../model/driver';
+import {Driver} from '../entity/driver';
 import {debounceTime, distinctUntilChanged, filter, forkJoin, Subject, switchMap, takeUntil} from 'rxjs';
 import {CheckboxEvent, DataTableComponent} from '../../../shared/component/data-table/data-table.component';
 import {MatButton} from '@angular/material/button';
@@ -9,8 +9,8 @@ import {TableCellDirective} from '../../../shared/component/data-table/table-cel
 import {MatDivider} from '@angular/material/list';
 import {NgClass, NgForOf, NgIf} from '@angular/common';
 import {FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {RouteFamiliarityLevel,} from '../model/routefamiliaritylevel';
-import {CrewStatus} from '../model/crewstatus';
+import {RouteFamiliarityLevel,} from '../entity/routefamiliaritylevel';
+import {CrewStatus} from '../entity/crewstatus';
 import {DialogService} from '../../../core/dialog.service';
 import {DriverFacadeService} from '../driverfacade.service';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
@@ -23,8 +23,8 @@ import {
   DRIVER_FILTER_FORM_META, DRIVER_IMMUTABLE_CONTROLLERS_META, DRIVER_MAIN_FORM_META,
   DRIVER_TABLE_META
 } from '../driver.meta';
-import {Employee} from '../../employeemodule/model/employee';
-import {LicenseCategory} from '../model/licensecategory';
+import {Employee} from '../../employeemodule/entity/employee';
+import {LicenseCategory} from '../entity/licensecategory';
 import {DriverMapper} from '../../../shared/mappers/DriverMapper';
 import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
 import {exportToExcel} from '../../../shared/component/export/excel-export.util';

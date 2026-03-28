@@ -5,7 +5,7 @@ import {
   VEHICLE_TABLE_META
 
 } from '../vehicle.meta';
-import {Vehicle} from '../model/vehicle';
+import {Vehicle} from '../entity/vehicle';
 import {VehicleFacadeService} from '../vehiclefacade.service';
 import {debounceTime, distinctUntilChanged, forkJoin, Subject, takeUntil} from 'rxjs';
 import {CheckboxEvent, DataTableComponent} from '../../../shared/component/data-table/data-table.component';
@@ -16,19 +16,19 @@ import {SideViewComponent} from '../../../shared/component/side-view/side-view.c
 import {NgClass, NgForOf, NgIf} from '@angular/common';
 import {MatDivider} from '@angular/material/divider';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {Conditionrate} from '../model/conditionrate';
+import {Conditionrate} from '../entity/conditionrate';
 import {FormbuilderService} from '../../../core/formbuilder.service';
 import {DialogService} from '../../../core/dialog.service';
 import {ButtonClickEvent, ButtonPanelComponent} from '../../../shared/component/button/button-panel/button-panel.component';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
-import {Vehiclestatus} from '../model/vehiclestatus';
-import {Make} from '../model/make';
-import {Fueltype} from '../model/fueltype';
-import {Branch} from '../../branchmodule/model/branch';
+import {Vehiclestatus} from '../entity/vehiclestatus';
+import {Make} from '../entity/make';
+import {Fueltype} from '../entity/fueltype';
+import {Branch} from '../../branchmodule/entity/branch';
 import {exportToExcel} from '../../../shared/component/export/excel-export.util';
 import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
-import {Model} from '../model/model';
-import {Bustype} from '../model/bustype';
+import {Model} from '../entity/model';
+import {Bustype} from '../entity/bustype';
 
 @Component({
   selector: 'app-vehicle',

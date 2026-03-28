@@ -4,7 +4,7 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../core/api-endpoints';
-import {Vehicle} from '../model/vehicle';
+import {Vehicle} from '../entity/vehicle';
 
 @Injectable({ providedIn: 'root' })
 export class VehicleService extends BaseHttpService <Vehicle>{

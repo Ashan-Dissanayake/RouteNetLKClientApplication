@@ -68,6 +68,7 @@ export class AppComponent {
         { icon: 'directions_bus', label: 'Vehicle', route: '/admin/vehicle' },
         { icon: 'groups', label: 'Driver', route: '/admin/driver' },
         { icon: 'groups', label: 'Conductor', route: '/admin/conductor' },
+        { icon: 'groups', label: 'Permit', route: '/admin/permit' },
       ],
       expanded: false
     },

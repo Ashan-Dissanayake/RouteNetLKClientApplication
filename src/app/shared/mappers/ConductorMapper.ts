@@ -1,4 +1,4 @@
-import {Conductor} from '../../features/crew/model/conductor';
+import {Conductor} from '../../features/crew/entity/conductor';
 
 export  class ConductorMapper{
   static fromForm(payload: any):Conductor{

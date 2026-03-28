@@ -3,9 +3,9 @@ import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {FormbuilderService} from '../../../core/formbuilder.service';
 import {BranchFacadeService} from '../branchfacade.service';
 import {debounceTime, distinctUntilChanged, filter, forkJoin, Subject, switchMap, takeUntil} from 'rxjs';
-import {Branch} from '../model/branch';
-import {BranchStatus} from '../model/branchstatus';
-import {BranchType} from '../model/branchtype';
+import {Branch} from '../entity/branch';
+import {BranchStatus} from '../entity/branchstatus';
+import {BranchType} from '../entity/branchtype';
 import {ButtonClickEvent, ButtonPanelComponent } from '../../../shared/component/button/button-panel/button-panel.component';
 import {DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
@@ -24,7 +24,7 @@ import {
   BRANCH_MAIN_FORM_META,
   BRANCH_TABLE_META
 } from '../branch.meta';
-import {RegionalOffice} from '../model/regionaloffice';
+import {RegionalOffice} from '../entity/regionaloffice';
 import {map} from 'rxjs/operators';
 
 @Component({

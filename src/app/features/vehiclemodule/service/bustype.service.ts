@@ -4,17 +4,19 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../core/api-endpoints';
-import {Designation} from '../entity/designation';
+import {Make} from '../entity/make';
+import {Model} from '../entity/model';
+import {Bustype} from '../entity/bustype';
 
 @Injectable({ providedIn: 'root' })
-export class DesignationService extends BaseHttpService <Designation>{
+export class BustypeService extends BaseHttpService <Bustype>{
 
   constructor(protected override http: HttpClient) {
     super(http);
   }
 
-  get():Observable<ApiResponse<Designation>>{
-    return  this.getAll(ApiEndpoints.designations);
+  get():Observable<ApiResponse<Bustype>>{
+    return  this.getAll(ApiEndpoints.bustype);
   }
 
 }

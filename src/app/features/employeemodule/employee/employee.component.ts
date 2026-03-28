@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Employee} from '../model/employee';
+import {Employee} from '../entity/employee';
 import {debounceTime, distinctUntilChanged, forkJoin, Subject, takeUntil} from 'rxjs';
 import {EmployeeFacadeService} from '../employeefacade.service';
 import {CheckboxEvent, DataTableComponent} from '../../../shared/component/data-table/data-table.component';
@@ -15,16 +15,16 @@ import {
 import {DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {MatDivider} from '@angular/material/divider';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {Department} from '../model/department';
+import {Department} from '../entity/department';
 import {FormbuilderService} from '../../../core/formbuilder.service';
 import {DialogService} from '../../../core/dialog.service';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
 import {ButtonClickEvent, ButtonPanelComponent} from '../../../shared/component/button/button-panel/button-panel.component';
-import {Designation} from '../model/designation';
-import {Employeestatus} from '../model/employeestatus';
-import {Employeetype} from '../model/employeetype';
-import {Gender} from '../model/gender';
-import {Branch} from '../../branchmodule/model/branch';
+import {Designation} from '../entity/designation';
+import {Employeestatus} from '../entity/employeestatus';
+import {Employeetype} from '../entity/employeetype';
+import {Gender} from '../entity/gender';
+import {Branch} from '../../branchmodule/entity/branch';
 import {exportToExcel} from '../../../shared/component/export/excel-export.util';
 import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
 

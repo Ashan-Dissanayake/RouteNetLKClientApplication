@@ -4,7 +4,7 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../core/api-endpoints';
-import {Gender} from '../model/gender';
+import {Gender} from '../entity/gender';
 
 @Injectable({ providedIn: 'root' })
 export class GenderService extends BaseHttpService <Gender>{

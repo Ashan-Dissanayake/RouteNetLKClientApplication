@@ -4,7 +4,7 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../core/api-endpoints';
-import {RouteFamiliarityLevel} from '../model/routefamiliaritylevel';
+import {RouteFamiliarityLevel} from '../entity/routefamiliaritylevel';
 
 
 @Injectable({ providedIn: 'root' })

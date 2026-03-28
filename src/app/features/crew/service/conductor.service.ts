@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {BaseHttpService} from '../../../core/basehttp.service';
-import {Conductor} from '../model/conductor';
+import {Conductor} from '../entity/conductor';
 import {HttpClient} from '@angular/common/http';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 import {Observable} from 'rxjs';

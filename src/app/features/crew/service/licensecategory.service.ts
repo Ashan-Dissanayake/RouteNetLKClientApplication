@@ -4,8 +4,8 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../core/api-endpoints';
-import {RouteFamiliarityLevel} from '../model/routefamiliaritylevel';
-import {LicenseCategory} from '../model/licensecategory';
+import {RouteFamiliarityLevel} from '../entity/routefamiliaritylevel';
+import {LicenseCategory} from '../entity/licensecategory';
 
 
 @Injectable({ providedIn: 'root' })

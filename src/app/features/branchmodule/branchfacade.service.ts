@@ -4,14 +4,14 @@ import {map} from 'rxjs/operators';
 import {BranchTypeService} from './services/branchtype.service';
 import {BranchStatusService} from './services/branchstatus.service';
 import {RegexService} from '../../core/regex.service';
-import {BranchType} from './model/branchtype';
-import {BranchStatus} from './model/branchstatus';
+import {BranchType} from './entity/branchtype';
+import {BranchStatus} from './entity/branchstatus';
 import {Regex} from '../../shared/models/regex.model';
-import {Branch} from './model/branch';
+import {Branch} from './entity/branch';
 import {BranchService} from './services/branch.service';
 import {normalizeSearchCriteria} from '../../core/search-criteria-normalizer';
 import {RegionalOfficeService} from './services/regionaloffice.service';
-import {RegionalOffice} from './model/regionaloffice';
+import {RegionalOffice} from './entity/regionaloffice';
 import {NumberService} from '../../core/number.service';
 
 @Injectable({

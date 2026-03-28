@@ -4,7 +4,7 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../core/api-endpoints';
-import {Employee} from '../model/employee';
+import {Employee} from '../entity/employee';
 
 @Injectable({ providedIn: 'root' })
 export class EmployeeService extends BaseHttpService <Employee>{

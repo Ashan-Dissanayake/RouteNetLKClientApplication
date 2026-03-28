@@ -1,25 +1,25 @@
 import {Injectable} from '@angular/core';
-import {VehicleService} from './services/vehicle.service';
+import {VehicleService} from './service/vehicle.service';
 import {Observable, throwError} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {Vehicle} from './model/vehicle';
-import {ConditionRateService} from './services/conditionrate.service';
+import {Vehicle} from './entity/vehicle';
+import {ConditionRateService} from './service/conditionrate.service';
 import {normalizeSearchCriteria} from '../../core/search-criteria-normalizer';
-import {Vehiclestatus} from './model/vehiclestatus';
-import {VehiclestatusService} from './services/vehiclestatus.service';
-import {MakeService} from './services/make.service';
-import {FueltypeService} from './services/fueltype.service';
-import {Make} from './model/make';
-import {Fueltype} from './model/fueltype';
+import {Vehiclestatus} from './entity/vehiclestatus';
+import {VehiclestatusService} from './service/vehiclestatus.service';
+import {MakeService} from './service/make.service';
+import {FueltypeService} from './service/fueltype.service';
+import {Make} from './entity/make';
+import {Fueltype} from './entity/fueltype';
 import {BranchService} from '../branchmodule/services/branch.service';
-import {Branch} from '../branchmodule/model/branch';
+import {Branch} from '../branchmodule/entity/branch';
 import {Regex} from '../../shared/models/regex.model';
 import {RegexService} from '../../core/regex.service';
-import {Conditionrate} from './model/conditionrate';
-import {ModelService} from './services/model.service';
-import {Model} from './model/model';
-import {BustypeService} from './services/bustype.service';
-import {Bustype} from './model/bustype';
+import {Conditionrate} from './entity/conditionrate';
+import {ModelService} from './service/model.service';
+import {Model} from './entity/model';
+import {BustypeService} from './service/bustype.service';
+import {Bustype} from './entity/bustype';
 
 @Injectable({
   providedIn: 'root',

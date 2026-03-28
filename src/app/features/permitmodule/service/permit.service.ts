@@ -4,17 +4,25 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../core/api-endpoints';
-import {Designation} from '../entity/designation';
+import {Permit} from '../entity/permit';
 
 @Injectable({ providedIn: 'root' })
-export class DesignationService extends BaseHttpService <Designation>{
+export class PermitService extends BaseHttpService <Permit>{
 
   constructor(protected override http: HttpClient) {
     super(http);
   }
 
-  get():Observable<ApiResponse<Designation>>{
-    return  this.getAll(ApiEndpoints.designations);
+  get(params?:any):Observable<ApiResponse<Permit>>{
+    return  this.getAll(ApiEndpoints.PERMIT,params);
+  }
+
+  save(permit:Permit):Observable<Permit>{
+    return this.post(ApiEndpoints.PERMIT,permit);
+  }
+
+  update(permit:Permit):Observable<Permit>{
+    return this.put(ApiEndpoints.PERMIT,permit);
   }
 
 }

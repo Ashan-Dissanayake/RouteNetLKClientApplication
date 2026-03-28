@@ -4,17 +4,17 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../core/api-endpoints';
-import {Make} from '../model/make';
+import {Conditionrate} from '../entity/conditionrate';
 
 @Injectable({ providedIn: 'root' })
-export class MakeService extends BaseHttpService <Make>{
+export class ConditionRateService extends BaseHttpService <Conditionrate>{
 
   constructor(protected override http: HttpClient) {
     super(http);
   }
 
-  get():Observable<ApiResponse<Make>>{
-    return  this.getAll(ApiEndpoints.make);
+  get():Observable<ApiResponse<Conditionrate>>{
+    return  this.getAll(ApiEndpoints.conditionrate);
   }
 
 }
