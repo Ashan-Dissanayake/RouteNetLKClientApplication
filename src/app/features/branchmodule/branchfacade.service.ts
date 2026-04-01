@@ -97,5 +97,4 @@ import {NumberService} from '../../core/number.service';
     return this.numberService.getGeneratedBranchCode(branchName).pipe(map(res => res.data));
   }
 
-
 }

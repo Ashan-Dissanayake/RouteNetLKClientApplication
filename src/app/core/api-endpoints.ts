@@ -58,4 +58,12 @@ export const ApiEndpoints = {
     PERMIT:`${BASE_URL}/permits`,
     PERMIT_TRANSFER:`${BASE_URL}/permits/transfer`,
 
+    //spare parts
+    PART_STATUS:`${BASE_URL}/part-statuses/summaries`,
+    PART_CATEGORY:`${BASE_URL}/part-categories/summaries`,
+    UNIT_OF_MEASURE:`${BASE_URL}/unit-of-measures/summaries`,
+    PART_MASTER:`${BASE_URL}/part-masters/summaries`,
+    PART:`${BASE_URL}/parts`,
+    PART_DEACTIVATE: `${BASE_URL}/parts/deactivate`,
+
 } as const;

@@ -22,6 +22,9 @@ export const routes: Routes = [
       { path: 'permit', loadComponent: () => import('./features/permitmodule/permit/permit.component').
         then(m => m.PermitComponent)
       },
+      { path: 'part', loadComponent: () => import('./features/sparepartmodule/sparepart/sparepart.component').
+        then(m => m.SparepartComponent)
+      },
     ]
   },
 ];
