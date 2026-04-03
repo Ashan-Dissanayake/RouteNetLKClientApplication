@@ -1,0 +1,111 @@
+<div class="container">
+  <h2>Part Request Details Management</h2>
+</div>
+<!-- Loading -->
+<mat-progress-bar *ngIf="loading$ | async" mode="indeterminate"></mat-progress-bar>
+
+<!-- Error -->
+<div *ngIf="error$ | async as error" id="error-window">
+  <mat-card>
+    <mat-card-title>Error loading parts</mat-card-title>
+    <mat-card-content>{{ error?.message }}</mat-card-content>
+    <button mat-raised-button color="primary" (click)="reload()">Retry</button>
+  </mat-card>
+</div>
+
+<!-- ===== Action Panel ===== -->
+<app-button-panel
+  *ngIf="metadata$ | async as metadata"
+  [buttons]="actionPanelConfig"
+  (actionClicked)="onActionTriggered($event)"
+  (dropdownClicked)="onDropdownOnlyClick($event)"
+  [contextData]="{ selectedRows: selectedRows }"
+>
+</app-button-panel>
+
+<div *ngIf="metadata$ | async as metadata" id="serverSearch">
+  <form [formGroup]="filterForm">
+    <dynamic-field
+      *ngFor="let field of filterFormMeta; trackBy: trackByField"
+      [formInstance]="filterForm"
+      [field]="field"
+    ></dynamic-field>
+  </form>
+</div>
+
+<!-- ===== Main Table with Side View ===== -->
+<app-side-view
+  [opened]="activePartRequest !== null"
+  [data]="activePartRequest"
+  [title]="'Part Details'"
+  [viewTemplate]="partDetailTemplate"
+  (closed)="onCloseDetailView()"
+>
+  <app-data-table
+    *ngIf="(partRequests$ | async)?.length"
+    [data]="(partRequests$ | async) || []"
+    [columns]="tableColumns"
+    [sortable]="true"
+    [paginatable]="true"
+    [pageSizeOptions]="[10, 20]"
+    (rowClick)="onRowClick($event)"
+    (checkBoxClick)="onRowCheckboxChanged($event)"
+    (selectAllClick)="onSelectAll($event)"
+    (actionClick)="onRowAction($event.action, $event.row)"
+  >
+    <!-- Row Actions -->
+    <ng-template tableCell="actions" let-row let-action="action">
+      <button mat-button style="color: green;" (click)="action('approved', row); $event.stopPropagation()">
+        <mat-icon>check_circle_outline</mat-icon>
+      </button>
+      <button mat-button style="color: red;" (click)="action('rejected', row); $event.stopPropagation()">
+        <mat-icon>cancel</mat-icon>
+      </button>
+    </ng-template>
+  </app-data-table>
+</app-side-view>
+
+<!--Template for detail view -->
+<ng-template #partDetailTemplate let-row>
+  <div  class="part-request-detail-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="title-section">
+        <mat-icon color="primary" class="part-request-icon">shopping_cart_checkout</mat-icon>
+        <div>
+          <h6 class="part-request-title">{{ row.number }}</h6>
+          <p class="part-request-subtitle">{{ row.branch.name}}</p>
+        </div>
+      </div>
+
+      <span
+        class="status-chip"
+        [ngClass]="{
+        'pending': row.partrequeststatus.name === 'Pending',
+        'approved': row.partrequeststatus.name === 'Approved',
+        'rejected': row.partrequeststatus.name === 'Rejected',
+        'completed': row.partrequeststatus.name === 'Completed'
+      }">
+      {{ row.partrequeststatus.name }}
+      </span>
+    </div>
+    <mat-divider></mat-divider>
+
+    <!-- General Info -->
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="label">Ordered Date</span>
+        <span class="value">{{ row.dorequested || '-' }}</span>
+      </div>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="coverage-grid ">
+      <mat-chip  *ngFor="let item of row.partrequestitems" selected>
+        {{ item.part.partmaster.name }}
+        x{{ item.quantity }}
+      </mat-chip>
+    </div>
+    <mat-divider></mat-divider>
+  </div>
+</ng-template>
+

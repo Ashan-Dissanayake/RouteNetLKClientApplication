@@ -57,4 +57,16 @@ export abstract class BaseHttpService<T> {
   delete(url: string, id: number): Observable<T> {
     return this.http.delete<T>(`${url}/${id}`);
   }
+
+  postActionById(
+    url: string,
+    id: number,
+    action: string,
+    body?: any
+  ): Observable<T> {
+    return this.http.post<T>(
+      `${url}/${id}/${action}`,
+      body ?? {}
+    );
+  }
 }

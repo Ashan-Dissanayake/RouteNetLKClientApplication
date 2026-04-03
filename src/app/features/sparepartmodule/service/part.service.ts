@@ -17,6 +17,10 @@ export class PartService extends BaseHttpService <Part>{
     return  this.getAll(ApiEndpoints.PART,params);
   }
 
+  getSummary():Observable<ApiResponse<Part>>{
+    return  this.getAll(ApiEndpoints.PART_SUMMARIES);
+  }
+
   save(part:Part):Observable<Part>{
     return this.post(ApiEndpoints.PART,part);
   }

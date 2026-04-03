@@ -64,6 +64,11 @@ export const ApiEndpoints = {
     UNIT_OF_MEASURE:`${BASE_URL}/unit-of-measures/summaries`,
     PART_MASTER:`${BASE_URL}/part-masters/summaries`,
     PART:`${BASE_URL}/parts`,
+    PART_SUMMARIES:`${BASE_URL}/parts/summaries`,
     PART_DEACTIVATE: `${BASE_URL}/parts/deactivate`,
+
+    //part request
+    PART_REQUEST:`${BASE_URL}/part-requests`,
+    PART_REQUEST_STATUS:`${BASE_URL}/part-request-statuses/summaries`,
 
 } as const;

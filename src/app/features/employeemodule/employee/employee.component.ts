@@ -27,6 +27,8 @@ import {Gender} from '../entity/gender';
 import {Branch} from '../../branchmodule/entity/branch';
 import {exportToExcel} from '../../../shared/component/export/excel-export.util';
 import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
+import {MatFormField} from '@angular/material/form-field';
+import {MatOption, MatSelect} from '@angular/material/select';
 
 @Component({
   selector: 'app-employee',
@@ -47,6 +49,9 @@ import {buildActionPanel} from '../../../shared/component/button/action-panel.fa
     NgIf,
     ReactiveFormsModule,
     ButtonPanelComponent,
+    MatFormField,
+    MatSelect,
+    MatOption,
   ],
   styleUrl: './employee.component.scss'
 })

@@ -70,6 +70,7 @@ export class AppComponent {
         { icon: 'groups', label: 'Conductor', route: '/admin/conductor' },
         { icon: 'assignment', label: 'Permit', route: '/admin/permit' },
         { icon: 'precision_manufacturing', label: 'Part', route: '/admin/part' },
+        { icon: 'shopping_cart_checkout', label: 'Part Request', route: '/admin/part-request' },
       ],
       expanded: false
     },

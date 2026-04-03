@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import {PartRequestComponent} from './features/partrequestmodule/partrequest/partrequest.component';
 
 export const routes: Routes = [
   {
@@ -24,6 +25,9 @@ export const routes: Routes = [
       },
       { path: 'part', loadComponent: () => import('./features/sparepartmodule/sparepart/sparepart.component').
         then(m => m.SparepartComponent)
+      },
+      { path: 'part-request', loadComponent: () => import('./features/partrequestmodule/partrequest/partrequest.component').
+        then(m => m.PartRequestComponent)
       },
     ]
   },

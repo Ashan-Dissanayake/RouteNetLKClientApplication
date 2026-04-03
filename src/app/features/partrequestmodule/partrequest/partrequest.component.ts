@@ -1,96 +1,101 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { PART_DATA_EXPORT_META, PART_FILTER_FORM_META, PART_IMMUTABLE_CONTROLLERS_META, PART_MAIN_FORM_META, PART_TABLE_META } from '../part.meta';
-import { buildActionPanel } from '../../../shared/component/button/action-panel.factory';
-import {async, Observable, Subject, take, takeUntil} from 'rxjs';
-import { Part } from '../entity/part';
-import {FormGroup, ReactiveFormsModule} from '@angular/forms';
-import { PartFacadeService } from '../partfacade.service';
-import { DialogService } from '../../../core/dialog.service';
-import { FormbuilderService } from '../../../core/formbuilder.service';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {
+  PART_REQUEST_DATA_EXPORT_META,
+  PART_REQUEST_FILTER_FORM_META,
+  PART_REQUEST_MAIN_FORM_META,
+  PART_REQUEST_TABLE_META
+} from '../partrequest.meta';
+import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
+import {async,Observable, Subject, take, takeUntil} from 'rxjs';
+import {PartRequest} from '../entity/partrequest';
+import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {DialogService} from '../../../core/dialog.service';
+import {FormbuilderService} from '../../../core/formbuilder.service';
+import {PartRequestFacadeService} from '../partrequestfacade.service';
 import {CheckboxEvent, DataTableComponent} from '../../../shared/component/data-table/data-table.component';
-import { exportToExcel } from '../../../shared/component/export/excel-export.util';
-import { ButtonClickEvent, ButtonPanelComponent } from '../../../shared/component/button/button-panel/button-panel.component';
-import { MatProgressBar } from "@angular/material/progress-bar";
-import { MatCard, MatCardTitle, MatCardContent } from "@angular/material/card";
-import { DynamicFieldComponent } from "../../../shared/component/form/dynamic-field.component";
+import {exportToExcel} from '../../../shared/component/export/excel-export.util';
+import {
+  ButtonClickEvent,
+  ButtonPanelComponent
+} from '../../../shared/component/button/button-panel/button-panel.component';
 import {AsyncPipe, NgClass, NgForOf, NgIf} from '@angular/common';
+import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
 import {MatButton} from '@angular/material/button';
+import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
 import {MatDivider} from '@angular/material/divider';
+import {MatProgressBar} from '@angular/material/progress-bar';
 import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
+import {Part} from '../../sparepartmodule/entity/part';
 import {MatIcon} from '@angular/material/icon';
+import {MatChip} from '@angular/material/chips';
 
 @Component({
-  selector: 'app-sparepart',
+  selector: 'app-partrequest',
   imports: [
-    MatProgressBar,
-    MatCard,
-    MatCardTitle,
-    MatCardContent,
-    ButtonPanelComponent,
-    DynamicFieldComponent,
-    ReactiveFormsModule,
-    NgIf,
-    MatButton,
     AsyncPipe,
-    NgForOf,
+    ButtonPanelComponent,
     DataTableComponent,
+    DynamicFieldComponent,
+    FormsModule,
+    MatButton,
+    MatCard,
+    MatCardContent,
+    MatCardTitle,
     MatDivider,
     MatIcon,
+    MatProgressBar,
+    NgForOf,
+    NgIf,
     SideViewComponent,
     TableCellDirective,
+    ReactiveFormsModule,
     NgClass,
+    MatChip
   ],
-  templateUrl: './sparepart.component.html',
-  styleUrl: './sparepart.component.scss',
+  templateUrl: './partrequest.component.html',
+  styleUrl: './partrequest.component.scss',
   standalone: true
 })
-export class SparepartComponent implements OnInit, OnDestroy {
-
-  // ===== Meta Data =====
-  protected readonly tableColumns = PART_TABLE_META;
+export class PartRequestComponent implements OnInit, OnDestroy  {
+// ===== Meta Data =====
+  protected readonly tableColumns = PART_REQUEST_TABLE_META;
   protected readonly actionPanelConfig = buildActionPanel();
-  protected readonly filterFormMeta = PART_FILTER_FORM_META;
-  protected readonly mainFormMeta = PART_MAIN_FORM_META;
-  protected readonly immutableControllers = PART_IMMUTABLE_CONTROLLERS_META;
-  protected readonly exportMeta = PART_DATA_EXPORT_META;
-
-  protected readonly async = async;
-
+  protected readonly filterFormMeta = PART_REQUEST_FILTER_FORM_META;
+  protected readonly mainFormMeta = PART_REQUEST_MAIN_FORM_META;
+  protected readonly exportMeta = PART_REQUEST_DATA_EXPORT_META;
 
   // ===== Reactive State =====
-  protected parts$: Observable<Part[]>;
+  protected partRequests$: Observable<PartRequest[]>;
   protected metadata$: Observable<any>;
   protected loading$: Observable<boolean>;
   protected error$: Observable<any>;
   private destroy$ = new Subject<void>();
 
   // ===== UI State =====
-  protected activePart: Part | null = null;
-  protected selectedRows = new Set<Part>();
+  protected activePartRequest: PartRequest | null = null;
+  protected selectedRows = new Set<PartRequest>();
 
   // ===== Forms =====
   protected filterForm: FormGroup = new FormGroup({});
   protected mainForm: FormGroup = new FormGroup({});
 
   constructor(
-    private partFacade: PartFacadeService,
+    private partRequestFacade: PartRequestFacadeService,
     private dialogService: DialogService,
     private formBuilderService: FormbuilderService,
 
   ) {
     // Safe assignment – BehaviorSubject guarantees a value
-    this.parts$ = this.partFacade.parts$;
-    this.metadata$ = this.partFacade.metadata$;
-    this.loading$ = this.partFacade.loading$;
-    this.error$ = this.partFacade.error$;
+    this.partRequests$ = this.partRequestFacade.partRequests$;
+    this.metadata$ = this.partRequestFacade.metadata$;
+    this.loading$ = this.partRequestFacade.loading$;
+    this.error$ = this.partRequestFacade.error$;
   }
-
 
   ngOnInit(): void {
     this.initializeModule();
     this.metadata$.pipe(takeUntil(this.destroy$)).subscribe(metadata => {
-      console.log(metadata)
       this.createFilterForm(metadata);
       this.createMainForm(metadata);
     });
@@ -102,28 +107,27 @@ export class SparepartComponent implements OnInit, OnDestroy {
   }
 
   private initializeModule() {
-    this.partFacade.initializePartModule()
+    this.partRequestFacade.initializePartRequestModule()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        error: err => this.dialogService.showError('Failed to initialize part module.', err)
+        error: err => this.dialogService.showError('Failed to initialize partRequestFacade module.', err)
       });
   }
 
   // ===== Form creation =====
   private createFilterForm(metadata: any): void {
     this.filterForm = this.formBuilderService.build(this.filterFormMeta, {
-      sspartstatus: metadata.partStatuses,
-      sscategory: metadata.partCategories
+      sspartrequeststatus: metadata.partRequestStatuses,
     });
     this.onFilterFormChanged();
   }
 
   private createMainForm(metadata: any): void {
+    console.log(metadata)
     this.mainForm = this.formBuilderService.build(this.mainFormMeta, {
       branch: metadata.branches,
-      partstatus: metadata.partStatuses,
-      partmaster: metadata.partMasters,
-      regexes: metadata.regexes
+      partrequeststatus: metadata.partRequestStatuses,
+      partrequestitem: metadata.parts,
     });
   }
 
@@ -131,23 +135,23 @@ export class SparepartComponent implements OnInit, OnDestroy {
   private onFilterFormChanged(): void {
     this.filterForm.valueChanges
       .pipe(takeUntil(this.destroy$))
-      .subscribe(filters => this.partFacade.filterParts(filters));
+      .subscribe(filters => this.partRequestFacade.filterPartRequests(filters));
   }
 
   // ===== Row & Selection Handlers =====
-  protected onRowClick(row: Part): void {
-    this.activePart = row;
+  protected onRowClick(row: PartRequest): void {
+    this.activePartRequest = row;
   }
 
+  protected onRowAction(action: string, row: PartRequest) {
+    if (action === 'approved') console.log("Approved");
+    if (action === 'rejected') console.log("Rejected");
+  }
 
-  protected reload(): void { this.partFacade.reloadParts(); }
+  protected reload(): void { this.partRequestFacade.reloadPartRequests(); }
 
   protected onCloseDetailView(): void {
-    this.activePart = null;
-  }
-
-  protected onRowAction(action: string, row: Part) {
-    if (action === 'edit') this.edit(row);
+    this.activePartRequest = null;
   }
 
   protected onRowCheckboxChanged(event: CheckboxEvent) {
@@ -158,16 +162,12 @@ export class SparepartComponent implements OnInit, OnDestroy {
   protected onSelectAll(checked: boolean) {
     this.selectedRows.clear();
     if (checked) {
-      this.parts$.pipe(take(1)).subscribe(rows => rows.forEach(r => this.selectedRows.add(r)));
+      this.partRequests$.pipe(take(1)).subscribe(rows => rows.forEach(r => this.selectedRows.add(r)));
     }
   }
 
   // ===== CRUD =====
   private openMainForm(): void {
-    this.mainForm.value.id
-      ? this.formBuilderService.setControlsState(this.mainForm, this.immutableControllers, true)
-      : this.formBuilderService.setControlsState(this.mainForm, this.immutableControllers, false);
-
     this.dialogService.showFormPopup({
       heading: this.mainForm.value.id ? 'Edit part' : 'Create part',
       form: this.mainForm,
@@ -179,55 +179,29 @@ export class SparepartComponent implements OnInit, OnDestroy {
   }
 
   private save(formData: any): void {
-    const operation$ = formData.id
-      ? this.partFacade.updatePart(formData)
-      : this.partFacade.createPart(formData);
-
+    const operation$ = this.partRequestFacade.createPartRequest(formData);
     operation$?.pipe(takeUntil(this.destroy$)).subscribe({
       next: () => this.dialogService.showSuccess('part saved successfully.'),
       error: (err) => this.dialogService.showMessage({ heading: 'Failed to save part', message: err.errorMessage }),
       complete: () => {
-        this.partFacade.reloadParts();
+        this.reload();
         this.formBuilderService.resetForm(this.mainForm);
-        this.formBuilderService.setControlsState(this.mainForm, this.immutableControllers, false);
       }
     });
   }
 
-  private edit(row: Part): void {
-    const normalizedRow = this.formBuilderService.mapNestedValues(row, [
-      { from: 'seatingcapacity.make', to: 'make', remove: false }
-    ]);
-    this.mainForm.patchValue(normalizedRow);
-    this.openMainForm();
-  }
+  private approvedPartRequest(partRequest: PartRequest): void {
 
-  protected deactivateSelectedRows(): void {
-    const toDeactivate = Array.from(this.selectedRows);
-    this.dialogService.showConfirmation({ heading: 'Deactivation', message: 'Are you sure?' })
-      .subscribe(confirmed => {
-        if (!confirmed) return;
-        this.partFacade.deactivateParts(toDeactivate)
-          ?.pipe(takeUntil(this.destroy$))
-          .subscribe({
-            next: () =>{
-              this.dialogService.showSuccess('Selected parts deactivated.');
-              this.partFacade.reloadParts();
-            } ,
-            error: (err) => this.dialogService.showError('Failed to deactivate parts.', err),
-            complete: () => this.selectedRows.clear()
-          });
-      });
   }
 
   // ===== Export =====
   protected toPdf(): void {
-    this.parts$.pipe(take(1)).subscribe(selectedArray => {
+    this.partRequests$.pipe(take(1)).subscribe(selectedArray => {
       if (this.selectedRows.size > 0) {
         this.dialogService.showPrintDialog({
           width: '1500px',
           height: '650px',
-          title: 'Vehicle Details',
+          title: 'Part Request Details',
           mode: 'table',
           data: Array.from(this.selectedRows),
           columns: this.exportMeta
@@ -243,14 +217,13 @@ export class SparepartComponent implements OnInit, OnDestroy {
       this.dialogService.showWarning('Please select at least one record to export.');
       return;
     }
-    exportToExcel(Array.from(this.selectedRows), this.exportMeta, 'sparts.xlsx');
+    exportToExcel(Array.from(this.selectedRows), this.exportMeta, 'part-request.xlsx');
   }
 
   // ===== Action Panel =====
   protected actionHandlers: Record<string, () => void> = {
     'clear-search': () => this.filterForm.reset(),
     'create': () => this.openMainForm(),
-    'bulk-deactivate': () => this.deactivateSelectedRows(),
     'export-pdf': () => this.toPdf(),
     'export-excel': () => this.toExcel()
   };
@@ -271,8 +244,8 @@ export class SparepartComponent implements OnInit, OnDestroy {
   }
 
   // ===== TrackBy for optimization =====
-  trackByVehicleId(index: number, part: Part) {
-    return part.id!;
+  trackByVehicleId(index: number, partRequest: PartRequest) {
+    return partRequest.id!;
   }
 
   trackByField(index: number, field: any) {
@@ -280,4 +253,5 @@ export class SparepartComponent implements OnInit, OnDestroy {
   }
 
 
+  protected readonly async = async;
 }
