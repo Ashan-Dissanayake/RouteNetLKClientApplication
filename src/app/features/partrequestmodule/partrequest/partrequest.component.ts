@@ -71,6 +71,8 @@ export class PartRequestComponent implements OnInit, OnDestroy  {
   protected error$: Observable<any>;
   private destroy$ = new Subject<void>();
 
+  protected readonly async = async;
+
   // ===== UI State =====
   protected activePartRequest: PartRequest | null = null;
   protected selectedRows = new Set<PartRequest>();
@@ -218,7 +220,7 @@ export class PartRequestComponent implements OnInit, OnDestroy  {
 
   // ===== Export =====
   protected toPdf(): void {
-    this.partRequests$.pipe(take(1)).subscribe(selectedArray => {
+    this.partRequests$.pipe(take(1)).subscribe(() => {
       if (this.selectedRows.size > 0) {
         this.dialogService.showPrintDialog({
           width: '1500px',
@@ -266,13 +268,9 @@ export class PartRequestComponent implements OnInit, OnDestroy  {
   }
 
   // ===== TrackBy for optimization =====
-  trackByVehicleId(index: number, partRequest: PartRequest) {
-    return partRequest.id!;
-  }
 
   trackByField(index: number, field: any) {
     return field.key || index;
   }
 
-  protected readonly async = async;
 }

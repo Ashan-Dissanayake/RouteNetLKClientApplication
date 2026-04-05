@@ -270,11 +270,7 @@ export class SparepartComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ===== TrackBy for optimization =====
-  trackByVehicleId(index: number, part: Part) {
-    return part.id!;
-  }
-
+  // ===== TrackBy for optimization ====
   trackByField(index: number, field: any) {
     return field.key || index;
   }
