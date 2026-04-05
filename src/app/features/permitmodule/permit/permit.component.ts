@@ -41,7 +41,6 @@ import {FormbuilderService} from '../../../core/formbuilder.service';
     MatIcon,
     SideViewComponent,
     ButtonPanelComponent,
-    DatePipe,
     MatDivider,
     NgClass,
     DynamicFieldComponent,

@@ -1,3 +1,5 @@
+import {InnerTableColumn} from '../component/innertable/inner-table-column.model';
+
 export type DateConfig = {
     minDate?: Date;
     maxDate?: Date;
@@ -26,7 +28,8 @@ export type FieldType =
     | 'year'
     | 'chips'
     | 'date-range'
-    | 'dualist';
+    | 'dualist'
+    | 'inner-table';
 
 export type FieldMode = 'regex' | 'options' | 'none' | 'date';
 
@@ -45,7 +48,13 @@ export interface FormField<TValue = unknown, TReference = unknown, TOption = unk
     mode: FieldMode;
     dateConfig?: DateConfig;
 
-    defaultValue: TValue;
-    referenceName: TReference;
+    defaultValue?: TValue;
+    referenceName?: TReference;
     referencePath?: string[];
+
+  innerTableConfig?: {
+    columns: InnerTableColumn[];   // ← changed from ColumnDef[] to FormTableColumn[]
+    meta: FormField[];            // ← added, drives the inline form
+    dataMap: Record<string, any>;   // ← options, regexes etc
+  };
 }

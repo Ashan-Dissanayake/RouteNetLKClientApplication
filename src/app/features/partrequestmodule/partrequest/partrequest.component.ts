@@ -26,7 +26,6 @@ import {MatDivider} from '@angular/material/divider';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
-import {Part} from '../../sparepartmodule/entity/part';
 import {MatIcon} from '@angular/material/icon';
 import {MatChip} from '@angular/material/chips';
 
@@ -123,11 +122,15 @@ export class PartRequestComponent implements OnInit, OnDestroy  {
   }
 
   private createMainForm(metadata: any): void {
-    console.log(metadata)
+    const lineField = PART_REQUEST_MAIN_FORM_META.find(f => f.name === 'partrequestitems');
+    if (lineField?.innerTableConfig) {
+      lineField.innerTableConfig.dataMap = { part: metadata.parts };
+    }
+
     this.mainForm = this.formBuilderService.build(this.mainFormMeta, {
       branch: metadata.branches,
       partrequeststatus: metadata.partRequestStatuses,
-      partrequestitem: metadata.parts,
+      partrequestitems: metadata.parts,
     });
   }
 
@@ -144,8 +147,8 @@ export class PartRequestComponent implements OnInit, OnDestroy  {
   }
 
   protected onRowAction(action: string, row: PartRequest) {
-    if (action === 'approved') console.log("Approved");
-    if (action === 'rejected') console.log("Rejected");
+    if (action === 'approved') this.approvedPartRequest(row);
+    if (action === 'rejected') this.rejectPartRequest(row);
   }
 
   protected reload(): void { this.partRequestFacade.reloadPartRequests(); }
@@ -171,7 +174,8 @@ export class PartRequestComponent implements OnInit, OnDestroy  {
     this.dialogService.showFormPopup({
       heading: this.mainForm.value.id ? 'Edit part' : 'Create part',
       form: this.mainForm,
-      meta: this.mainFormMeta
+      meta: this.mainFormMeta,
+      width:'900px'
     }).subscribe(formData => {
       if (formData) this.save(formData);
       else this.formBuilderService.resetForm(this.mainForm);
@@ -191,7 +195,25 @@ export class PartRequestComponent implements OnInit, OnDestroy  {
   }
 
   private approvedPartRequest(partRequest: PartRequest): void {
+    this.partRequestFacade.approvedPartRequest(partRequest).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => this.dialogService.showSuccess('part request approved successfully.'),
+      error: (err) => this.dialogService.showMessage({ heading: 'Failed to approve part request', message: err.errorMessage }),
+      complete: () => {
+        this.reload();
+        if (this.activePartRequest?.id === partRequest.id) this.activePartRequest = null;
+      }
+    });
+  }
 
+  private rejectPartRequest(partRequest: PartRequest): void {
+    this.partRequestFacade.rejectPartRequest(partRequest).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => this.dialogService.showSuccess('part request rejected successfully.'),
+      error: (err) => this.dialogService.showMessage({ heading: 'Failed to reject part request', message: err.errorMessage }),
+      complete: () => {
+        this.reload();
+        if (this.activePartRequest?.id === partRequest.id) this.activePartRequest = null;
+      }
+    });
   }
 
   // ===== Export =====
@@ -251,7 +273,6 @@ export class PartRequestComponent implements OnInit, OnDestroy  {
   trackByField(index: number, field: any) {
     return field.key || index;
   }
-
 
   protected readonly async = async;
 }

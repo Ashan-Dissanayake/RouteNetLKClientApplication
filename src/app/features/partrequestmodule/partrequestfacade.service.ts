@@ -1,15 +1,15 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, finalize, forkJoin, Observable, tap, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
-import {Regex} from '../../shared/models/regex.model';
 import {Branch} from '../branchmodule/entity/branch';
 import {BranchService} from '../branchmodule/services/branch.service';
 import {normalizeSearchCriteria} from '../../core/search-criteria-normalizer';
 import {PartRequest} from './entity/partrequest';
 import {PartRequestService} from './service/partrequest.service';
 import {PartRequestStatusService} from './service/partrequeststatus.service';
-import {RegexService} from '../../core/regex.service';
 import {PartRequestStatus} from './entity/partrequeststatus';
+import {PartMasterService} from '../sparepartmodule/service/partmaster.service';
+import {PartMaster} from '../sparepartmodule/entity/partmaster';
 import {PartService} from '../sparepartmodule/service/part.service';
 import {Part} from '../sparepartmodule/entity/part';
 
@@ -34,6 +34,7 @@ export class PartRequestFacadeService {
     private partRequestService:PartRequestService,
     private partRequestStatusService:PartRequestStatusService,
     private branchService:BranchService,
+    // private partMasterService:PartMasterService,
     private partService:PartService,
   ) {}
 
@@ -45,6 +46,7 @@ export class PartRequestFacadeService {
 
     return forkJoin({
       partRequestStatuses:this.loadPartRequestStatuses(),
+      // partMasters:this.loadPartMasters(),
       parts:this.loadParts(),
       branches:this.loadBranches(),
     }).pipe(
@@ -81,6 +83,14 @@ export class PartRequestFacadeService {
 
   createPartRequest(partRequestData: PartRequest): Observable<PartRequest> {
       return this.partRequestService.save(partRequestData);
+  }
+
+  approvedPartRequest(partRequest: PartRequest) :Observable<PartRequest>{
+    return this.partRequestService.approveRequest(partRequest.id);
+  }
+
+  rejectPartRequest(partRequest: PartRequest) :Observable<PartRequest>{
+    return this.partRequestService.rejectRequest(partRequest.id);
   }
 
   // ===== Metadata Loading =====

@@ -101,11 +101,10 @@
     <mat-divider></mat-divider>
     <div class="coverage-grid ">
       <mat-chip  *ngFor="let item of row.partrequestitems" selected>
-        {{ item.part.partmaster.name }}
+        {{ item.part.name }}
         x{{ item.quantity }}
       </mat-chip>
     </div>
     <mat-divider></mat-divider>
   </div>
 </ng-template>
-

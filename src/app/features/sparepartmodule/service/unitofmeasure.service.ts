@@ -7,7 +7,7 @@ import {ApiEndpoints} from '../../../core/api-endpoints';
 import {UnitOfMeasure} from '../entity/unitofmeasure';
 
 @Injectable({ providedIn: 'root' })
-export class PartmasterService extends BaseHttpService <UnitOfMeasure>{
+export class UnitOfMeasureService extends BaseHttpService <UnitOfMeasure>{
 
   constructor(protected override http: HttpClient) {
     super(http);

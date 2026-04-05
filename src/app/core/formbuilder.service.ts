@@ -28,6 +28,14 @@ export class FormbuilderService {
         if (regexRule) validators.push(Validators.pattern(regexRule.regex));
       }
 
+      if (field.type === 'inner-table') {
+        group[field.name] = new FormControl(
+          { value: field.defaultValue ?? [], disabled: !!field.disabled },
+          field.required ? [FormbuilderService.nonEmptyArray()] : []
+        );
+        return;
+      }
+
       if (field.type === 'date-range') {
         group[field.name] = this.fb.group({
           start: new FormControl(null, field.required ? Validators.required : []),
@@ -98,6 +106,16 @@ export class FormbuilderService {
     return result;
   }
 
+  static nonEmptyArray(): ValidatorFn {
+    return (control: AbstractControl) => {
+      const value = control.value;
+      if (!Array.isArray(value) || value.length === 0) {
+        return { required: true };
+      }
+      return null;
+    };
+  }
+
 }
 
 type NormalizationRule = {
@@ -105,5 +123,6 @@ type NormalizationRule = {
   to: string;   // new key, e.g., 'make'
   remove?: boolean; // whether to remove the original key
 };
+
 
 
