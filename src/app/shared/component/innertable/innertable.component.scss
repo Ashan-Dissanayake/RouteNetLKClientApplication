@@ -1,0 +1,169 @@
+.form-table-wrapper {
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+
+  .inline-form {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 8px;
+
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      flex: 1;
+
+      dynamic-field {
+        flex: 1;
+        min-width: 140px;
+
+        // tighten mat-form-field spacing inside inline row
+        ::ng-deep .mat-mdc-form-field {
+          width: 100%;
+
+          .mat-mdc-form-field-subscript-wrapper {
+            display: none;
+          }
+
+          &.mat-form-field-invalid {
+            .mat-mdc-form-field-subscript-wrapper {
+              display: block;
+            }
+          }
+        }
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding-top: 6px;
+    }
+  }
+
+  .table-section {
+    overflow-x: auto;
+
+    .form-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: auto;
+
+      thead tr {
+        background: #fafafa;
+        border-bottom: 1px solid #e0e0e0;
+
+        th {
+          padding: 9px 14px;
+          text-align: left;
+          font-size: 0.78rem;
+          font-weight: 600;
+          color: #616161;
+          white-space: nowrap;
+
+          &.actions-col {
+            width: 44px;
+            min-width: 44px;
+          }
+        }
+      }
+
+      tbody {
+        .snapshot-row {
+          border-bottom: 1px solid #f5f5f5;
+          cursor: pointer;
+          transition: background 0.15s;
+
+          &:last-child { border-bottom: none; }
+
+          &:hover { background: #f5f5f5; }
+
+          &.selected {
+            background: #e0f2f1;
+            border-left: 3px solid #009688;
+
+            td { color: #00695c; }
+          }
+
+          td {
+            padding: 9px 14px;
+            font-size: 0.85rem;
+            color: #212121;
+
+            &.actions-col {
+              width: 44px;
+              min-width: 44px;
+              text-align: center;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .empty-state {
+    padding: 20px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #bdbdbd;
+    font-style: italic;
+  }
+}
+
+// buttons
+.btn-action {
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: background 0.2s;
+
+  &.btn-add {
+    background: #009688;
+    color: #fff;
+    &:hover { background: #00796b; }
+  }
+
+  &.btn-update {
+    background: #1976d2;
+    color: #fff;
+    &:hover { background: #1565c0; }
+  }
+
+  &.btn-cancel {
+    background: #f5f5f5;
+    color: #616161;
+    border: 1px solid #e0e0e0;
+    &:hover { background: #eeeeee; }
+  }
+}
+
+.btn-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  color: #9e9e9e;
+  transition: background 0.2s, color 0.2s;
+
+  &:hover {
+    background: #fdecea;
+    color: #e53935;
+  }
+}

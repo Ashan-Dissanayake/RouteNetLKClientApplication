@@ -124,6 +124,7 @@ export class MatDualListboxComponent<T extends Record<string, any>>
   }
 
   ngAfterViewInit(): void {
+    console.log(this.sourceList)
     //this.DestinationList?.options.forEach(option => option._setSelected(true));
   }
 

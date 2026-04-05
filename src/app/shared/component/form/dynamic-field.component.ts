@@ -14,6 +14,9 @@ import {MatDualListboxComponent} from '../dual-list-box/mat-dual-listbox.compone
 import {MatOption, MatSelect} from '@angular/material/select';
 import {MatNativeDateModule} from '@angular/material/core';
 import {FilePickerComponent} from '../file-picker/file-picker.component';
+import {DataTableComponent} from '../data-table/data-table.component';
+import {PART_REQUEST_TABLE_META} from '../../../features/partrequestmodule/partrequest.meta';
+import {InnerableComponent} from '../innertable/innertable.component';
 
 @Component({
   selector: 'dynamic-field',
@@ -53,18 +56,12 @@ import {FilePickerComponent} from '../file-picker/file-picker.component';
           <mat-label>{{ field.label || field.name }}</mat-label>
           <input matInput
                  type="number"
-                 [min]="1900"
-                 [max]="currentYear"
                  step="1"
                  [formControlName]="field.name"/>
           <mat-error
             *ngIf="formInstance.get(field.name)?.invalid && (formInstance.get(field.name)?.dirty || formInstance.get(field.name)?.touched)">
             <ng-container *ngIf="formInstance.get(field.name)?.hasError('required')">
               This field is required.
-            </ng-container>
-            <ng-container
-              *ngIf="formInstance.get(field.name)?.hasError('min') || formInstance.get(field.name)?.hasError('max')">
-              Enter a valid year between 1900 and {{ currentYear }}.
             </ng-container>
           </mat-error>
         </mat-form-field>
@@ -123,7 +120,6 @@ import {FilePickerComponent} from '../file-picker/file-picker.component';
           </mat-error>
         </mat-form-field>
 
-
         <!-- Dual List Box -->
         <mat-form-field *ngSwitchCase="'dualist'" appearance="outline">
           <mat-label>{{ field.label || field.name }}</mat-label>
@@ -134,9 +130,23 @@ import {FilePickerComponent} from '../file-picker/file-picker.component';
             [destinationObjectReference]="field.referencePath || []">
           </mat-dual-listbox>
           <mat-error *ngIf="formInstance.get(field.name)?.hasError('required')">
-            This field is required.
+            This field is required
           </mat-error>
         </mat-form-field>
+
+        <ng-container *ngSwitchCase="'inner-table'">
+          <label class="table-field-label">{{ field.label }}</label>
+          <app-form-table
+            [formControlName]="field.name"
+            [meta]="field.innerTableConfig?.meta || []"
+            [columns]="field.innerTableConfig?.columns || []"
+            [dataMap]="field.innerTableConfig?.dataMap || {}">
+          </app-form-table>
+          <mat-error *ngIf="formInstance.get(field.name)?.invalid
+                 && formInstance.get(field.name)?.touched">
+            This field is required
+          </mat-error>
+        </ng-container>
       </ng-container>
     </ng-container>
   `
@@ -163,6 +173,8 @@ import {FilePickerComponent} from '../file-picker/file-picker.component';
     MatOption,
     FormsModule,
     FilePickerComponent,
+    DataTableComponent,
+    InnerableComponent,
   ]
 })
 export class DynamicFieldComponent {
@@ -210,5 +222,6 @@ export class DynamicFieldComponent {
 
 
   protected readonly oninput = oninput;
+  protected readonly PART_REQUEST_TABLE_META = PART_REQUEST_TABLE_META;
 }
 
