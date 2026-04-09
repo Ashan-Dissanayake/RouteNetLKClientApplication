@@ -71,6 +71,7 @@ export class AppComponent {
         { icon: 'assignment', label: 'Permit', route: '/admin/permit' },
         { icon: 'precision_manufacturing', label: 'Part', route: '/admin/part' },
         { icon: 'shopping_cart_checkout', label: 'Part Request', route: '/admin/part-request' },
+        { icon: 'assignment_turned_in', label: 'GRN', route: '/admin/grn' },
       ],
       expanded: false
     },

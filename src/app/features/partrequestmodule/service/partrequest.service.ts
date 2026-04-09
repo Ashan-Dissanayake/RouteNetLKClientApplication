@@ -5,6 +5,7 @@ import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../core/api-endpoints';
 import {PartRequest} from '../entity/partrequest';
+import {Part} from '../../sparepartmodule/entity/part';
 
 @Injectable({ providedIn: 'root' })
 export class PartRequestService extends BaseHttpService <PartRequest>{
@@ -16,6 +17,11 @@ export class PartRequestService extends BaseHttpService <PartRequest>{
   get(params?:any):Observable<ApiResponse<PartRequest>>{
     return  this.getAll(ApiEndpoints.PART_REQUEST,params);
   }
+
+  getSummary():Observable<ApiResponse<PartRequest>>{
+    return  this.getAll(ApiEndpoints.PART_REQUEST_SUMMARIES);
+  }
+
 
   save(partRequest:PartRequest):Observable<PartRequest>{
     return this.post(ApiEndpoints.PART_REQUEST,partRequest);

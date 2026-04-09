@@ -1,15 +1,6 @@
 import {ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR, ReactiveFormsModule} from '@angular/forms';
 import {ChangeDetectorRef, Component, forwardRef, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {NgForOf, NgIf} from '@angular/common';
-import {
-  MatCell,
-  MatCellDef,
-  MatColumnDef,
-  MatHeaderCell,
-  MatHeaderCellDef,
-  MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef,
-  MatTable
-} from '@angular/material/table';
 import {InnerTableColumn} from './inner-table-column.model';
 import {FormField} from '../../models/formfieldata.model';
 import {FormbuilderService} from '../../../core/formbuilder.service';
@@ -20,11 +11,8 @@ import {DynamicFieldComponent} from '../form/dynamic-field.component';
   standalone: true,
   imports: [
     ReactiveFormsModule, NgForOf, NgIf,
-    MatTable, MatColumnDef, MatHeaderCell, MatHeaderCellDef,
-    MatCell, MatCellDef, MatHeaderRow, MatHeaderRowDef,
-    MatRow, MatRowDef,
-    forwardRef(() => DynamicFieldComponent),  // ← self-reference
-    InnerableComponent,
+    forwardRef(() => DynamicFieldComponent), DynamicFieldComponent,  // ← self-reference
+    // InnerableComponent,
   ],
   providers: [
     {
@@ -138,10 +126,6 @@ export class InnerableComponent implements ControlValueAccessor,OnChanges  {
     if (changes['columns']) {
       this.displayedColumns = [...this.columns.map(c => c.field), 'actions'];
     }
-    console.log('rowForm:', this.rowForm);  // ← check this
-    console.log('changes:', changes);
-    console.log('meta:', this.meta);
-    console.log('dataMap:', this.dataMap);
   }
 
   getValue(row: any, field: string) {
@@ -163,9 +147,26 @@ export class InnerableComponent implements ControlValueAccessor,OnChanges  {
 
   selectRow(index: number) {
     this.selectedIndex = index;
-    this.rowForm.patchValue(this.snapshots[index]);
+    const row = this.snapshots[index];
+    const flattened = this.flattenRow(row);
+    this.rowForm.patchValue(flattened);
     this.cdr.markForCheck();
   }
+
+  private flattenRow(row: any): Record<string, any> {
+    const result: Record<string, any> = {};
+    for (const key of Object.keys(this.rowForm.controls)) {
+      result[key] = key.split('.').reduce((a, p) => a?.[p], row) ?? null;
+    }
+    return result;
+  }
+
+  // selectRow(index: number) {
+  //   this.selectedIndex = index;
+  //   console.log(this.snapshots[index]);
+  //   this.rowForm.patchValue(this.snapshots[index]);
+  //   this.cdr.markForCheck();
+  // }
 
   update() {
     if (this.rowForm.invalid) {
@@ -174,10 +175,12 @@ export class InnerableComponent implements ControlValueAccessor,OnChanges  {
       return;
     }
     this.snapshots = this.snapshots.map((r, i) =>
-      i === this.selectedIndex ? { ...this.rowForm.value } : r
+      i === this.selectedIndex
+        ? { ...r, ...this.rowForm.value }  // ← r has full original object including partrequestitem
+        : r
     );
     this.selectedIndex = -1;
-    this.formBuilder.resetForm(this.rowForm);   // ← use service helper
+    this.formBuilder.resetForm(this.rowForm);
     this.emit();
   }
 

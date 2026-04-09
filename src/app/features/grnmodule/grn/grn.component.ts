@@ -1,17 +1,17 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {
-  PART_REQUEST_DATA_EXPORT_META,
-  PART_REQUEST_FILTER_FORM_META,
-  PART_REQUEST_MAIN_FORM_META,
-  PART_REQUEST_TABLE_META
-} from '../partrequest.meta';
+  GRN_DATA_EXPORT_META,
+  GRN_FILTER_FORM_META,
+  GRN_MAIN_FORM_META,
+  GRN_TABLE_META
+} from '../grn.meta';
 import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
-import {async,Observable, Subject, take, takeUntil} from 'rxjs';
-import {PartRequest} from '../entity/partrequest';
+import {async, Observable, Subject, take, takeUntil} from 'rxjs';
+import {Grn} from '../entity/grn';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {DialogService} from '../../../core/dialog.service';
 import {FormbuilderService} from '../../../core/formbuilder.service';
-import {PartRequestFacadeService} from '../partrequestfacade.service';
+import {GrnFacadeService} from '../grnfacade.service';
 import {CheckboxEvent, DataTableComponent} from '../../../shared/component/data-table/data-table.component';
 import {exportToExcel} from '../../../shared/component/export/excel-export.util';
 import {
@@ -19,53 +19,53 @@ import {
   ButtonPanelComponent
 } from '../../../shared/component/button/button-panel/button-panel.component';
 import {AsyncPipe, NgClass, NgForOf, NgIf} from '@angular/common';
-import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
 import {MatButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
-import {MatDivider} from '@angular/material/divider';
 import {MatProgressBar} from '@angular/material/progress-bar';
+import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
+import {MatChip} from '@angular/material/chips';
+import {MatDivider} from '@angular/material/divider';
 import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
 import {MatIcon} from '@angular/material/icon';
-import {MatChip} from '@angular/material/chips';
-
 @Component({
-  selector: 'app-partrequest',
+  selector: 'app-grn',
   imports: [
     AsyncPipe,
-    ButtonPanelComponent,
-    DataTableComponent,
-    DynamicFieldComponent,
-    FormsModule,
     MatButton,
     MatCard,
     MatCardContent,
     MatCardTitle,
-    MatDivider,
-    MatIcon,
     MatProgressBar,
-    NgForOf,
     NgIf,
+    ButtonPanelComponent,
+    DynamicFieldComponent,
+    FormsModule,
+    NgForOf,
+    ReactiveFormsModule,
+    DataTableComponent,
+    MatChip,
+    MatDivider,
     SideViewComponent,
     TableCellDirective,
-    ReactiveFormsModule,
-    NgClass,
-    MatChip
+    MatIcon,
+    NgClass
   ],
-  templateUrl: './partrequest.component.html',
-  styleUrl: './partrequest.component.scss',
-  standalone: true
+  templateUrl: './grn.component.html',
+  styleUrl: './grn.component.scss',
+  standalone:true
 })
-export class PartRequestComponent implements OnInit, OnDestroy  {
+export class GrnComponent implements OnInit, OnDestroy  {
+
   // ===== Meta Data =====
-  protected readonly tableColumns = PART_REQUEST_TABLE_META;
-  protected readonly actionPanelConfig = buildActionPanel();
-  protected readonly filterFormMeta = PART_REQUEST_FILTER_FORM_META;
-  protected readonly mainFormMeta = PART_REQUEST_MAIN_FORM_META;
-  protected readonly exportMeta = PART_REQUEST_DATA_EXPORT_META;
+  protected readonly tableColumns = GRN_TABLE_META;
+  protected readonly actionPanelConfig = buildActionPanel({exclude: ['create', 'bulk-deactivate']});
+  protected readonly filterFormMeta = GRN_FILTER_FORM_META;
+  protected readonly mainFormMeta = GRN_MAIN_FORM_META;
+  protected readonly exportMeta = GRN_DATA_EXPORT_META;
 
   // ===== Reactive State =====
-  protected partRequests$: Observable<PartRequest[]>;
+  protected grns$: Observable<Grn[]>;
   protected metadata$: Observable<any>;
   protected loading$: Observable<boolean>;
   protected error$: Observable<any>;
@@ -74,24 +74,24 @@ export class PartRequestComponent implements OnInit, OnDestroy  {
   protected readonly async = async;
 
   // ===== UI State =====
-  protected activePartRequest: PartRequest | null = null;
-  protected selectedRows = new Set<PartRequest>();
+  protected activePartRequest: Grn | null = null;
+  protected selectedRows = new Set<Grn>();
 
   // ===== Forms =====
   protected filterForm: FormGroup = new FormGroup({});
   protected mainForm: FormGroup = new FormGroup({});
 
   constructor(
-    private partRequestFacade: PartRequestFacadeService,
+    private grnFacade: GrnFacadeService,
     private dialogService: DialogService,
     private formBuilderService: FormbuilderService,
 
   ) {
     // Safe assignment – BehaviorSubject guarantees a value
-    this.partRequests$ = this.partRequestFacade.partRequests$;
-    this.metadata$ = this.partRequestFacade.metadata$;
-    this.loading$ = this.partRequestFacade.loading$;
-    this.error$ = this.partRequestFacade.error$;
+    this.grns$ = this.grnFacade.grns$;
+    this.metadata$ = this.grnFacade.metadata$;
+    this.loading$ = this.grnFacade.loading$;
+    this.error$ = this.grnFacade.error$;
   }
 
   ngOnInit(): void {
@@ -108,31 +108,33 @@ export class PartRequestComponent implements OnInit, OnDestroy  {
   }
 
   private initializeModule() {
-    this.partRequestFacade.initializePartRequestModule()
+    this.grnFacade.initializeGrnModule()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        error: err => this.dialogService.showError('Failed to initialize partRequestFacade module.', err)
+        error: err => this.dialogService.showError('Failed to initialize GRN module.', err)
       });
   }
 
   // ===== Form creation =====
   private createFilterForm(metadata: any): void {
     this.filterForm = this.formBuilderService.build(this.filterFormMeta, {
-      sspartrequeststatus: metadata.partRequestStatuses,
+      ssgrnstatus: metadata.grnStatuses,
+      sspartrequest: metadata.partRequests,
     });
     this.onFilterFormChanged();
   }
 
   private createMainForm(metadata: any): void {
-    const lineField = PART_REQUEST_MAIN_FORM_META.find(f => f.name === 'partrequestitems');
+    //M:n with addtional attributes
+    const lineField = GRN_MAIN_FORM_META.find(f => f.name === 'grnpartrequestitems');
     if (lineField?.innerTableConfig) {
-      lineField.innerTableConfig.dataMap = { part: metadata.parts };
+      lineField.innerTableConfig.dataMap = { partreqiestitems: metadata.parts };
     }
 
     this.mainForm = this.formBuilderService.build(this.mainFormMeta, {
-      branch: metadata.branches,
-      partrequeststatus: metadata.partRequestStatuses,
-      partrequestitems: metadata.parts,
+     // branch: metadata.branches,
+     // grnststatus: metadata.grnststatus,
+      //partrequest: metadata.partrequest,
     });
   }
 
@@ -140,23 +142,22 @@ export class PartRequestComponent implements OnInit, OnDestroy  {
   private onFilterFormChanged(): void {
     this.filterForm.valueChanges
       .pipe(takeUntil(this.destroy$))
-      .subscribe(filters => this.partRequestFacade.filterPartRequests(filters));
+      .subscribe(filters => this.grnFacade.filterGrns(filters));
   }
 
   // ===== Row & Selection Handlers =====
-  protected onRowClick(row: PartRequest): void {
+  protected onRowClick(row: Grn): void {
     this.activePartRequest = row;
   }
 
-  protected onRowAction(action: string, row: PartRequest) {
-    if (action === 'approved') this.approvedPartRequest(row);
-    if (action === 'rejected') this.rejectPartRequest(row);
-  }
-
-  protected reload(): void { this.partRequestFacade.reloadPartRequests(); }
+  protected reload(): void { this.grnFacade.reloadGrns(); }
 
   protected onCloseDetailView(): void {
     this.activePartRequest = null;
+  }
+
+  protected onRowAction(action: string, row: Grn) {
+    if (action === 'edit') this.edit(row);
   }
 
   protected onRowCheckboxChanged(event: CheckboxEvent) {
@@ -167,14 +168,14 @@ export class PartRequestComponent implements OnInit, OnDestroy  {
   protected onSelectAll(checked: boolean) {
     this.selectedRows.clear();
     if (checked) {
-      this.partRequests$.pipe(take(1)).subscribe(rows => rows.forEach(r => this.selectedRows.add(r)));
+      this.grns$.pipe(take(1)).subscribe(rows => rows.forEach(r => this.selectedRows.add(r)));
     }
   }
 
   // ===== CRUD =====
   private openMainForm(): void {
     this.dialogService.showFormPopup({
-      heading: this.mainForm.value.id ? 'Edit part' : 'Create part',
+      heading: this.mainForm.value.id ? 'Edit GRN' : 'Create GRN',
       form: this.mainForm,
       meta: this.mainFormMeta,
       width:'900px'
@@ -185,10 +186,10 @@ export class PartRequestComponent implements OnInit, OnDestroy  {
   }
 
   private save(formData: any): void {
-    const operation$ = this.partRequestFacade.createPartRequest(formData);
+    const operation$ = this.grnFacade.updateGrn(formData);
     operation$?.pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => this.dialogService.showSuccess('part saved successfully.'),
-      error: (err) => this.dialogService.showMessage({ heading: 'Failed to save part', message: err.errorMessage }),
+      next: () => this.dialogService.showSuccess('GRN saved successfully.'),
+      error: (err) => this.dialogService.showMessage({ heading: 'Failed to save GRN', message: err.errorMessage }),
       complete: () => {
         this.reload();
         this.formBuilderService.resetForm(this.mainForm);
@@ -196,36 +197,27 @@ export class PartRequestComponent implements OnInit, OnDestroy  {
     });
   }
 
-  private approvedPartRequest(partRequest: PartRequest): void {
-    this.partRequestFacade.approvedPartRequest(partRequest).pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => this.dialogService.showSuccess('part request approved successfully.'),
-      error: (err) => this.dialogService.showMessage({ heading: 'Failed to approve part request', message: err.errorMessage }),
-      complete: () => {
-        this.reload();
-        if (this.activePartRequest?.id === partRequest.id) this.activePartRequest = null;
-      }
-    });
-  }
-
-  private rejectPartRequest(partRequest: PartRequest): void {
-    this.partRequestFacade.rejectPartRequest(partRequest).pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => this.dialogService.showSuccess('part request rejected successfully.'),
-      error: (err) => this.dialogService.showMessage({ heading: 'Failed to reject part request', message: err.errorMessage }),
-      complete: () => {
-        this.reload();
-        if (this.activePartRequest?.id === partRequest.id) this.activePartRequest = null;
-      }
-    });
+  private edit(row: Grn): void {
+    const status = row.grnstatus.name;
+    if (status === 'Received'||status === 'Partially Received') {
+      this.dialogService.showMessage({
+        heading: 'Edit not allowed',
+        message: 'Cannot edit a GRN that has already been Received or Partially Received.'
+      });
+      return;
+    }
+    this.mainForm.patchValue(row);
+    this.openMainForm();
   }
 
   // ===== Export =====
   protected toPdf(): void {
-    this.partRequests$.pipe(take(1)).subscribe(() => {
+    this.grns$.pipe(take(1)).subscribe(() => {
       if (this.selectedRows.size > 0) {
         this.dialogService.showPrintDialog({
           width: '1500px',
           height: '650px',
-          title: 'Part Request Details',
+          title: 'Grn Details',
           mode: 'table',
           data: Array.from(this.selectedRows),
           columns: this.exportMeta
@@ -241,8 +233,9 @@ export class PartRequestComponent implements OnInit, OnDestroy  {
       this.dialogService.showWarning('Please select at least one record to export.');
       return;
     }
-    exportToExcel(Array.from(this.selectedRows), this.exportMeta, 'part-request.xlsx');
+    exportToExcel(Array.from(this.selectedRows), this.exportMeta, 'grn.xlsx');
   }
+
 
   // ===== Action Panel =====
   protected actionHandlers: Record<string, () => void> = {
@@ -266,11 +259,12 @@ export class PartRequestComponent implements OnInit, OnDestroy  {
       this.dialogService.showWarning(`Unhandled dropdown action: ${event.type}`);
     }
   }
-
   // ===== TrackBy for optimization =====
 
   trackByField(index: number, field: any) {
     return field.key || index;
   }
+
+
 
 }

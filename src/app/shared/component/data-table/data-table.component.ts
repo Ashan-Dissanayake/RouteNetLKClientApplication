@@ -1,9 +1,9 @@
 import {
-  AfterViewInit, ChangeDetectorRef,
+  AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef,
   Component, ContentChildren,
   EventEmitter,
   Input,
-  OnChanges,
+  OnChanges, OnDestroy,
   Output, QueryList, SimpleChanges,
   ViewChild
 } from '@angular/core';
@@ -22,6 +22,7 @@ import {
 import {NgClass, NgForOf, NgIf, NgTemplateOutlet} from '@angular/common';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {FormsModule} from '@angular/forms';
+import {Subject, takeUntil} from 'rxjs';
 
 
 @Component({
@@ -50,8 +51,9 @@ import {FormsModule} from '@angular/forms';
   templateUrl: './data-table.component.html',
   standalone: true,
   styleUrl: './data-table.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DataTableComponent<T = any> implements OnChanges, AfterViewInit {
+export class DataTableComponent<T = any> implements OnChanges, AfterViewInit,OnDestroy {
 
   @Input() data: any[] = [];
   @Input() columns: ColumnDef[] = [];
@@ -65,7 +67,6 @@ export class DataTableComponent<T = any> implements OnChanges, AfterViewInit {
   @Output() checkBoxClick = new EventEmitter<CheckboxEvent<T>>();
   @Output() selectAllClick = new EventEmitter<boolean>();
 
-
   @ContentChildren(TableCellDirective) customCellTemplates!: QueryList<TableCellDirective>;
 
   @ViewChild(MatSort) sort!: MatSort;
@@ -76,6 +77,8 @@ export class DataTableComponent<T = any> implements OnChanges, AfterViewInit {
   dataSource = new MatTableDataSource<any>([]);
   displayedColumns: string[] = [];
 
+  private destroy$ = new Subject<void>();
+
   constructor(private cdr: ChangeDetectorRef) {}
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -84,8 +87,12 @@ export class DataTableComponent<T = any> implements OnChanges, AfterViewInit {
       this.dataSource.data = [...(this.data ?? [])];
       this.cdr.markForCheck();
     }
+    // if (changes['columns']) {
+    //   this.displayedColumns = ['select', ...this.columns.map(c => c.key)];
+    // }
     if (changes['columns']) {
       this.displayedColumns = ['select', ...this.columns.map(c => c.key)];
+      this.cdr.markForCheck();
     }
   }
 
@@ -144,12 +151,24 @@ export class DataTableComponent<T = any> implements OnChanges, AfterViewInit {
       this.dataSource.paginator = this.paginator;
     }
 
-    this.customCellTemplates.changes.subscribe(() => {
-      this.mapCustomTemplates();
-      this.cdr.markForCheck();
-    });
+    // this.customCellTemplates.changes.subscribe(() => {
+    //   this.mapCustomTemplates();
+    //   this.cdr.markForCheck();
+    // });
+
+    this.customCellTemplates.changes
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.mapCustomTemplates();
+        this.cdr.markForCheck();
+      });
 
     this.cdr.markForCheck();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
 }

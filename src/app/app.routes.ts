@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import {PartRequestComponent} from './features/partrequestmodule/partrequest/partrequest.component';
 
 export const routes: Routes = [
   {
@@ -28,6 +27,9 @@ export const routes: Routes = [
       },
       { path: 'part-request', loadComponent: () => import('./features/partrequestmodule/partrequest/partrequest.component').
         then(m => m.PartRequestComponent)
+      },
+      { path: 'grn', loadComponent: () => import('./features/grnmodule/grn/grn.component').
+        then(m => m.GrnComponent)
       },
     ]
   },

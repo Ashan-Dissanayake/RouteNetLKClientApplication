@@ -69,6 +69,11 @@ export const ApiEndpoints = {
 
     //part request
     PART_REQUEST:`${BASE_URL}/part-requests`,
+    PART_REQUEST_SUMMARIES:`${BASE_URL}/part-requests/summaries`,
     PART_REQUEST_STATUS:`${BASE_URL}/part-request-statuses/summaries`,
+
+    //GRN
+    GRN:`${BASE_URL}/grns`,
+    GRN_STATUS:`${BASE_URL}/grn-statuses/summaries`,
 
 } as const;
