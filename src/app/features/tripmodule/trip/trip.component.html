@@ -105,9 +105,9 @@
         class="status-chip"
         [ngClass]="{
         'DRAFT': row.tripstatus.name === 'Draft',
-        'ACTIVATE': row.tripstatus.name === 'Activate',
-        'SUSPEND': row.tripstatus.name === 'Suspend',
-        'DISCONTINUE': row.tripstatus.name === 'Discontinue'
+        'ACTIVATE': row.tripstatus.name === 'Active',
+        'SUSPEND': row.tripstatus.name === 'Suspended',
+        'DISCONTINUE': row.tripstatus.name === 'Discontinued'
       }">
       {{ row.tripstatus.name }}
       </span>

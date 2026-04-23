@@ -72,7 +72,7 @@ export class AppComponent {
         { icon: 'precision_manufacturing', label: 'Part', route: '/admin/part' },
         { icon: 'shopping_cart_checkout', label: 'Part Request', route: '/admin/part-request' },
         { icon: 'assignment_turned_in', label: 'GRN', route: '/admin/grn' },
-        { icon: 'assignment_turned_in', label: 'Trip', route: '/admin/trip' },
+        { icon: 'navigation', label: 'Trip', route: '/admin/trip' },
       ],
       expanded: false
     },

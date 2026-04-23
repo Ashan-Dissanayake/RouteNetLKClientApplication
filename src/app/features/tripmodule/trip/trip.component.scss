@@ -4,6 +4,10 @@ $text-label: #777;
 $font-family: Roboto, 'Segoe UI', sans-serif;
 
 $status-colors: (
+  'DRAFT': (
+    color: #ffffff,
+    bg: #605f5f
+  ),
   'ACTIVATE': (
     color: #0f5132,
     bg: #d1e7dd
@@ -14,9 +18,9 @@ $status-colors: (
     bg: #f8d7da
   ),
 
-  'SUSPENDED': (
-    color: #41464b,
-    bg: #e2e3e5
+  'SUSPEND': (
+    bg: #e7e700,
+    color: #000000
   ),
 );
 
