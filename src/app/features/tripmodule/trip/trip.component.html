@@ -61,15 +61,15 @@
 
       <mat-menu #menu="matMenu">
         <button mat-menu-item (click)="action('activate', row)">
-          <mat-icon style="color: #297c1d;">play_circle_outline</mat-icon>
+          <mat-icon style="color: #297c1d;">check_circle</mat-icon>
           <span>Activate</span>
         </button>
         <button mat-menu-item (click)="action('suspend', row)">
-          <mat-icon style="color: #dca11d;">check_circle_outline</mat-icon>
+          <mat-icon style="color: #dca11d;">block</mat-icon>
           <span>Suspend</span>
         </button>
         <button mat-menu-item (click)="action('discontinue', row)">
-          <mat-icon style="color: red;">cancel</mat-icon>
+          <mat-icon style="color: red;">remove_circle</mat-icon>
           <span>Discontinue</span>
         </button>
       </mat-menu>
