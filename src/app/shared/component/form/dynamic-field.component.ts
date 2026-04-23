@@ -1,4 +1,4 @@
-import {Component, Input, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, Input, ViewChild} from '@angular/core';
 import {MatFormField, MatFormFieldModule} from '@angular/material/form-field';
 import {MatError, MatInput, MatLabel} from '@angular/material/input';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -15,8 +15,12 @@ import {MatOption, MatSelect} from '@angular/material/select';
 import {MatNativeDateModule} from '@angular/material/core';
 import {FilePickerComponent} from '../file-picker/file-picker.component';
 import {DataTableComponent} from '../data-table/data-table.component';
-import {PART_REQUEST_TABLE_META} from '../../../features/partrequestmodule/partrequest.meta';
 import {InnerableComponent} from '../innertable/innertable.component';
+import {
+  MatTimepicker,
+  MatTimepickerInput,
+  MatTimepickerToggle
+} from '@angular/material/timepicker';
 
 @Component({
   selector: 'dynamic-field',
@@ -120,6 +124,34 @@ import {InnerableComponent} from '../innertable/innertable.component';
           </mat-error>
         </mat-form-field>
 
+        <!--Time Pciker-->
+        <mat-form-field *ngSwitchCase="'time-range'" appearance="outline">
+          <mat-label>{{ field.label || field.name }}</mat-label>
+          <mat-timepicker #timePicker></mat-timepicker>
+
+          <mat-timepicker-toggle
+            *ngIf="timePicker"
+            matSuffix
+            [for]="timePicker">
+          </mat-timepicker-toggle>
+
+          <input
+            matInput
+            [formControlName]="field.name"
+            [matTimepicker]="timePicker"
+            [matTimepickerMin]="field.timeConfig?.minTime ?? null"
+            [matTimepickerMax]="field.timeConfig?.maxTime ?? null"
+          >
+
+          <mat-error
+            *ngIf="formInstance.get(field.name)?.invalid && formInstance.get(field.name)?.touched">
+            <ng-container
+              *ngIf="formInstance.get(field.name)?.hasError('required')">
+              This field is required.
+            </ng-container>
+          </mat-error>
+        </mat-form-field>
+
         <!-- Dual List Box -->
         <mat-form-field *ngSwitchCase="'dualist'" appearance="outline">
           <mat-label>{{ field.label || field.name }}</mat-label>
@@ -175,9 +207,12 @@ import {InnerableComponent} from '../innertable/innertable.component';
     FilePickerComponent,
     DataTableComponent,
     InnerableComponent,
+    MatTimepickerToggle,
+    MatTimepicker,
+    MatTimepickerInput
   ]
 })
-export class DynamicFieldComponent {
+export class DynamicFieldComponent implements AfterViewInit{
 
   @Input() formInstance!: FormGroup;
   @Input() field!: FormField;
@@ -217,11 +252,28 @@ export class DynamicFieldComponent {
     this.picker?.close();
   }
 
-
   currentYear = new Date().getFullYear();
 
+  private bindTimeControl(fieldName: string): void {
+    const control = this.formInstance.get(fieldName);
+    if (!control) return;
 
-  protected readonly oninput = oninput;
-  protected readonly PART_REQUEST_TABLE_META = PART_REQUEST_TABLE_META;
+    control.valueChanges.subscribe(value => {
+      if (value instanceof Date) {
+        const formatted = value.toTimeString().substring(0, 5);
+
+        if (control.value !== formatted) {
+          control.setValue(formatted, { emitEvent: false });
+        }
+      }
+    });
+  }
+
+  ngAfterViewInit() {
+    if (this.field?.type === 'time-range') {
+      this.bindTimeControl(this.field.name);
+    }
+  }
+
 }
 

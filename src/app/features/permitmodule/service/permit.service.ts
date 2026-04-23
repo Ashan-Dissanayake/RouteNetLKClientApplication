@@ -5,6 +5,7 @@ import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../core/api-endpoints';
 import {Permit} from '../entity/permit';
+import {Branch} from '../../branchmodule/entity/branch';
 
 @Injectable({ providedIn: 'root' })
 export class PermitService extends BaseHttpService <Permit>{
@@ -15,6 +16,10 @@ export class PermitService extends BaseHttpService <Permit>{
 
   get(params?:any):Observable<ApiResponse<Permit>>{
     return  this.getAll(ApiEndpoints.PERMIT,params);
+  }
+
+  getSummary(): Observable<ApiResponse<Permit>> {
+    return this.getAll(ApiEndpoints.PERMIT_SUMMARIES);
   }
 
   save(permit:Permit):Observable<Permit>{

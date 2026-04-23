@@ -44,7 +44,6 @@ export class VehicleFacadeService {
     return this.getVehicles();
   }
 
-
   loadConditionRates(): Observable<Conditionrate[]> {
     return this.conditionRateService.get().pipe(map(res => res.data));
   }
@@ -67,7 +66,6 @@ export class VehicleFacadeService {
   loadBusTypes(): Observable<Bustype[]> {
     return this.busTypeService.get().pipe(map(res => res.data));
   }
-
 
   loadBranches(): Observable<Branch[]> {
     return this.branchService.getSummary().pipe(map(res => res.data));

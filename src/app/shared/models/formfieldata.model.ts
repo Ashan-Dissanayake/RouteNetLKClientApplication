@@ -6,6 +6,11 @@ export type DateConfig = {
     range?: { years:number,months:number,days:number};
 };
 
+export type TimeConfig = {
+  minTime?: string | null;
+  maxTime?: string | null;
+};
+
 export type OptionsField<T = unknown> = {
     id: number;
 } & Record<string, T>;
@@ -15,6 +20,7 @@ export type FieldType =
     | 'number'
     | 'date'
     | 'file'
+    | 'time-range'
     | 'checkbox'
     | 'radio'
     | 'select'
@@ -47,14 +53,15 @@ export interface FormField<TValue = unknown, TReference = unknown, TOption = unk
 
     mode: FieldMode;
     dateConfig?: DateConfig;
+    timeConfig?: TimeConfig;
 
     defaultValue?: TValue;
     referenceName?: TReference;
     referencePath?: string[];
 
   innerTableConfig?: {
-    columns: InnerTableColumn[];   // ← changed from ColumnDef[] to FormTableColumn[]
-    meta: FormField[];            // ← added, drives the inline form
-    dataMap: Record<string, any>;   // ← options, regexes etc
+    columns: InnerTableColumn[];
+    meta: FormField[];
+    dataMap: Record<string, any>;
   };
 }

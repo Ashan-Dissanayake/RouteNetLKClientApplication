@@ -1,4 +1,4 @@
-import {Component, inject, OnInit, ViewChild} from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { RouterModule } from '@angular/router';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import {NgClass, NgIf} from '@angular/common';
+import {NgIf} from '@angular/common';
 import {MatDateFormats, provideNativeDateAdapter} from "@angular/material/core";
 
 
@@ -72,6 +72,7 @@ export class AppComponent {
         { icon: 'precision_manufacturing', label: 'Part', route: '/admin/part' },
         { icon: 'shopping_cart_checkout', label: 'Part Request', route: '/admin/part-request' },
         { icon: 'assignment_turned_in', label: 'GRN', route: '/admin/grn' },
+        { icon: 'assignment_turned_in', label: 'Trip', route: '/admin/trip' },
       ],
       expanded: false
     },

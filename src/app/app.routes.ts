@@ -30,7 +30,10 @@ export const routes: Routes = [
       },
       { path: 'grn', loadComponent: () => import('./features/grnmodule/grn/grn.component').
         then(m => m.GrnComponent)
-      },
+      } ,
+      { path: 'trip', loadComponent: () => import('./features/tripmodule/trip/trip.component').
+        then(m => m.TripComponent)
+      }
     ]
   },
 ];

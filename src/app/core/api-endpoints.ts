@@ -1,6 +1,6 @@
 /*
  === API Endpoints Constant ===
-  Centralize API endpoints for better maintainabilit
+  Centralize API endpoints for better maintainability
  */
 
 const BASE_URL = 'http://localhost:8080';
@@ -9,7 +9,7 @@ export const ApiEndpoints = {
 
     regexes: `${BASE_URL}/regexes`,
 
-  //Branch
+    //Branch
     branchstatuses:`${BASE_URL}/branch-statuses/summaries`,
     branchtypes:`${BASE_URL}/branch-types/summaries`,
     branches: `${BASE_URL}/branches`,
@@ -32,7 +32,7 @@ export const ApiEndpoints = {
     employeenumber:`${BASE_URL}/number-generator/employee`,
 
 
-  //Crew
+    //Crew
     drivers:`${BASE_URL}/drivers`,
     conductors:`${BASE_URL}/conductors`,
 
@@ -40,7 +40,7 @@ export const ApiEndpoints = {
     routeFamiliarityLevels:`${BASE_URL}/route-familiarity-levels/summaries`,
     licenseCategories:`${BASE_URL}/license-categories/summaries`,
 
-  //Vehicle
+    //Vehicle
     vehicles:`${BASE_URL}/vehicles`,
     vehiclessummaries:`${BASE_URL}/vehicles/summaries`,
     conditionrate:`${BASE_URL}/condition-rates/summaries`,
@@ -56,6 +56,7 @@ export const ApiEndpoints = {
     PERMIT_STATUS:`${BASE_URL}/permit-statuses/summaries`,
     ROUTE:`${BASE_URL}/routes/summaries`,
     PERMIT:`${BASE_URL}/permits`,
+    PERMIT_SUMMARIES:`${BASE_URL}/permits/summaries`,
     PERMIT_TRANSFER:`${BASE_URL}/permits/transfer`,
 
     //spare parts
@@ -75,5 +76,16 @@ export const ApiEndpoints = {
     //GRN
     GRN:`${BASE_URL}/grns`,
     GRN_STATUS:`${BASE_URL}/grn-statuses/summaries`,
+
+    //ROSTER
+    ROSTER:`${BASE_URL}/rosters`,
+    ROSTER_STATUS:`${BASE_URL}/roster-statuses/summaries`,
+    ROSTER_DEACTIVATE: `${BASE_URL}/rosters/deactivate`,
+
+    //TRIP
+    TRIP:`${BASE_URL}/trips`,
+    TRIP_TYPE:`${BASE_URL}/trip-types/summaries`,
+    TRIP_STATUS:`${BASE_URL}/trip-statuses/summaries`,
+    ORIGIN_TERMINAL:`${BASE_URL}/origin-terminals/summaries`,
 
 } as const;

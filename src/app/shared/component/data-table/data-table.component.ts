@@ -83,13 +83,10 @@ export class DataTableComponent<T = any> implements OnChanges, AfterViewInit,OnD
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['data']) {
-      // avoid mutating input
       this.dataSource.data = [...(this.data ?? [])];
       this.cdr.markForCheck();
     }
-    // if (changes['columns']) {
-    //   this.displayedColumns = ['select', ...this.columns.map(c => c.key)];
-    // }
+
     if (changes['columns']) {
       this.displayedColumns = ['select', ...this.columns.map(c => c.key)];
       this.cdr.markForCheck();
@@ -150,11 +147,6 @@ export class DataTableComponent<T = any> implements OnChanges, AfterViewInit,OnD
     if (this.paginatable && this.paginator) {
       this.dataSource.paginator = this.paginator;
     }
-
-    // this.customCellTemplates.changes.subscribe(() => {
-    //   this.mapCustomTemplates();
-    //   this.cdr.markForCheck();
-    // });
 
     this.customCellTemplates.changes
       .pipe(takeUntil(this.destroy$))

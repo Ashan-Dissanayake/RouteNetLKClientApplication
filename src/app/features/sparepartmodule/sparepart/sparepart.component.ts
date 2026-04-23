@@ -139,7 +139,6 @@ export class SparepartComponent implements OnInit, OnDestroy {
     this.activePart = row;
   }
 
-
   protected reload(): void { this.partFacade.reloadParts(); }
 
   protected onCloseDetailView(): void {
@@ -227,7 +226,7 @@ export class SparepartComponent implements OnInit, OnDestroy {
         this.dialogService.showPrintDialog({
           width: '1500px',
           height: '650px',
-          title: 'Vehicle Details',
+          title: 'Part Details',
           mode: 'table',
           data: Array.from(this.selectedRows),
           columns: this.exportMeta

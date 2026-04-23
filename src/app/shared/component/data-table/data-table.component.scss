@@ -62,9 +62,10 @@
 
   /* === CELLS === */
   mat-cell, mat-header-cell {
-    padding: 10px 16px;
+    //padding: 10px 16px;
     vertical-align: middle;
     line-height: 1.2;
+    margin: unset;
 
     &:first-of-type {
       padding-left: 8px !important;
@@ -77,12 +78,16 @@
   }
 
   mat-header-cell {
-    white-space: nowrap;
+    //white-space: nowrap;
     user-select: none;
   }
 
   mat-cell {
     word-break: break-word;
+  }
+
+  mat-cell:last-child button{
+    //action button colmns cells
   }
 
   /* === SPECIFIC ELEMENTS === */
