@@ -1,0 +1,213 @@
+// 1. VARIABLES
+$btn-primary: #048f98;
+$btn-primary-hover: #004649;
+$btn-disabled: rgba(125, 136, 141, 0.69);
+$accent-orange: #ff9800;
+$btn-radius: 4px;
+$btn-font-size: 13px;
+$border-color: #e0e0e0;
+$bg-light: #f8f9fa;
+
+// 2. MAIN LAYOUT STRUCTURE
+.trip-dashboard-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  grid-template-rows: auto auto 1fr;
+  gap: 20px;
+  padding: 20px;
+  height: calc(100vh - 64px);
+  box-sizing: border-box;
+  background-color: $bg-light;
+  overflow: hidden;
+
+  .grid-header {
+    grid-column: 1 / span 2;
+    border-bottom: 1px solid $border-color;
+    padding-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h2 { margin: 0; color: #333; font-size: 1.4rem; }
+  }
+
+  .grid-form-top {
+    grid-column: 1;
+    grid-row: 2;
+    background: #fff;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  // LEFT BOTTOM PANEL (TABLE)
+  .grid-form-bottom {
+    grid-column: 1;
+    grid-row: 3;
+    min-height: 0;
+    height: 100%;
+
+    mat-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #fff;
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      box-shadow: none !important;
+
+      mat-card-header {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        padding: 8px 16px;
+        border-bottom: 1px solid #f0f0f0;
+
+        .section-title { font-weight: bold; margin: 0; color: #444; }
+
+        mat-form-field {
+          width: 200px;
+          margin-left: 20px;
+          font-size: 12px;
+          ::ng-deep .mat-mdc-form-field-subscript-wrapper { display: none; }
+        }
+
+        .info-item {
+          margin-left: auto;
+          text-align: right;
+          p { margin: 0; font-size: 11px; color: #888; text-transform: uppercase; }
+          span { font-weight: 800; color: $accent-orange; font-size: 1.1rem; }
+        }
+      }
+
+      mat-card-content {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 0;
+
+        &::-webkit-scrollbar { width: 6px; }
+        &::-webkit-scrollbar-thumb { background: #dcdcdc; border-radius: 10px; }
+      }
+    }
+  }
+
+  // RIGHT PANEL (ASSIGNMENTS)
+  .grid-right-panel {
+    grid-column: 2;
+    grid-row: 2 / span 2;
+    background-color: #fff;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    box-shadow: none !important;
+
+    mat-card-header {
+      flex-shrink: 0;
+      padding: 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    // This ensures the Material internal padding doesn't block your scrolling
+    ::ng-deep .mat-mdc-card-content {
+      padding: 0 !important;
+      flex-grow: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-body {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 16px;
+
+      &::-webkit-scrollbar { width: 5px; }
+      &::-webkit-scrollbar-thumb { background: #eee; border-radius: 10px; }
+
+      // ASSIGNMENT LIST & ITEM STYLES (NESTED INSIDE RIGHT PANEL)
+      .assignment-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+
+        .assignment-item {
+          background: #fdfdfd;
+          border: 1px solid $border-color;
+          border-left: 5px solid #ccc;
+          padding: 12px;
+          border-radius: 6px;
+          transition: all 0.2s;
+
+          // Status Colors (Linked to [class] in HTML)
+          &.Proposed { border-left-color: #3182ce; background: #ebf8ff; }
+          &.Confirmed { border-left-color: #48bb78; background: #f0fff4; }
+          &.Draft    { border-left-color: #a0aec0; background: #f7fafc; }
+
+          .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .emp-name { font-weight: 700; font-size: 0.9rem; color: #2d3748; }
+            .status-chip {
+              font-size: 0.65rem;
+              font-weight: 800;
+              padding: 2px 6px;
+              border-radius: 4px;
+              background: rgba(0,0,0,0.05);
+              text-transform: uppercase;
+            }
+          }
+
+          .shift-info { margin: 4px 0; font-size: 0.8rem; color: #4a5568; }
+
+          .item-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 8px;
+            border-top: 1px dashed #eee;
+            padding-top: 5px;
+
+            button {
+              transform: scale(0.85);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// 3. FORM & BUTTONS
+.dynamic-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  ::ng-deep mat-form-field { width: 100%; font-size: 13px; }
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+
+  button {
+    background-color: $btn-primary;
+    color: white;
+    border-radius: $btn-radius;
+    font-weight: 600;
+
+    &:hover:not(:disabled) { background-color: $btn-primary-hover; color: white }
+    &.btn-secondary { background: #eee; color: #444; }
+  }
+}
+
+// 4. MISC
+.no-data-msg {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-style: italic;
+}

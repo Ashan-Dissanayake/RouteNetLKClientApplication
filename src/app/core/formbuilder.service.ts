@@ -2,12 +2,16 @@ import { Injectable } from '@angular/core';
 import {AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators} from '@angular/forms';
 import {Regex} from '../shared/models/regex.model';
 import {FormField} from '../shared/models/formfieldata.model';
+import {DialogService} from './dialog.service';
 
 
 @Injectable({ providedIn: 'root' })
 export class FormbuilderService {
 
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    private dialogService: DialogService
+  ) {}
 
   build(fields: FormField[], dataMap: Record<string, any>): FormGroup {
     const group: Record<string, AbstractControl> = {};
@@ -115,6 +119,77 @@ export class FormbuilderService {
       return null;
     };
   }
+
+  handleSave(
+    form: FormGroup,
+    entityName: string,
+    onExecute: (payload: any) => void
+  ): void {
+    // 1. Validate
+    if (form.invalid) {
+      const invalidControls = this.getInvalidControls(form);
+      const errorList = invalidControls
+        .map(ctrl => `<li>${this.formatLabel(ctrl)}</li>`)
+        .join('');
+
+      this.dialogService.showMessage({
+        heading: 'Validation Error',
+        message: `<p>Please correct the following fields:</p><ul>${errorList}</ul>`
+      });
+      return;
+    }
+
+    const isUpdate = !!form.get('id')?.value;
+
+    if (isUpdate) {
+      this.handleUpdateFlow(form, entityName, onExecute);
+    } else {
+      this.handleCreateFlow(form, entityName, onExecute);
+    }
+  }
+
+  private handleCreateFlow(form: FormGroup, entity: string, onExecute: any): void {
+    this.dialogService.showConfirmation({
+      heading: `Create ${entity}`,
+      message: `Are you sure you want to create this ${entity.toLowerCase()}?`
+    }).subscribe(confirmed => {
+      if (confirmed) onExecute(form.getRawValue());
+    });
+  }
+
+  private handleUpdateFlow(form: FormGroup, entity: string, onExecute: any): void {
+    const dirtyValues = this.getUpdatedValues(form);
+    const changedKeys = Object.keys(dirtyValues).filter(k => k !== 'id');
+
+    if (changedKeys.length === 0) {
+      this.dialogService.showMessage({
+        heading: 'No Changes',
+        message: 'No fields have been modified. There is nothing to update.'
+      });
+      return;
+    }
+
+    const changeListHtml = changedKeys
+      .map(key => `<li><strong>${this.formatLabel(key)}</strong></li>`)
+      .join('');
+
+    this.dialogService.showConfirmation({
+      heading: `Update ${entity}`,
+      message: `
+        <p>You are updating the following fields:</p>
+        <ul style="margin: 10px 0;">${changeListHtml}</ul>
+        <p>Do you want to proceed?</p>
+      `
+    }).subscribe(confirmed => {
+      if (confirmed) {
+        // Merge raw values with dirty values to ensure all context is sent
+        const payload = { ...form.getRawValue(), ...dirtyValues };
+        onExecute(payload);
+      }
+    });
+  }
+
+
 
 }
 

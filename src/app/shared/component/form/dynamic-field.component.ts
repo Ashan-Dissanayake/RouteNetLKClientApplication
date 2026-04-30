@@ -247,7 +247,10 @@ export class DynamicFieldComponent implements AfterViewInit{
     }
 
     const rangeGroup = this.formInstance.get(fieldName) as FormGroup;
-    rangeGroup.patchValue({ end });
+    rangeGroup.patchValue({
+      start: start,
+      end: end
+    });
 
     this.picker?.close();
   }

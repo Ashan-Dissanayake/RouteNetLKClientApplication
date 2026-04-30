@@ -1,8 +1,3 @@
-/*
- === API Endpoints Constant ===
-  Centralize API endpoints for better maintainability
- */
-
 const BASE_URL = 'http://localhost:8080';
 
 export const ApiEndpoints = {
@@ -79,8 +74,10 @@ export const ApiEndpoints = {
 
     //ROSTER
     ROSTER:`${BASE_URL}/rosters`,
-    ROSTER_STATUS:`${BASE_URL}/roster-statuses/summaries`,
-    ROSTER_DEACTIVATE: `${BASE_URL}/rosters/deactivate`,
+    ROSTER_SUMMARIES:`${BASE_URL}/rosters/summaries`,
+    ROSTER_SHIFT:`${BASE_URL}/roster-shifts`,
+    ROSTER_SHIFT_ASSIGNMENT_VIEW:`${BASE_URL}/roster-shift-assignment/view`,
+    ROSTER_SHIFT_ASSIGNMENT:`${BASE_URL}/roster-shift-assignment`,
 
     //TRIP
     TRIP:`${BASE_URL}/trips`,

@@ -33,6 +33,9 @@ export const routes: Routes = [
       } ,
       { path: 'trip', loadComponent: () => import('./features/tripmodule/trip/trip.component').
         then(m => m.TripComponent)
+      },
+      { path: 'roster', loadComponent: () => import('./features/rostermodule/roster/roster.component').
+        then(m => m.RosterComponent)
       }
     ]
   },

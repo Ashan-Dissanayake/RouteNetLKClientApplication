@@ -37,6 +37,13 @@ export abstract class BaseHttpService<T> {
     return this.http.get<ApiResponse<T, false>>(url, { params: httpParams });
   }
 
+  // base.service.ts
+
+  getById<T>(url: string, id: number | string): Observable<ApiResponse<T>> {
+    const finalUrl = `${url}/${id}`;
+    return this.http.get<ApiResponse<T>>(finalUrl);
+  }
+
   post(url: string, data: T): Observable<T> {
     return this.http.post<T>(url, data);
   }

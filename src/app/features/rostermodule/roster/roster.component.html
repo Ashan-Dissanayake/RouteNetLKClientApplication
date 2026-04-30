@@ -1,0 +1,116 @@
+<div class="trip-dashboard-grid">
+
+  <header class="grid-header">
+    <div class="header-content">
+      <h2>Roster Details Management</h2>
+    </div>
+
+    <mat-progress-bar *ngIf="loading$ | async" mode="indeterminate"></mat-progress-bar>
+
+    <div *ngIf="error$ | async as error" class="custom-error-panel">
+      <div class="error-title">Error loading Trips</div>
+      <div class="error-message">{{ error?.message }}</div>
+      <button class="btn-retry" (click)="reload()">Retry</button>
+    </div>
+  </header>
+
+  <section class="grid-form-top">
+    <form [formGroup]="mainForm">
+      <div class="dynamic-form-grid">
+        <dynamic-field
+          *ngFor="let field of mainFormMeta"
+          [formInstance]="mainForm"
+          [field]="field">
+        </dynamic-field>
+        <div class="form-actions">
+          <button mat-button (click)="save()">Save</button>
+          <button mat-button class="btn-secondary" (click)="cancel()">Cancel</button>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <section class="grid-form-bottom">
+    <mat-card>
+      <mat-card-header>
+        <p class="section-title">Roster Slots</p>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Roster Week</mat-label>
+          <mat-select (selectionChange)="onRosterSelected($event.value.id)" >
+            <mat-option *ngFor="let roster of (rosters$ | async); trackBy: trackByRosterId" [value]="roster">
+              {{ roster.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button mat-icon-button><mat-icon>backspace</mat-icon></button>
+        <button
+          mat-button
+          matTooltip="Assign Crew"
+          style="color: #3677d0;"
+          [disabled]="!selectedRosterId || isAssigning"
+          (click)="assignedCrew()">
+
+          <mat-icon *ngIf="!isAssigning">how_to_reg</mat-icon>
+          <mat-spinner *ngIf="isAssigning" diameter="20" style="display: inline-block;"></mat-spinner>
+
+          <span *ngIf="!isAssigning">Assign</span>
+          <span *ngIf="isAssigning">Processing...</span>
+        </button>
+        <div class="info-item" *ngIf="rosterShifts$ | async as rosterShifts">
+          <p >Roster Configuration</p>
+          <span>Total Shifts {{ rosterShifts.length/2 }}</span>
+        </div>
+      </mat-card-header>
+      <mat-card-content>
+        <app-data-table
+          *ngIf="(rosterShifts$ | async)?.length"
+          [data]="(rosterShifts$ | async) || []"
+          [columns]="tableColumns"
+          [sortable]="true"
+          [paginatable]="true"
+          [pageSizeOptions]="[10, 20]"
+        >
+          </app-data-table>
+      </mat-card-content>
+    </mat-card>
+  </section>
+
+<!--  <aside class="grid-right-panel">-->
+  <mat-card class="grid-right-panel">
+    <mat-card-header>
+      <mat-card-title>Assignment Review</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content class="panel-body">
+      <div class="assignment-list" *ngIf="rosterShiftsAssignments$ | async as assignments">
+        <div class="assignment-item" *ngFor="let item of assignments" [class]="item.status">
+          <div class="item-header">
+            <span class="emp-name">{{ item.employeeName || 'Unassigned' }}</span>
+            <span class="status-chip">{{ item.status }}</span>
+          </div>
+
+          <p class="shift-info">
+            {{ item.shiftName }} | {{ item.shiftDate | date:'mediumDate' }}
+          </p>
+
+          <div class="shift-time-details" style="font-size: 0.8rem; color: gray;">
+            {{ item.startTime }} - {{ item.endTime }} ({{ item.designation }})
+          </div>
+
+          <div class="item-actions">
+            <button (click)="approvedAss(item.id)" mat-icon-button matTooltip="Approve">
+              <mat-icon style="color: green">check_circle</mat-icon>
+            </button>
+            <button (click)="rejectAss(item.id)" mat-icon-button matTooltip="Reject">
+              <mat-icon style="color: orange">cancel</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="assignments.length === 0" class="no-data-msg">
+          No assignments found for this week.
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

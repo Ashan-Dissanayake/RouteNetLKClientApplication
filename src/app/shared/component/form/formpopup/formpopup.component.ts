@@ -38,36 +38,51 @@ export class FormpopupComponent {
     private formBuilderService:FormbuilderService
   ) {}
 
-
-   private onSave(): void {
-    const form = this.data.form;
-
-    if (!form.valid) {
-      const invalidControls = this.formBuilderService.getInvalidControls(form)
-      const errorList = invalidControls.map(ctrl => `<li>${ctrl}</li>`).join('');
-
-      this.dialogService.showMessage({
-        heading: 'Validation Error',
-        message: `
-        <p>You have errors in the following fields:</p>
-        <ul>${errorList}</ul>
-      `
-      });
-      return;
-    }
-
-    this.isUpdate = !!form.get('id')?.value;
-
-    if (this.isUpdate) {
-      this.handleUpdate(form);
-    } else {
-      this.handleCreate(form);
-    }
+  private onSave(): void {
+    this.formBuilderService.handleSave(
+      this.data.form,
+      this.data.heading,
+      (payload) => {
+        // If the service confirms everything is okay, we close the dialog with the data
+        this.dialogRef.close(payload);
+      }
+    );
   }
 
-  private onCancel():void {
-    this.dialogRef.close();
+  //  private onSave(): void {
+  //   const form = this.data.form;
+  //
+  //   if (!form.valid) {
+  //     const invalidControls = this.formBuilderService.getInvalidControls(form)
+  //     const errorList = invalidControls.map(ctrl => `<li>${ctrl}</li>`).join('');
+  //
+  //     this.dialogService.showMessage({
+  //       heading: 'Validation Error',
+  //       message: `
+  //       <p>You have errors in the following fields:</p>
+  //       <ul>${errorList}</ul>
+  //     `
+  //     });
+  //     return;
+  //   }
+  //
+  //   this.isUpdate = !!form.get('id')?.value;
+  //
+  //   if (this.isUpdate) {
+  //     this.handleUpdate(form);
+  //   } else {
+  //     this.handleCreate(form);
+  //   }
+  // }
+
+  // private onCancel():void {
+  //   this.dialogRef.close();
+  //   this.data.form.reset();
+  // }
+
+  private onCancel(): void {
     this.data.form.reset();
+    this.dialogRef.close();
   }
 
   private handleCreate(form: FormGroup): void {
@@ -127,9 +142,19 @@ export class FormpopupComponent {
 
   handleAction(event: ButtonClickEvent | string) {
     const type = typeof event === 'string' ? event : event.type;
-    const handler = this.actionHandlers[type];
-    if (handler) handler();
-    else this.dialogService.showWarning('Unhandled button action:', type);
+
+    if (type === 'save' || type === 'create') {
+      this.onSave();
+    } else if (type === 'cancel') {
+      this.onCancel();
+    }
   }
+
+  // handleAction(event: ButtonClickEvent | string) {
+  //   const type = typeof event === 'string' ? event : event.type;
+  //   const handler = this.actionHandlers[type];
+  //   if (handler) handler();
+  //   else this.dialogService.showWarning('Unhandled button action:', type);
+  // }
 
 }

@@ -97,7 +97,6 @@ export class TripComponent  implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initializeModule();
     this.metadata$.pipe(takeUntil(this.destroy$)).subscribe(metadata => {
-      console.log(metadata)
       this.createFilterForm(metadata);
       this.createMainForm(metadata);
     });

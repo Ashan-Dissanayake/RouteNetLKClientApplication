@@ -7,7 +7,7 @@ import { MatListModule } from '@angular/material/list';
 import { RouterModule } from '@angular/router';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import {NgIf} from '@angular/common';
-import {MatDateFormats, provideNativeDateAdapter} from "@angular/material/core";
+import {MAT_DATE_FORMATS, MatDateFormats, provideNativeDateAdapter} from "@angular/material/core";
 
 
 interface MenuItem {
@@ -36,7 +36,12 @@ const formats: MatDateFormats = {
 @Component({
   selector: 'app-root',
   standalone: true,
-  providers: [ provideNativeDateAdapter(formats)],
+  providers: [
+    // Provide the adapter first
+    provideNativeDateAdapter(),
+    // Override the formats globaly
+    { provide: MAT_DATE_FORMATS, useValue: formats }
+  ],
   imports: [
     MatSidenavModule,
     MatToolbarModule,
@@ -73,6 +78,7 @@ export class AppComponent {
         { icon: 'shopping_cart_checkout', label: 'Part Request', route: '/admin/part-request' },
         { icon: 'assignment_turned_in', label: 'GRN', route: '/admin/grn' },
         { icon: 'navigation', label: 'Trip', route: '/admin/trip' },
+        { icon: 'calendar_month', label: 'Roster', route: '/admin/roster' },
       ],
       expanded: false
     },
