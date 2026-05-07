@@ -79,6 +79,7 @@ export class AppComponent {
         { icon: 'assignment_turned_in', label: 'GRN', route: '/admin/grn' },
         { icon: 'navigation', label: 'Trip', route: '/admin/trip' },
         { icon: 'calendar_month', label: 'Roster', route: '/admin/roster' },
+        { icon: 'route', label: 'Trp Execution', route: '/admin/trip-execution' },
       ],
       expanded: false
     },

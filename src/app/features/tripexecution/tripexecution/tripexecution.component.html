@@ -1,0 +1,121 @@
+<div class="execution-dashboard-grid">
+  <header class="grid-header">
+    <h2>Trip Execution Log</h2>
+    <mat-progress-bar mode="indeterminate" *ngIf="loading$ | async"></mat-progress-bar>
+  </header>
+
+  <section class="grid-execution-form">
+    <mat-card>
+      <mat-card-header>
+        <p class="section-title">Dispatch Entry</p>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="mainForm">
+          <div class="dynamic-form-grid">
+            <dynamic-field
+              *ngFor="let field of mainFormMeta"
+              [formInstance]="mainForm"
+              [field]="field">
+            </dynamic-field>
+          </div>
+          <div class="form-actions">
+            <button mat-button (click)="initialize()">Initialize</button>
+            <button mat-button class="btn-secondary" (click)="cancel()">Cancel</button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </section>
+
+
+
+  <section class="grid-execution-summary">
+    <mat-card>
+      <mat-card-header>
+        <p class="section-title">Execution Summary</p>
+        <mat-basic-chip *ngIf="activeTripExecution" class="status-badge" [ngClass]="activeTripExecution.status | lowercase" >
+          {{ activeTripExecution.status }} </mat-basic-chip>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngIf="activeTripExecution; else noSelection">
+          <div class="info-group">
+            <div class="info-row">
+              <span class="label">Route</span>
+              <span class="value">{{ activeTripExecution.routeName }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Bus Number</span>
+              <span class="value" style="color: #048f98;">{{ activeTripExecution.vehicleNumber || 'N/A'}}</span>
+            </div>
+          </div>
+          <div class="info-group">
+            <div class="info-row">
+              <span class="label">Planned Departure</span>
+              <span class="value">{{ activeTripExecution.plannedDeparture }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Planned Arrival</span>
+              <span class="value">{{ activeTripExecution.plannedArrival }}</span>
+            </div>
+          </div>
+          <div class="info-group">
+            <div class="info-row">
+              <span class="label">Driver</span>
+              <span class="value">{{ activeTripExecution.driverName || 'N/A' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Conductor</span>
+              <span class="value">{{ activeTripExecution.conductorName || 'N/A' }}</span>
+            </div>
+          </div>
+
+          <div class="execution-actions">
+            <button mat-flat-button color="primary" [matMenuTriggerFor]="statusMenu">
+              <mat-icon>traffic</mat-icon>
+              UPDATE TRIP STATUS
+            </button>
+            <mat-menu #statusMenu="matMenu" >
+              <button mat-menu-item (click)="changeStatus('scheduled')">Scheduled</button>
+              <button mat-menu-item (click)="changeStatus('dispatched')">Dispatched</button>
+              <button mat-menu-item (click)="changeStatus('active')"> Set Active</button>
+              <button mat-menu-item (click)="changeStatus('completed')"> Mark Completed</button>
+              <button mat-menu-item (click)="changeStatus('interrupted')">Interrupted (Issue)</button>
+              <button mat-menu-item (click)="changeStatus('cancelled')">Cancel Trip</button>
+            </mat-menu>
+          </div>
+        </div>
+        <ng-template #noSelection>
+          <div class="empty-state">
+            <mat-icon>info</mat-icon>
+            <p>Select a trip from the log</p>
+          </div>
+        </ng-template>
+      </mat-card-content>
+    </mat-card>
+  </section>
+
+  <section class="grid-data-table">
+    <mat-card >
+      <mat-card-content>
+        <app-data-table
+          (rowClick)="onRowClick($event)"
+          *ngIf="(tripExecutions$ | async)?.length"
+          [data]="(tripExecutions$ | async) || []"
+          [columns]="tableColumns"
+          [sortable]="true"
+          [paginatable]="true"
+          [pageSizeOptions]="[10, 20]"
+          (actionClick)="onRowAction($event.action, $event.row)"
+        >
+          <ng-template tableCell="actions" let-row let-action="action">
+            <button mat-button matTooltip="Assign Resource" style="color: #558cd9;" (click)="action('assigned', row); $event.stopPropagation()">
+              <mat-icon *ngIf="!isAssigning">conveyor_belt</mat-icon>
+              <mat-spinner *ngIf="isAssigning" diameter="20" style="display: inline-block;"></mat-spinner>
+            </button>
+          </ng-template>
+        </app-data-table>
+      </mat-card-content>
+    </mat-card>
+  </section>
+</div>
+

@@ -8,6 +8,7 @@ export const TRIP_TABLE_META = [
   {key: 'todepature', label: 'Departure Time'},
   {key: 'toarrival', label: 'Arrival Time'},
   {key: 'triptype.name', label: 'Trip Type'},
+  {key: 'opcalender.name', label: 'OP Calender'},
   {key: 'originterminal.name', label: 'Origin Terminal'},
   {key: 'tripstatus.name', label: 'Status'},
   {key: 'actions', label: 'Actions'}
@@ -27,7 +28,8 @@ export const TRIP_MAIN_FORM_META: FormField[] = [
   {name: 'toarrival', type: 'time-range', label: 'Arrival Time', required: true, mode: 'none'},
   {name: 'triptype', type: 'select', label: 'Trip Type', required: true, mode: 'options'},
   {name: 'originterminal', type: 'select', label: 'Origin Terminal', required: true, mode: 'options'},
-  {name: 'tripstatus', type: 'select', label: 'Status', required: true, mode: 'options'}
+  {name: 'tripstatus', type: 'select', label: 'Status', required: true, mode: 'options'},
+  {name: 'opcalender', type: 'select', label: 'OP Calender', required: true, mode: 'options'}
 ] as FormField[];
 
 export const TRIP_DATA_EXPORT_META = [

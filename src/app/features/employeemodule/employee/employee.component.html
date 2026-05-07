@@ -1,135 +1,136 @@
-<div class="container">
-  <h2>Employee Management</h2>
-</div>
+<div class="employee-dashboard-container">
 
-<!-- ===== Action Panel ===== -->
-<app-button-panel
-  [buttons]="actionPanelConfig"
-  (actionClicked)="onActionTriggered($event)"
-  (dropdownClicked)="onDropdownOnlyClick($event)"
-  [contextData]="{ selectedRows: this.selectedRows }"
->
-</app-button-panel>
-
-<!-- ===== Filter Section ===== -->
-<div *ngIf="filterForm && dataInitialized" id="serverSearch">
-  <form [formGroup]="filterForm">
-    <dynamic-field
-      *ngFor="let field of filterFormMeta"
-      [formInstance]="filterForm"
-      [field]="field"
+  <div class="header-section">
+    <div class="title-wrapper">
+      <h2>Employee Management</h2>
+    </div>
+    <app-button-panel
+      [buttons]="actionPanelConfig"
+      (actionClicked)="onActionTriggered($event)"
+      (dropdownClicked)="onDropdownOnlyClick($event)"
+      [contextData]="{ selectedRows: this.selectedRows }"
     >
-    </dynamic-field>
-  </form>
+    </app-button-panel>
+  </div>
+
+  <section *ngIf="filterForm && dataInitialized" id="serverSearch">
+    <form [formGroup]="filterForm">
+      <dynamic-field
+        *ngFor="let field of filterFormMeta"
+        [formInstance]="filterForm"
+        [field]="field">
+      </dynamic-field>
+    </form>
+  </section>
+
+  <section class="main-content-area">
+    <app-side-view
+      [opened]="activeEmployee !== null"
+      [data]="activeEmployee"
+      [title]="'Employee Intelligence'"
+      [viewTemplate]="employeeDetailTemplate"
+      (closed)="onCloseDetailView()"
+    >
+      <app-data-table
+        [data]="employees"
+        [columns]="tableColumns"
+        [sortable]="true"
+        [paginatable]="true"
+        [pageSizeOptions]="[10, 20]"
+        (rowClick)="onRowClick($event)"
+        (actionClick)="onRowAction($event.action, $event.row)"
+        (checkBoxClick)="onRowCheckboxChanged($event)"
+        (selectAllClick)="onSelectAll($event)"
+      >
+        <ng-template tableCell="actions" let-row let-action="action">
+          <button mat-icon-button (click)="action('edit', row); $event.stopPropagation()">
+            <mat-icon color="primary">edit</mat-icon>
+          </button>
+        </ng-template>
+      </app-data-table>
+    </app-side-view>
+  </section>
 </div>
 
-<!-- ===== Main Table with Side View ===== -->
-<app-side-view
-  [opened]="activeEmployee !== null"
-  [data]="activeEmployee"
-  [title]="'Employee Details'"
-  [viewTemplate]="employeeDetailTemplate"
-  (closed)="onCloseDetailView()"
->
-  <app-data-table
-    [data]="employees"
-    [columns]="tableColumns"
-    [sortable]="true"
-    [paginatable]="true"
-    [pageSizeOptions]="[10, 20]"
-    (rowClick)="onRowClick($event)"
-    (actionClick)="onRowAction($event.action, $event.row)"
-    (checkBoxClick)="onRowCheckboxChanged($event)"
-    (selectAllClick)="onSelectAll($event)"
-  >
-    <!-- Row Actions -->
-    <ng-template tableCell="actions" let-row let-action="action">
-      <button mat-button (click)="action('edit', row); $event.stopPropagation()">
-        <mat-icon>mode_edit</mat-icon>
-      </button>
-    </ng-template>
-  </app-data-table>
-</app-side-view>
-
-
-
-
-<!--Template for detail view -->
 <ng-template #employeeDetailTemplate let-row>
-  <div  class="employee-detail-container">
-    <!-- Header -->
+  <div class="employee-detail-container">
+
     <div class="header">
       <div class="title-section">
-        <mat-icon color="primary" class="employee-icon">{{row.image}}</mat-icon>
+        <mat-icon class="employee-icon">account_circle</mat-icon>
         <div>
           <h2 class="employee-title">{{ row.fullname }}</h2>
-          <p class="employee-subtitle">Number: {{ row.number }}</p>
+          <p class="employee-subtitle">Emp No: {{ row.number }}</p>
         </div>
       </div>
-
-          <span
-            class="status-chip"
-            [ngClass]="{
-        'active': row.employeestatus.name === 'Active',
-        'suspend': row.employeestatus.name === 'Suspend',
-        'resigned': row.employeestatus.name === 'Resigned',
-        'Onleave': row.employeestatus.name === 'On leave'
-      }">
-      {{ row.employeestatus.name }}
+      <span class="status-chip" [ngClass]="row.employeestatus.name.toLowerCase().replace(' ', '')">
+        {{ row.employeestatus.name }}
       </span>
     </div>
 
     <mat-divider></mat-divider>
 
-    <!-- General Info -->
-    <div class="info-grid">
-      <div class="info-item">
-        <span class="label">NIC</span>
-        <span class="value">{{ row.nic || '-' }}</span>
+    <div class="detail-section">
+      <h3 class="section-label">Personal Identity</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">NIC Number</span>
+          <span class="value">{{ row.nic || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Gender</span>
+          <span class="value">{{ row.gender?.name || '-' }}</span>
+        </div>
       </div>
-      <div class="info-item">
-        <span class="label">Gender</span>
-        <span class="value">{{ row.gender.name || '-' }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">Mobile</span>
-        <span class="value">{{ row.mobile || '-' }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">Email</span>
-        <span class="value">{{ row.email || '-' }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">Address</span>
-        <span class="value">{{ row.address || '-' }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">Emergency Contact</span>
-        <span class="value">{{ row.emergencycontact || '-' }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">Branch</span>
-        <span class="value">{{ row.branch.name || '-' }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">Department</span>
-        <span class="value">{{ row.department.name || '-' }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">Designation</span>
-        <span class="value">{{ row.designation.name || '-' }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">Type</span>
-        <span class="value">{{ row.employeetype.name || '-' }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">Date of Joined</span>
-        <span class="value">{{ row.doj | date: 'mediumDate' }}</span>
-      </div>
-
     </div>
-    <mat-divider></mat-divider>
+
+    <div class="detail-section">
+      <h3 class="section-label">Contact Details</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Mobile</span>
+          <span class="value">{{ row.mobile || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Email Address</span>
+          <span class="value">{{ row.email || '-' }}</span>
+        </div>
+        <div class="info-item full-width">
+          <span class="label">Residential Address</span>
+          <span class="value">{{ row.address || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Emergency Contact</span>
+          <span class="value">{{ row.emergencycontact || '-' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h3 class="section-label">Employment Information</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Branch</span>
+          <span class="value">{{ row.branch?.name || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Department</span>
+          <span class="value">{{ row.department?.name || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Designation</span>
+          <span class="value">{{ row.designation?.name || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Employee Type</span>
+          <span class="value">{{ row.employeetype?.name || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Date of Joined</span>
+          <span class="value">{{ row.doj | date: 'mediumDate' }}</span>
+        </div>
+      </div>
+    </div>
+
   </div>
 </ng-template>
-

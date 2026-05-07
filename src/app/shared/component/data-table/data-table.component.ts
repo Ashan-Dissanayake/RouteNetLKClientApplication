@@ -95,7 +95,7 @@ export class DataTableComponent<T = any> implements OnChanges, AfterViewInit,OnD
 
   getValue(row: T, key: string) {
     if (row == null) return '';
-    return key.split('.').reduce((acc: any, part) => acc?.[part], row) ?? '';
+    return key.split('.').reduce((acc: any, part) => acc?.[part], row) ?? 'N/A';
   }
 
   onRowClicked(row: T) {

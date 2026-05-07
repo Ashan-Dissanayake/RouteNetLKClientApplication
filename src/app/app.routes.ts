@@ -36,6 +36,9 @@ export const routes: Routes = [
       },
       { path: 'roster', loadComponent: () => import('./features/rostermodule/roster/roster.component').
         then(m => m.RosterComponent)
+      },
+      { path: 'trip-execution', loadComponent: () => import('./features/tripexecution/tripexecution/tripexecution.component').
+        then(m => m.TripExecutionComponent)
       }
     ]
   },

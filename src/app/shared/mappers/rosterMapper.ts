@@ -11,7 +11,7 @@ export class RosterMapper{
   }
 
 
-  private static formatDate(date: any): string{
+  public static formatDate(date: any): string{
     const d = new Date(date);
     return d.toLocaleDateString('en-CA');
   }

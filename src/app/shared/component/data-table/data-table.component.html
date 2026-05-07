@@ -1,6 +1,6 @@
 
 <div class="table-wrapper" [ngClass]="tableClass" >
-  <mat-table [dataSource]="dataSource" matSort *ngIf="dataSource">
+  <mat-table [dataSource]="dataSource" matSort *ngIf="dataSource" class="mat-elevation-z0">
 
     <!-- Checkbox Column -->
     <ng-container matColumnDef="select">
@@ -37,7 +37,7 @@
     </ng-container>
 
     <!-- Header Row -->
-    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-header-row *matHeaderRowDef="displayedColumns;" ></mat-header-row>
     <!--  Data Row-->
     <mat-row *matRowDef="let row; columns: displayedColumns" (click)="onRowClicked(row)"></mat-row>
 

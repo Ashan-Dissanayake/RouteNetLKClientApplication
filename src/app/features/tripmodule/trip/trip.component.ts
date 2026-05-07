@@ -129,6 +129,7 @@ export class TripComponent  implements OnInit, OnDestroy {
       branch: metadata.branches,
       triptype: metadata.tripTypes,
       tripstatus: metadata.tripStatuses,
+      opcalender: metadata.opCalenders,
       permite: metadata.permits,
       originterminal: metadata.originTerminals,
     });

@@ -83,6 +83,12 @@ export const ApiEndpoints = {
     TRIP:`${BASE_URL}/trips`,
     TRIP_TYPE:`${BASE_URL}/trip-types/summaries`,
     TRIP_STATUS:`${BASE_URL}/trip-statuses/summaries`,
+    OP_CALENDER:`${BASE_URL}/op-calenders/summaries`,
     ORIGIN_TERMINAL:`${BASE_URL}/origin-terminals/summaries`,
+
+    //
+    TRIP_EXECUTION:`${BASE_URL}/trip-execution`,
+    TRIP_EXECUTION_GENERATE_ASSIGNMENT:`${BASE_URL}/trip-execution/generate-assignments`,
+    TRIP_EXECUTION_INITIALIZATION:`${BASE_URL}/trip-execution/initialize`,
 
 } as const;

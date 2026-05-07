@@ -2,14 +2,11 @@ import {Injectable} from '@angular/core';
 import {BehaviorSubject, finalize, forkJoin, Observable, tap, throwError} from 'rxjs';
 import {Part} from './entity/part';
 import {PartService} from './service/part.service';
-import {PartCategoryService} from './service/partcategory.service';
 import {PartMasterService} from './service/partmaster.service';
 import {RegexService} from '../../core/regex.service';
 import {PartStatusService} from './service/partstatus.service';
 import {PartStatus} from './entity/partstatus';
 import {catchError, map} from 'rxjs/operators';
-import {PartCategory} from './entity/partcategory';
-import {UnitOfMeasure} from './entity/unitofmeasure';
 import {Regex} from '../../shared/models/regex.model';
 import {Branch} from '../branchmodule/entity/branch';
 import {BranchService} from '../branchmodule/services/branch.service';
@@ -50,8 +47,6 @@ export class PartFacadeService {
     return forkJoin({
       partStatuses:this.loadPartStatuses(),
       partMasters:this.loadPartMasters(),
-      // partCategories:this.loadPartCategories(),
-      // unitOfMeasurement:this.loadUnitOfMeasurements(),
       branches:this.loadBranches(),
       regexes: this.loadStaticRegexes(),
     }).pipe(
@@ -104,9 +99,7 @@ export class PartFacadeService {
 
   // ===== Metadata Loading =====
   loadPartStatuses(): Observable<PartStatus[]> { return this.partStatusService.get().pipe(map(res => res.data)); }
-  // loadPartCategories(): Observable<PartCategory[]> { return this.partCategoryService.get().pipe(map(res => res.data)); }
   loadPartMasters(): Observable<PartMaster[]> { return this.partMasterService.get().pipe(map(res => res.data)); }
-  // loadUnitOfMeasurements(): Observable<UnitOfMeasure[]> { return this.unitOfMeasureService.get().pipe(map(res => res.data)); }
   loadStaticRegexes(): Observable<Regex> { return this.regexService.getStaticRegexes('parts').pipe(map(res => res.data)); }
   loadBranches(): Observable<Branch[]> {return this.branchService.getSummary().pipe(map(res => res.data));}
 

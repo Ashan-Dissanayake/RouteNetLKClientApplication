@@ -181,7 +181,6 @@ export class RosterComponent {
       .subscribe({
         next: () => {
           this.dialogService.showSuccess('Crew assigned successfully.');
-          // MANUALLY REFRESH DATA AFTER SUCCESS
           this.rosterFacade.loadRosterShifts(this.selectedRosterId!).subscribe();
           this.rosterFacade.loadRosterShiftAssignments(this.selectedRosterId!).subscribe();
         },
@@ -195,7 +194,6 @@ export class RosterComponent {
       .subscribe({
         next: () => {
           this.dialogService.showSuccess('Approved successfully.');
-          // REFRESH DATA TO SHOW NEW STATUS
           if (this.selectedRosterId) {
             this.rosterFacade.loadRosterShiftAssignments(this.selectedRosterId).subscribe();
           }
@@ -213,7 +211,6 @@ export class RosterComponent {
       .subscribe({
         next: () => {
           this.dialogService.showSuccess('Rejected successfully.');
-          // REFRESH DATA TO SHOW NEW STATUS
           if (this.selectedRosterId) {
             this.rosterFacade.loadRosterShiftAssignments(this.selectedRosterId).subscribe();
           }

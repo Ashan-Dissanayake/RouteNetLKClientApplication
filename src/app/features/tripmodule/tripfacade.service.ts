@@ -14,6 +14,8 @@ import {TripType} from './entity/triptype';
 import {Permit} from '../permitmodule/entity/permit';
 import {TripStatus} from './entity/tripstatus';
 import {OriginTerminal} from './entity/originterminal';
+import {OpCalender} from './entity/opcalender';
+import {OpCalenderService} from './service/opcalender.service';
 
 @Injectable({
   providedIn: 'root',
@@ -37,6 +39,7 @@ export class TripFacadeService{
     private tripTypeService:TripTypeService,
     private permitService:PermitService,
     private tripStatusService:TripStatusService,
+    private opCalenderService:OpCalenderService,
     private originTerminalService:OriginTerminalService,
     private tripService:TripService
   ) {
@@ -53,6 +56,7 @@ export class TripFacadeService{
       tripTypes:this.loadTripTypes(),
       permits:this.loadPermits(),
       tripStatuses:this.loadTripStatus(),
+      opCalenders:this.loadOpCalenders(),
       originTerminals:this.loadOriginTerminals(),
     }).pipe(
       tap(metadata => this.metadataSubject.next(metadata)),
@@ -111,6 +115,7 @@ export class TripFacadeService{
   loadTripTypes(): Observable<TripType[]> { return this.tripTypeService.get().pipe(map(res => res.data)); }
   loadPermits(): Observable<Permit[]> { return this.permitService.getSummary().pipe(map(res => res.data)); }
   loadTripStatus(): Observable<TripStatus[]> { return this.tripStatusService.get().pipe(map(res => res.data)); }
+  loadOpCalenders(): Observable<OpCalender[]> { return this.opCalenderService.get().pipe(map(res => res.data)); }
   loadOriginTerminals(): Observable<OriginTerminal[]> { return this.originTerminalService.get().pipe(map(res => res.data)); }
 
   private refreshTrips(): void {
