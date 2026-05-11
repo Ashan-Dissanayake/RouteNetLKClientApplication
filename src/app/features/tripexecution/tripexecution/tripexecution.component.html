@@ -19,15 +19,13 @@
             </dynamic-field>
           </div>
           <div class="form-actions">
-            <button mat-button (click)="initialize()">Initialize</button>
+            <button mat-button (click)="initializeTripExecution()">Initialize</button>
             <button mat-button class="btn-secondary" (click)="cancel()">Cancel</button>
           </div>
         </form>
       </mat-card-content>
     </mat-card>
   </section>
-
-
 
   <section class="grid-execution-summary">
     <mat-card>
@@ -69,18 +67,36 @@
             </div>
           </div>
 
+          <div class="info-group">
+            <div class="info-row">
+              <span class="label">Start Odo:</span>
+              <span class="value">{{ activeTripExecution.startodometer || 'N/A' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">End Odo:</span>
+              <span class="value">{{ activeTripExecution.endodometer || 'N/A' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Passenger Count</span>
+              <span class="value">{{ activeTripExecution.passengercount || 'N/A' }}</span>
+            </div>
+          </div>
+
           <div class="execution-actions">
             <button mat-flat-button color="primary" [matMenuTriggerFor]="statusMenu">
               <mat-icon>traffic</mat-icon>
               UPDATE TRIP STATUS
             </button>
-            <mat-menu #statusMenu="matMenu" >
-              <button mat-menu-item (click)="changeStatus('scheduled')">Scheduled</button>
-              <button mat-menu-item (click)="changeStatus('dispatched')">Dispatched</button>
-              <button mat-menu-item (click)="changeStatus('active')"> Set Active</button>
-              <button mat-menu-item (click)="changeStatus('completed')"> Mark Completed</button>
-              <button mat-menu-item (click)="changeStatus('interrupted')">Interrupted (Issue)</button>
-              <button mat-menu-item (click)="changeStatus('cancelled')">Cancel Trip</button>
+            <mat-menu #statusMenu="matMenu">
+              <ng-container *ngIf="metadata$ | async as metadata">
+                <ng-container *ngFor="let opt of metadata.tripExecutionStatuses">
+                  <button mat-menu-item
+                          *ngIf="!['Scheduled', 'Completed'].includes(opt.name)"
+                          (click)="changeStatus(opt.name)">
+                    {{ opt.name }}
+                  </button>
+                </ng-container>
+              </ng-container>
             </mat-menu>
           </div>
         </div>

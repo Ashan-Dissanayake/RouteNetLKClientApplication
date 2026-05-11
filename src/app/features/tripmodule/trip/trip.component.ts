@@ -45,7 +45,6 @@ import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
     TableCellDirective,
     MatIcon,
     NgClass,
-    MatHint,
     MatMenu,
     MatIconButton,
     MatMenuTrigger,

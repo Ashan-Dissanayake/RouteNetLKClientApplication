@@ -1,14 +1,17 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {MatProgressBar} from '@angular/material/progress-bar';
-import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
+import {MatCard, MatCardContent, MatCardFooter, MatCardHeader, MatCardTitle} from '@angular/material/card';
 import {MatButton, MatIconButton} from '@angular/material/button';
-import {TRIP_EXECUTION_MAIN_FORM_META, TRIP_EXECUTION_TABLE_META} from '../tripexecution.meta';
+import {
+  TRIP_EXECUTION_MAIN_FORM_META,
+  TRIP_EXECUTION_TABLE_META,
+} from '../tripexecution.meta';
 import {async, finalize, Observable, Subject, takeUntil} from 'rxjs';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {DialogService} from '../../../core/dialog.service';
 import {FormbuilderService} from '../../../core/formbuilder.service';
 import {TripExecutionFacadeService} from '../tripexecutionfacade.service';
-import {PART_REQUEST_MAIN_FORM_META, PART_REQUEST_TABLE_META} from '../../partrequestmodule/partrequest.meta';
+import {PART_REQUEST_MAIN_FORM_META} from '../../partrequestmodule/partrequest.meta';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
 import {AsyncPipe, formatDate, LowerCasePipe, NgClass, NgForOf, NgIf, UpperCasePipe} from '@angular/common';
 import {DataTableComponent} from '../../../shared/component/data-table/data-table.component';
@@ -19,7 +22,6 @@ import {MatTooltip} from '@angular/material/tooltip';
 import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
 import {MatDivider} from '@angular/material/divider';
 import {MatChip} from '@angular/material/chips';
-import {Trip} from '../../tripmodule/entity/trip';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
 
 @Component({
@@ -51,6 +53,7 @@ import {MatProgressSpinner} from '@angular/material/progress-spinner';
     UpperCasePipe,
     LowerCasePipe,
     MatProgressSpinner,
+    MatCardFooter,
   ],
   templateUrl: './tripexecution.component.html',
   styleUrl: './tripexecution.component.scss',
@@ -71,12 +74,11 @@ export class TripExecutionComponent implements OnInit, OnDestroy{
   // ===== Forms =====
   protected mainForm: FormGroup = new FormGroup({});
 
+  // ===== Control Variables =====
   protected activeTripExecution: any | null = null;
   isAssigning = false;
 
   protected readonly async = async;
-
-
 
   constructor(
     private tripExecutionFacade: TripExecutionFacadeService,
@@ -127,7 +129,7 @@ export class TripExecutionComponent implements OnInit, OnDestroy{
     });
   }
 
-  protected initialize() {
+  protected initializeTripExecution() {
     this.formBuilderService.handleSave(this.mainForm, 'Trip Execution', (payload) => {
       payload.doservice = formatDate(payload.doservice, 'yyyy-MM-dd', 'en-US');
       this.tripExecutionFacade.initializeTripExecution(payload)
@@ -136,7 +138,7 @@ export class TripExecutionComponent implements OnInit, OnDestroy{
           next: () => {
             this.dialogService.showSuccess('Successfully Initialized.');
             this.formBuilderService.resetForm(this.mainForm);
-            // this.reload();
+            this.reload();
           },
           error: (err) => this.dialogService.showWarning('Error', err.errorMessage)
         });
@@ -167,21 +169,40 @@ export class TripExecutionComponent implements OnInit, OnDestroy{
   protected onRowClick(row: any): void {
     this.activeTripExecution = row;
   }
+
   protected onRowAction(action: string, row: any) {
-    console.log(row)
-    if (action === 'assigned') this.assignedResource(row);
+    if (action === 'assigned' && row.vehicle == null) this.assignedResource(row);
   }
 
   protected changeStatus(status: string) {
-   console.log(status)
+   if (status.toLowerCase() == 'checked in' ) this.checkedIn();
+   if (status.toLowerCase() == 'dispatched' )  this.dispatched();
+   if (status.toLowerCase() == 'in progress' )  this.inProgress();
+   if (status.toLowerCase() == 'arrived' )  this.arrived();
+   if (status.toLowerCase() == 'breakdown' )  this.breakdown();
+   if (status.toLowerCase() == 'cancelled' ) this.cancelled();
+   if (status.toLowerCase() == 'completed' )  this.completed();
   }
 
-  private statusActionHandlers: Record<string, () => void> = {
-    'scheduled': () =>console.log("1"),
-    'dispatched': () => console.log("1"),
-    'active': () => console.log("1"),
-    'completed': () => console.log("1"),
-    'interrupted': () => console.log("1"),
-    'cancelled': () => console.log("1"),
-  };
+  private checkedIn(): void  { this.updateTripStatus(this.tripExecutionFacade.checkedIn(this.activeTripExecution.id)); }
+  private dispatched(): void { this.updateTripStatus(this.tripExecutionFacade.dispatched(this.activeTripExecution.id)); }
+  private inProgress(): void { this.updateTripStatus(this.tripExecutionFacade.inProgress(this.activeTripExecution.id)); }
+  private arrived(): void { this.updateTripStatus(this.tripExecutionFacade.arrived(this.activeTripExecution.id)); }
+  private breakdown(): void  { this.updateTripStatus(this.tripExecutionFacade.breakdown(this.activeTripExecution.id));}
+  private completed(): void  { this.updateTripStatus(this.tripExecutionFacade.completed(this.activeTripExecution.id));}
+  private cancelled(): void  { this.updateTripStatus(this.tripExecutionFacade.cancelled(this.activeTripExecution.id)); }
+
+  private updateTripStatus(updateObservable$: Observable<any>): void {
+    updateObservable$.pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => this.dialogService.showSuccess('Successfully Updated.'),
+      error: (err) => this.dialogService.showMessage({
+        heading: 'Failed to Update Status',
+        message: err.errorMessage
+      }),
+      complete: () => {
+        this.reload();
+        this.activeTripExecution = null;
+      }
+    });
+  }
 }

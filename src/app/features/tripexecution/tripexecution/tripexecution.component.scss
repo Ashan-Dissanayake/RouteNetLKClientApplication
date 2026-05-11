@@ -6,14 +6,15 @@ $border-color: #e0e0e0;
 $bg-light: #f8f9fa;
 $btn-radius: 4px;
 $execution-status-colors: (
-  'scheduled': (color: #2b6cb0, bg: #ebf8ff), // Blue - Waiting
-  'dispatched': (color: #2c5282, bg: #bee3f8), // Deep Blue - Ready at Bay
-  'active': (color: #22543d, bg: #c6f6d5), // Green - On the road
-  'completed': (color: #4a5568, bg: #edf2f7), // Gray - Finished
-  'cancelled': (color: #822727, bg: #fed7d7), // Red - Terminated
-  'interrupted': (color: #744210, bg: #feebc8) // Orange - Breakdown/Issue
+  'scheduled': (color: #2D3748, bg: #E2E8F0),   // Slate - Initial state
+  'checked-in': (color: #553C9A, bg: #E9D8FD),  // Purple - On-site/Arrival
+  'dispatched': (color: #2B6CB0, bg: #EBF8FF),  // Blue - Left the origin
+  'arrived': (color: #2C7A7B, bg: #E6FFFA),     // Teal - Reached destination
+  'active': (color: #2F855A, bg: #F0FFF4),      // Green - In progress
+  'completed': (color: #1A202C, bg: #F7FAFC),   // Dark Gray - Finalized
+  'cancelled': (color: #C53030, bg: #FFF5F5),   // Red - Aborted
+  'breakdown': (color: #C05621, bg: #FFFAF0)    // Orange - Issue/Warning
 );
-
 
 
 // 2. MAIN LAYOUT

@@ -14,7 +14,6 @@ import {MatDualListboxComponent} from '../dual-list-box/mat-dual-listbox.compone
 import {MatOption, MatSelect} from '@angular/material/select';
 import {MatNativeDateModule} from '@angular/material/core';
 import {FilePickerComponent} from '../file-picker/file-picker.component';
-import {DataTableComponent} from '../data-table/data-table.component';
 import {InnerableComponent} from '../innertable/innertable.component';
 import {
   MatTimepicker,
@@ -205,7 +204,6 @@ import {
     MatOption,
     FormsModule,
     FilePickerComponent,
-    DataTableComponent,
     InnerableComponent,
     MatTimepickerToggle,
     MatTimepicker,
@@ -219,7 +217,6 @@ export class DynamicFieldComponent implements AfterViewInit{
 
   endDate: Date | undefined;
   @ViewChild('picker') picker!: MatDatepicker<any>;
-
 
   compareFn(o1: any | null, o2: any | null): boolean {
     if (!o1 || !o2) {

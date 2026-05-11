@@ -10,6 +10,9 @@ export const TRIP_EXECUTION_TABLE_META = [
   {key: 'vehicleNumber', label: 'Bus Number'},
   {key: 'driverName', label: 'Driver Name'},
   {key: 'conductorName', label: 'Conductor Name'},
+  {key: 'startodometer', label: 'Start Odo:'},
+  {key: 'endodometer', label: 'Start Odo:'},
+  {key: 'passengercount', label: 'Passenger Count'},
   {key: 'status', label: 'Status'},
   {key: 'actions', label: 'Actions'}
 ];
@@ -24,6 +27,12 @@ export const TRIP_EXECUTION_MAIN_FORM_META: FormField[] = [
   {name: 'branch', type: 'select', label: 'Branch', required: true, mode: 'options'},
   {name: 'doservice', type: 'date', label: 'Service Date', required: true, mode: 'date'},
 ] as FormField[];
+
+export const TRIP_EXECUTION_UPDATE_FORM_META:FormField[] = [
+  {name: 'startodometer', type: 'text', label: 'Start Odometer', required: false, mode: 'none'},
+  {name: 'endodometer', type: 'text', label: 'End Odometer', required: false, mode: 'none'},
+  {name: 'passengercount', type: 'text', label: 'Passenger Count', required: false, mode: 'none'},
+]
 
 export const TRIP_EXECUTION_DATA_EXPORT_META = [
   { key:'partmaster.sku', header: 'SKU' },

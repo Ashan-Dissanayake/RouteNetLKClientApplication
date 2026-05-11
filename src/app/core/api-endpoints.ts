@@ -88,6 +88,7 @@ export const ApiEndpoints = {
 
     //
     TRIP_EXECUTION:`${BASE_URL}/trip-execution`,
+    TRIP_EXECUTION_STATUS:`${BASE_URL}/trip-execution-statuses/summaries`,
     TRIP_EXECUTION_GENERATE_ASSIGNMENT:`${BASE_URL}/trip-execution/generate-assignments`,
     TRIP_EXECUTION_INITIALIZATION:`${BASE_URL}/trip-execution/initialize`,
 

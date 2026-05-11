@@ -27,4 +27,60 @@ export class TripExecutionService extends BaseHttpService <TripExecution>{
     return this.post(ApiEndpoints.TRIP_EXECUTION_GENERATE_ASSIGNMENT,data);
   }
 
+  checkedIn(id: number): Observable<TripExecution> {
+    return this.postActionById(
+      ApiEndpoints.TRIP_EXECUTION,
+      id,
+      'checked-in'
+    );
+  }
+
+  dispatched(id: number): Observable<TripExecution> {
+    return this.postActionById(
+      ApiEndpoints.TRIP_EXECUTION,
+      id,
+      'dispatched'
+    );
+  }
+
+  inProgress(id: number): Observable<TripExecution> {
+    return this.postActionById(
+      ApiEndpoints.TRIP_EXECUTION,
+      id,
+      'in-progress'
+    );
+  }
+
+  arrived(id: number): Observable<TripExecution> {
+    return this.postActionById(
+      ApiEndpoints.TRIP_EXECUTION,
+      id,
+      'arrived'
+    );
+  }
+
+  breakdown(id: number): Observable<TripExecution> {
+    return this.postActionById(
+      ApiEndpoints.TRIP_EXECUTION,
+      id,
+      'breakdown'
+    );
+  }
+
+  completed(id: number): Observable<TripExecution> {
+    return this.postActionById(
+      ApiEndpoints.TRIP_EXECUTION,
+      id,
+      'completed'
+    );
+  }
+
+  cancelled(id: number): Observable<TripExecution> {
+    return this.postActionById(
+      ApiEndpoints.TRIP_EXECUTION,
+      id,
+      'cancelled'
+    );
+  }
+
 }
