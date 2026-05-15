@@ -1,0 +1,178 @@
+$text-main: #333;
+$text-muted: #666;
+$text-label: #777;
+$font-family: Roboto, 'Segoe UI', sans-serif;
+
+$status-colors: (
+  'reported': (color: #c53030, bg: #fff5f5),
+  'in-progress': (color: #2b6cb0, bg: #ebf8ff),
+  'vehicle-recovery': (color: #744210, bg: #feebc8),
+  'pending-allocation': (color: #4a5568, bg: #edf2f7),
+  'resolved': (color: #22543d, bg: #c6f6d5),
+  'closed': (color: #ffffff, bg: #10a695)
+);
+
+.container {
+  padding: 10px;
+}
+
+#serverSearch {
+  ::ng-deep .mat-mdc-form-field {
+    width: unset !important;
+    padding-inline-start: 20px;
+  }
+}
+
+.incident-detail-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1rem;
+  color: $text-main;
+  font-family: $font-family;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .title-section {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      .incident-icon {
+        font-size: 25px;
+      }
+      .incident-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      .incident-subtitle {
+        font-size: 0.9rem;
+        color: $text-muted;
+        margin: 0;
+      }
+    }
+  }
+
+  .status-chip {
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-radius: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    @each $status, $colors in $status-colors {
+      &.#{$status} {
+        color: map-get($colors, color);
+        background: map-get($colors, bg);
+      }
+    }
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 24px;
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+
+      .label {
+        font-size: 0.8rem;
+        color: $text-label;
+        margin-bottom: 2px;
+        text-transform: uppercase;
+      }
+      .value {
+        font-size: 1rem;
+        font-weight: 500;
+        color: #222;
+        word-break: break-word;
+      }
+    }
+  }
+}
+
+// 3. DETAIL VIEW STYLING
+.incident-detail-container {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    .title-section {
+      display: flex;
+      gap: 16px;
+      .incident-icon { font-size: 52px; width: 52px; height: 52px; color: #048f98; }
+      .incident-title { font-size: 1.3rem; font-weight: 700; margin: 0; color: #1a202c; }
+      .incident-subtitle { font-size: 0.9rem; color: $text-muted; }
+    }
+  }
+
+  .detail-section {
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #048f98;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      border-left: 3px solid #048f98;
+      padding-left: 8px;
+    }
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 24px;
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+
+      &.full-width { grid-column: 1 / span 2; }
+
+      .label {
+        font-size: 0.7rem;
+        color: $text-muted;
+        text-transform: uppercase;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+
+      .value {
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #1a202c;
+      }
+    }
+  }
+}
+
+
+/* Responsive adjustments */
+.coverage-grid {
+  display: flex;
+  gap: 8px;
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  @media (max-width: 800px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 500px) {
+    grid-template-columns: 1fr;
+  }
+}

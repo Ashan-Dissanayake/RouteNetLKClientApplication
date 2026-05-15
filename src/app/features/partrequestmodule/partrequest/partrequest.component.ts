@@ -20,7 +20,7 @@ import {
 } from '../../../shared/component/button/button-panel/button-panel.component';
 import {AsyncPipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
-import {MatButton} from '@angular/material/button';
+import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
 import {MatDivider} from '@angular/material/divider';
 import {MatProgressBar} from '@angular/material/progress-bar';
@@ -28,6 +28,7 @@ import {SideViewComponent} from '../../../shared/component/side-view/side-view.c
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
 import {MatIcon} from '@angular/material/icon';
 import {MatChip} from '@angular/material/chips';
+import {MatTooltip} from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-partrequest',
@@ -50,7 +51,9 @@ import {MatChip} from '@angular/material/chips';
     TableCellDirective,
     ReactiveFormsModule,
     NgClass,
-    MatChip
+    MatChip,
+    MatIconButton,
+    MatTooltip
   ],
   templateUrl: './partrequest.component.html',
   styleUrl: './partrequest.component.scss',
@@ -268,7 +271,6 @@ export class PartRequestComponent implements OnInit, OnDestroy  {
   }
 
   // ===== TrackBy for optimization =====
-
   trackByField(index: number, field: any) {
     return field.key || index;
   }

@@ -80,6 +80,7 @@ export class AppComponent {
         { icon: 'navigation', label: 'Trip', route: '/admin/trip' },
         { icon: 'calendar_month', label: 'Roster', route: '/admin/roster' },
         { icon: 'route', label: 'Trp Execution', route: '/admin/trip-execution' },
+        { icon: 'report_problem', label: 'Incident Report', route: '/admin/incident-report' },
       ],
       expanded: false
     },

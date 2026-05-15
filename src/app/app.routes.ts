@@ -39,6 +39,9 @@ export const routes: Routes = [
       },
       { path: 'trip-execution', loadComponent: () => import('./features/tripexecution/tripexecution/tripexecution.component').
         then(m => m.TripExecutionComponent)
+      },
+      { path: 'incident-report', loadComponent: () => import('./features/incidentreportmodule/incidentreport/incidentreport.component').
+        then(m => m.IncidentReportComponent)
       }
     ]
   },

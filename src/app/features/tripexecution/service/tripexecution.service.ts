@@ -7,6 +7,7 @@ import {TripExecution} from '../entity/tripexecution';
 import {Employee} from '../../employeemodule/entity/employee';
 import {ApiResponse} from '../../../shared/models/apiresponse.model';
 import {PartRequest} from '../../partrequestmodule/entity/partrequest';
+import {Branch} from '../../branchmodule/entity/branch';
 
 @Injectable({ providedIn: 'root' })
 export class TripExecutionService extends BaseHttpService <TripExecution>{
@@ -81,6 +82,10 @@ export class TripExecutionService extends BaseHttpService <TripExecution>{
       id,
       'cancelled'
     );
+  }
+
+  getSummary(): Observable<ApiResponse<TripExecution>> {
+    return this.getAll(ApiEndpoints.TRIP_EXECUTION_SUMMARIES);
   }
 
 }
