@@ -5,9 +5,9 @@ $font-family: Roboto, 'Segoe UI', sans-serif;
 
 $status-colors: (
   'reported': (color: #c53030, bg: #fff5f5),
-  'inprogress': (color: #2b6cb0, bg: #ebf8ff),
-  'vehiclerecovery': (color: #744210, bg: #feebc8),
-  'pendingallocation': (color: #4a5568, bg: #edf2f7),
+  'in-progress': (color: #2b6cb0, bg: #ebf8ff),
+  'vehicle-recovery': (color: #744210, bg: #feebc8),
+  'pending-allocation': (color: #4a5568, bg: #edf2f7),
   'resolved': (color: #22543d, bg: #c6f6d5),
   'closed': (color: #ffffff, bg: #10a695)
 );

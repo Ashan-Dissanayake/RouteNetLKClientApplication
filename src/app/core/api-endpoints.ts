@@ -95,7 +95,12 @@ export const ApiEndpoints = {
 
     //INCIDENT
     INCIDENTS:`${BASE_URL}/incidents`,
+    INCIDENTS_SUMMARIES:`${BASE_URL}/incidents/summaries`,
     INCIDENT_TYPES:`${BASE_URL}/incident-types/summaries`,
     INCIDENT_STATUS:`${BASE_URL}/incident-statuses/summaries`,
+
+    //INCIDENT VEHICLE ALLOCATION
+    INCIDENT_VEHICLE_ALLOCATION:`${BASE_URL}/incident-vehicle-allocations`,
+    INCIDENT_VEHICLE_ALLOCATION_STATUS:`${BASE_URL}/incident-vehicle-allocation-statuses/summaries`,
 
 } as const;

@@ -81,6 +81,7 @@ export class AppComponent {
         { icon: 'calendar_month', label: 'Roster', route: '/admin/roster' },
         { icon: 'route', label: 'Trp Execution', route: '/admin/trip-execution' },
         { icon: 'report_problem', label: 'Incident Report', route: '/admin/incident-report' },
+        { icon: 'settings_backup_restore', label: 'Incident Vehicle Allocation', route: '/admin/incident-vehicle-allocation' },
       ],
       expanded: false
     },

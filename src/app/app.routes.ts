@@ -42,6 +42,9 @@ export const routes: Routes = [
       },
       { path: 'incident-report', loadComponent: () => import('./features/incidentreportmodule/incidentreport/incidentreport.component').
         then(m => m.IncidentReportComponent)
+      },
+      { path: 'incident-vehicle-allocation', loadComponent: () => import('./features/incidentvehicleallocationmodule/incidentvehicleallocation/incidentvehicleallocation.component').
+        then(m => m.IncidentVehicleAllocationComponent)
       }
     ]
   },

@@ -19,7 +19,7 @@ export class IncidentService extends BaseHttpService <Incident>{
   }
 
   getSummary():Observable<ApiResponse<Incident>>{
-    return  this.getAll(ApiEndpoints.INCIDENTS);
+    return  this.getAll(ApiEndpoints.INCIDENTS_SUMMARIES);
   }
 
   save(incident:Incident):Observable<Incident>{

@@ -1,0 +1,69 @@
+<div class="container">
+  <h2>Incident Vehicle Allocation Details Management</h2>
+</div>
+<!-- Loading -->
+<mat-progress-bar *ngIf="loading$ | async" mode="indeterminate"></mat-progress-bar>
+
+<!-- Error -->
+<div *ngIf="error$ | async as error" id="error-window">
+  <mat-card>
+    <mat-card-title>Error loading parts</mat-card-title>
+    <mat-card-content>{{ error?.message }}</mat-card-content>
+    <button mat-raised-button color="primary" (click)="reload()">Retry</button>
+  </mat-card>
+</div>
+
+<!-- ===== Action Panel ===== -->
+<app-button-panel
+  *ngIf="metadata$ | async as metadata"
+  [buttons]="actionPanelConfig"
+  (actionClicked)="onActionTriggered($event)"
+  (dropdownClicked)="onDropdownOnlyClick($event)"
+  [contextData]="{ selectedRows: selectedRows }"
+>
+</app-button-panel>
+
+<div *ngIf="metadata$ | async as metadata" id="serverSearch">
+  <form [formGroup]="filterForm">
+    <dynamic-field
+      *ngFor="let field of filterFormMeta; trackBy: trackByField"
+      [formInstance]="filterForm"
+      [field]="field"
+    ></dynamic-field>
+  </form>
+</div>
+
+<!-- ===== Main Table with Side View ===== -->
+<app-data-table
+  *ngIf="(incidentVehicleAllocations$ | async)?.length"
+  [data]="(incidentVehicleAllocations$ | async) || []"
+  [columns]="tableColumns"
+  [sortable]="true"
+  [paginatable]="true"
+  [pageSizeOptions]="[10, 20]"
+  (rowClick)="onRowClick($event)"
+  (checkBoxClick)="onRowCheckboxChanged($event)"
+  (selectAllClick)="onSelectAll($event)"
+  (actionClick)="onRowAction($event.action, $event.row)"
+>
+  <!-- Row Actions -->
+  <ng-template tableCell="actions" let-row let-action="action">
+    <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
+      <mat-icon>more_horizontal</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item (click)="action('in-progress', row)">
+        <mat-icon style="color: #2b6cb0;">build</mat-icon>
+        <span>In Progress</span>
+      </button>
+      <button mat-menu-item (click)="action('released', row)">
+        <mat-icon style="color: #744210;">local_shipping</mat-icon>
+        <span>Released</span>
+      </button>
+      <button mat-menu-item (click)="action('cancelled', row)">
+        <mat-icon style="color: #4a5568;">hourglass_empty</mat-icon>
+        <span>Cancelled</span>
+      </button>
+    </mat-menu>
+  </ng-template>
+</app-data-table>

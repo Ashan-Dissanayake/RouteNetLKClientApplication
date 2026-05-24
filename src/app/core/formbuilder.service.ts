@@ -110,6 +110,17 @@ export class FormbuilderService {
     return result;
   }
 
+  //for dynamic meta data handling
+  updateOptions(fields: FormField[], form: FormGroup, fieldName: string, newOptions: any[]): void {
+    const field = fields.find(f => f.name === fieldName);
+    if (!field) return;
+
+    field.options = newOptions.map(o => ({ id: o.id, ...o }));
+
+    form.get(fieldName)?.reset();
+    form.get(fieldName)?.markAsPristine();
+  }
+
   static nonEmptyArray(): ValidatorFn {
     return (control: AbstractControl) => {
       const value = control.value;
@@ -188,6 +199,7 @@ export class FormbuilderService {
       }
     });
   }
+
 
 
 
