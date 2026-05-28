@@ -68,8 +68,8 @@ export class DialogService {
         this.showSnackBar(message, action, {duration, panelClass: ['snackbar-success']});
     }
 
-    showWarning(message: string, action = 'OK', duration = DEFAULT_CONFIG.SNACKBAR_DURATION) {
-        this.showSnackBar(message, action, {duration, panelClass: ['snackbar-warning']});
+    showWarning(message: string, action = 'OK', duration = DEFAULT_CONFIG.SNACKBAR_DURATION):any {
+       return  this.showSnackBar(message, action, {duration, panelClass: ['snackbar-warning']});
     }
 
     showError(message: string, action = 'Close', duration = DEFAULT_CONFIG.SNACKBAR_DURATION) {

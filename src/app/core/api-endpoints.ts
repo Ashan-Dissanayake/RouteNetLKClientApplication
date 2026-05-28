@@ -103,4 +103,8 @@ export const ApiEndpoints = {
     INCIDENT_VEHICLE_ALLOCATION:`${BASE_URL}/incident-vehicle-allocations`,
     INCIDENT_VEHICLE_ALLOCATION_STATUS:`${BASE_URL}/incident-vehicle-allocation-statuses/summaries`,
 
+    //FARE COLLECTION
+    FARE_COLLECTION:`${BASE_URL}/fare-collections`,
+    TICKET_MACHINES:`${BASE_URL}/ticket-machines/summaries`,
+
 } as const;

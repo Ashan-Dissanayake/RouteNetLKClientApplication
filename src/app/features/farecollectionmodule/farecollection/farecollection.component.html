@@ -1,0 +1,116 @@
+<div class="container">
+  <h2>Fare Collection Management</h2>
+</div>
+<!-- Loading -->
+<mat-progress-bar *ngIf="loading$ | async" mode="indeterminate"></mat-progress-bar>
+
+<!-- Error -->
+<div *ngIf="error$ | async as error" id="error-window">
+  <mat-card>
+    <mat-card-title>Error loading Trips</mat-card-title>
+    <mat-card-content>{{ error?.message }}</mat-card-content>
+    <button mat-raised-button color="primary" (click)="reload()">Retry</button>
+  </mat-card>
+</div>
+
+<!-- ===== Action Panel ===== -->
+<app-button-panel
+  *ngIf="metadata$ | async as metadata"
+  [buttons]="actionPanelConfig"
+  (actionClicked)="onActionTriggered($event)"
+  (dropdownClicked)="onDropdownOnlyClick($event)"
+  [contextData]="{ selectedRows: selectedRows }"
+>
+</app-button-panel>
+
+<div *ngIf="metadata$ | async as metadata" id="serverSearch">
+  <form [formGroup]="filterForm">
+    <dynamic-field
+      *ngFor="let field of filterFormMeta; trackBy: trackByField"
+      [formInstance]="filterForm"
+      [field]="field"
+    ></dynamic-field>
+  </form>
+</div>
+
+<!-- ===== Main Table with Side View ===== -->
+<app-side-view
+  [opened]="activeRow !== null"
+  [data]="activeRow"
+  [title]="'Fare Collection Details'"
+  [viewTemplate]="tripDetailTemplate"
+  (closed)="onCloseDetailView()"
+>
+  <app-data-table
+    *ngIf="(fareCollections$ | async)?.length"
+    [data]="(fareCollections$ | async) || []"
+    [columns]="tableColumns"
+    [sortable]="true"
+    [paginatable]="true"
+    [pageSizeOptions]="[10, 20]"
+    (rowClick)="onRowClick($event)"
+    (checkBoxClick)="onRowCheckboxChanged($event)"
+    (selectAllClick)="onSelectAll($event)"
+    (actionClick)="onRowAction($event.action, $event.row)"
+  >
+    <!-- Row Actions -->
+    <ng-template tableCell="actions" let-row let-action="action">
+      <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
+        <mat-icon>more_vert</mat-icon> </button>
+
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="action('reconciled', row)">
+          <mat-icon style="color: #22543d;">play_circle</mat-icon>
+          <span>Reconciled</span>
+        </button>
+      </mat-menu>
+    </ng-template>
+  </app-data-table>
+</app-side-view>
+
+<!--Template for detail view -->
+<ng-template #tripDetailTemplate let-row>
+  <div  class="fare-collection-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="title-section">
+        <mat-icon color="primary" class="trip-icon">precision_manufacturing</mat-icon>
+        <div>
+          <h6 class="trip-title">{{ row.branch.name }}</h6>
+          <p class="trip-subtitle">Trip: {{ row.tripexecution.name }}</p>
+        </div>
+      </div>
+    </div>
+    <mat-divider></mat-divider>
+
+    <!-- General Info -->
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="label">Ticket Machine</span>
+        <span class="value">{{ row.ticketmachine.name || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Total Tickets</span>
+        <span class="value">{{ row.totaltickets || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Cache Collected</span>
+        <span class="value">{{ row.cachecollected || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Digital Payments</span>
+        <span class="value">{{ row.digitalpayments || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Reconciled</span>
+        <span class="value">{{ row.isreconciled || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Collected Time</span>
+        <span class="value">{{ row.tocollected || '-' }}</span>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+

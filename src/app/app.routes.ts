@@ -45,6 +45,9 @@ export const routes: Routes = [
       },
       { path: 'incident-vehicle-allocation', loadComponent: () => import('./features/incidentvehicleallocationmodule/incidentvehicleallocation/incidentvehicleallocation.component').
         then(m => m.IncidentVehicleAllocationComponent)
+      } ,
+      { path: 'fare-collection', loadComponent: () => import('./features/farecollectionmodule/farecollection/farecollection.component').
+        then(m => m.FareCollectionComponent)
       }
     ]
   },

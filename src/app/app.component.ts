@@ -82,6 +82,7 @@ export class AppComponent {
         { icon: 'route', label: 'Trp Execution', route: '/admin/trip-execution' },
         { icon: 'report_problem', label: 'Incident Report', route: '/admin/incident-report' },
         { icon: 'settings_backup_restore', label: 'Incident Vehicle Allocation', route: '/admin/incident-vehicle-allocation' },
+        { icon: 'money', label: 'Fare Collection', route: '/admin/fare-collection' },
       ],
       expanded: false
     },
