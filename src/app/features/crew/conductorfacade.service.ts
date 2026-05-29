@@ -9,7 +9,7 @@ import {RouteFamiliarityService} from './service/routefamiliarity.service';
 import {CrewStatus} from './entity/crewstatus';
 import {RouteFamiliarityLevel} from './entity/routefamiliaritylevel';
 import {Employee} from '../employeemodule/entity/employee';
-import {EmployeeService} from '../employeemodule/services/employee.service';
+import {EmployeeService} from '../employeemodule/services/api/employee.service';
 import {Regex} from '../../shared/models/regex.model';
 import {RegexService} from '../../core/regex.service';
 import {DriverMapper} from '../../shared/mappers/DriverMapper';

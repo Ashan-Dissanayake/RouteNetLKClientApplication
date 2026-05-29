@@ -9,7 +9,7 @@ import {PartStatus} from './entity/partstatus';
 import {catchError, map} from 'rxjs/operators';
 import {Regex} from '../../shared/models/regex.model';
 import {Branch} from '../branchmodule/entity/branch';
-import {BranchService} from '../branchmodule/services/branch.service';
+import {BranchService} from '../branchmodule/services/api/branch.service';
 import {normalizeSearchCriteria} from '../../core/search-criteria-normalizer';
 import {PartMaster} from './entity/partmaster';
 

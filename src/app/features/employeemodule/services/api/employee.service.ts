@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
-import {BaseHttpService} from '../../../core/basehttp.service';
+import {BaseHttpService} from '../../../../core/basehttp.service';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {ApiResponse} from '../../../shared/models/apiresponse.model';
-import {ApiEndpoints} from '../../../core/api-endpoints';
-import {Employee} from '../entity/employee';
+import {ApiResponse} from '../../../../shared/models/apiresponse.model';
+import {ApiEndpoints} from '../../../../core/api-endpoints';
+import {Employee} from '../../entity/employee';
 
 @Injectable({ providedIn: 'root' })
 export class EmployeeService extends BaseHttpService <Employee>{
@@ -14,34 +14,38 @@ export class EmployeeService extends BaseHttpService <Employee>{
   }
 
   get(params?:any):Observable<ApiResponse<Employee>>{
-    return  this.getAll(ApiEndpoints.employees,params);
+    return  this.getAll(ApiEndpoints.EMPLOYEES,params);
   }
 
   getSummary():Observable<ApiResponse<Employee>>{
-    return  this.getAll(ApiEndpoints.employeesList);
+    return  this.getAll(ApiEndpoints.EMPLOYEES_SUMMARIES);
   }
 
   getByDesignationDriver():Observable<ApiResponse<Employee>>{
-    return  this.getAll(ApiEndpoints.employeesByDriver);
+    return  this.getAll(ApiEndpoints.EMPLOYEES_BY_DRIVER);
   }
 
   getByDesignationConductor():Observable<ApiResponse<Employee>>{
-    return  this.getAll(ApiEndpoints.employeesByConductor);
+    return  this.getAll(ApiEndpoints.EMPLOYEES_BY_CONDUCTOR);
   }
 
 
   save(employee:Employee):Observable<Employee>{
-    return this.post(ApiEndpoints.employees,employee);
+    return this.post(ApiEndpoints.EMPLOYEES,employee);
   }
 
   update(employee:Employee):Observable<Employee>{
-    return this.put(ApiEndpoints.employees,employee);
+    return this.put(ApiEndpoints.EMPLOYEES,employee);
   }
 
   deactivate(ids: number[] | number): Observable<number[]> {
-    // Ensure we always send an array to the backend
     const payload = Array.isArray(ids) ? ids : [ids];
-    return this.http.post<number[]>(ApiEndpoints.employeesdeactivate,payload);
+    return this.http.delete<number[]>(
+      ApiEndpoints.EMPLOYEES_DEACTIVATE,
+      {
+        body: payload
+      }
+    );
   }
 
 }

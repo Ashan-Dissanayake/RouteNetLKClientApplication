@@ -1,4 +1,4 @@
-export class Employeetype{
+export class EmployeeType{
 
   id!:number;
   name!: string;

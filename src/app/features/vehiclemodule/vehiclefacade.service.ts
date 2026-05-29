@@ -11,7 +11,7 @@ import {MakeService} from './service/make.service';
 import {FueltypeService} from './service/fueltype.service';
 import {Make} from './entity/make';
 import {Fueltype} from './entity/fueltype';
-import {BranchService} from '../branchmodule/services/branch.service';
+import {BranchService} from '../branchmodule/services/api/branch.service';
 import {Branch} from '../branchmodule/entity/branch';
 import {Regex} from '../../shared/models/regex.model';
 import {RegexService} from '../../core/regex.service';

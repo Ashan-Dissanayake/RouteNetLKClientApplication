@@ -1,10 +1,10 @@
 import {Injectable, OnDestroy} from '@angular/core';
 import {BehaviorSubject, finalize, forkJoin, Observable, Subject, takeUntil, tap, throwError} from 'rxjs';
-import {FareCollection} from '../entity/farecollection';
-import {FareCollectionService} from './farecollection.service';
+import {FareCollection} from '../../entity/farecollection';
+import {FareCollectionService} from '../api/farecollection.service';
 import {catchError, map} from 'rxjs/operators';
-import {normalizeSearchCriteria} from '../../../core/search-criteria-normalizer';
-import {EMPTY_FARE_COLLECTION_METADATA, FareCollectionMetadata} from '../meta/farecollection.metadata.model';
+import {normalizeSearchCriteria} from '../../../../core/search-criteria-normalizer';
+import {EMPTY_FARE_COLLECTION_METADATA, FareCollectionMetadata} from '../../model/farecollection.metadata.model';
 import {FareCollectionMetadataService} from './farecollection.metadata.service';
 
 @Injectable()

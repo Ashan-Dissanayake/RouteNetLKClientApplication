@@ -1,16 +1,13 @@
-// Variables - Extract Constants
-$primary-text: #333;
-$secondary-text: #666;
-$muted-text: #777;
-$border-color: #e0e0e0;
-$bg-light: #f8f8f8;
-$transition-speed: 0.2s;
+$text-main: #333;
+$text-muted: #666;
+$text-label: #777;
+$font-family: Roboto, 'Segoe UI', sans-serif;
 
-// Mixins - Extract Functionality
-@mixin status-color($color, $bg) {
-  color: $color;
-  background: $bg;
-}
+$status-colors: (
+  'ACTIVE': (color: #0b6b2f, bg: #d7f6df),
+  'SUSPENDED': (color: #000000, bg: #f5d253),
+  'CLOSED': (color: #8b0000, bg: #f9d9d9)
+);
 
 .container {
   padding: 10px;
@@ -28,8 +25,8 @@ $transition-speed: 0.2s;
   flex-direction: column;
   gap: 1.25rem;
   padding: 1rem;
-  color: $primary-text;
-  font-family: Roboto, 'Segoe UI', sans-serif;
+  color: $text-main;
+  font-family: $font-family;
 
   .header {
     display: flex;
@@ -42,9 +39,8 @@ $transition-speed: 0.2s;
       gap: 0.75rem;
 
       .branch-icon {
-        font-size: 40px;
+        font-size: 25px;
       }
-
       .branch-title {
         font-size: 1.4rem;
         font-weight: 600;
@@ -53,29 +49,24 @@ $transition-speed: 0.2s;
 
       .branch-subtitle {
         font-size: 0.9rem;
-        color: $secondary-text;
+        color: $text-muted;
         margin: 0;
       }
     }
+  }
 
-    .status-chip {
-      font-weight: 600;
-      font-size: 0.8rem;
-      padding: 4px 10px;
-      border-radius: 16px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+  .status-chip {
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-radius: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 
-      &.active {
-        @include status-color(#0b6b2f, #d7f6df);
-      }
-
-      &.suspend {
-        @include status-color(#000000, #f5d253);
-      }
-
-      &.close {
-        @include status-color(#8b0000, #f9d9d9);
+    @each $status, $colors in $status-colors {
+      &.#{$status} {
+        color: map-get($colors, color);
+        background: map-get($colors, bg);
       }
     }
   }
@@ -91,7 +82,7 @@ $transition-speed: 0.2s;
 
       .label {
         font-size: 0.8rem;
-        color: $muted-text;
+        color: $text-label;
         margin-bottom: 2px;
         text-transform: uppercase;
       }
@@ -106,78 +97,17 @@ $transition-speed: 0.2s;
   }
 }
 
-.coverage-section {
-  margin-top: 1rem;
+/* Responsive adjustments */
+.coverage-grid {
+  display: grid; // Assumed layout base
 
-  .section-title {
-    display: flex;
-    align-items: center;
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: $primary-text;
-    margin-bottom: 0.75rem;
-
-    .section-icon {
-      margin-right: 0.5rem;
-      font-size: 22px;
-    }
-  }
-
-  .coverage-grid {
-    display: grid;
+  @media (max-width: 1200px) {
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    background: $bg-light;
-    border-radius: 8px;
-    padding: 10px;
-
-    @media (max-width: 800px) {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    @media (max-width: 500px) {
-      grid-template-columns: 1fr;
-    }
   }
-
-  .coverage-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: #fff;
-    border: 1px solid $border-color;
-    border-radius: 6px;
-    padding: 12px 8px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-    text-align: center;
-    transition: transform $transition-speed ease, box-shadow $transition-speed ease;
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    }
-
-    mat-icon {
-      font-size: 20px;
-      margin-bottom: 6px;
-    }
-
-    .district-name {
-      font-weight: 600;
-      color: #222;
-      font-size: 0.95rem;
-    }
-
-    .district-id {
-      font-size: 0.8rem;
-      color: $muted-text;
-    }
+  @media (max-width: 800px) {
+    grid-template-columns: repeat(2, 1fr);
   }
-
-  .no-coverage {
-    font-size: 0.9rem;
-    color: #999;
-    font-style: italic;
-    margin-left: 1rem;
+  @media (max-width: 500px) {
+    grid-template-columns: 1fr;
   }
 }

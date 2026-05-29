@@ -7,7 +7,7 @@ import {IncidentVehicleAllocation} from './entity/incidentvehicleallocation';
 import {IncidentVehicleAllocationStatusService} from './service/incidenvehicleallocationtstatus.service';
 import {IncidentVehicleAllocationService} from './service/incidentvehicleallocation.service';
 import {VehicleService} from '../vehiclemodule/service/vehicle.service';
-import {BranchService} from '../branchmodule/services/branch.service';
+import {BranchService} from '../branchmodule/services/api/branch.service';
 import {IncidentService} from '../incidentreportmodule/service/incident.service';
 import {IncidentVehicleAllocationStatus} from './entity/incidentvehicleallocationstatus';
 import {Incident} from '../incidentreportmodule/entity/incident';

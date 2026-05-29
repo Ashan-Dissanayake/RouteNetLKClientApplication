@@ -4,7 +4,6 @@ import {HttpClient} from '@angular/common/http';
 import {ApiEndpoints} from './api-endpoints';
 import {BaseHttpService} from './basehttp.service';
 import {ApiResponse} from '../shared/models/apiresponse.model';
-import {Regex} from '../shared/models/regex.model';
 
 @Injectable({ providedIn: 'root' })
 export class NumberService extends BaseHttpService<any>{
@@ -14,7 +13,7 @@ export class NumberService extends BaseHttpService<any>{
   }
 
   getGeneratedBranchCode(branchName: string): Observable<ApiResponse<string,false>> {
-    return this.getObject<string>(`${ApiEndpoints.branchcode}/${branchName}`);
+    return this.getObject<string>(`${ApiEndpoints.BRANCH_CODE}/${branchName}`);
   }
 
   // getGeneratedEmployeeNumber(): Observable<ApiResponse<string,false>> {

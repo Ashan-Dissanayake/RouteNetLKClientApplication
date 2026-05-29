@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 import {Subject} from 'rxjs';
-import {FormbuilderService} from '../../../core/formbuilder.service';
-import {FareCollectionMetadata} from '../meta/farecollection.metadata.model';
+import {FormbuilderService} from '../../../../core/formbuilder.service';
+import {FareCollectionMetadata} from '../../model/farecollection.metadata.model';
 import {FormGroup} from '@angular/forms';
-import {FARE_COLLECTION_FILTER_FORM_META, FARE_COLLECTION_MAIN_FORM_META} from '../meta/farecollection.metadata';
+import {FARE_COLLECTION_FILTER_FORM_META, FARE_COLLECTION_MAIN_FORM_META} from '../../model/farecollection.meta';
 
 
 @Injectable()

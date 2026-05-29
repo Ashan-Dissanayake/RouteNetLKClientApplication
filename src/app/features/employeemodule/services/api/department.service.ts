@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
-import {BaseHttpService} from '../../../core/basehttp.service';
+import {BaseHttpService} from '../../../../core/basehttp.service';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {ApiResponse} from '../../../shared/models/apiresponse.model';
-import {ApiEndpoints} from '../../../core/api-endpoints';
-import {Department} from '../entity/department';
+import {ApiResponse} from '../../../../shared/models/apiresponse.model';
+import {ApiEndpoints} from '../../../../core/api-endpoints';
+import {Department} from '../../entity/department';
 
 @Injectable({ providedIn: 'root' })
 export class DepartmentService extends BaseHttpService <Department>{
@@ -14,7 +14,7 @@ export class DepartmentService extends BaseHttpService <Department>{
   }
 
   get():Observable<ApiResponse<Department>>{
-    return  this.getAll(ApiEndpoints.departments);
+    return  this.getAll(ApiEndpoints.DEPARTMENTS);
   }
 
 }

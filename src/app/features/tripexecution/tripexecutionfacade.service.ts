@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, finalize, forkJoin, Observable, tap, throwError} from 'rxjs';
-import {BranchService} from '../branchmodule/services/branch.service';
+import {BranchService} from '../branchmodule/services/api/branch.service';
 import {catchError, map} from 'rxjs/operators';
 import {Branch} from '../branchmodule/entity/branch';
 import {TripExecution} from './entity/tripexecution';

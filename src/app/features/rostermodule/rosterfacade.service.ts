@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {BranchService} from '../branchmodule/services/branch.service';
+import {BranchService} from '../branchmodule/services/api/branch.service';
 import {BehaviorSubject, finalize, forkJoin, Observable, tap, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {Roster} from './entity/roster';

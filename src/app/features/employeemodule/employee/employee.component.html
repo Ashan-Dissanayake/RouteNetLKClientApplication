@@ -13,10 +13,10 @@
     </app-button-panel>
   </div>
 
-  <section *ngIf="filterForm && dataInitialized" id="serverSearch">
+  <section *ngIf="metadata$ | async as metadata" id="serverSearch">
     <form [formGroup]="filterForm">
       <dynamic-field
-        *ngFor="let field of filterFormMeta"
+        *ngFor="let field of filterFormMeta; trackBy: trackByField"
         [formInstance]="filterForm"
         [field]="field">
       </dynamic-field>
@@ -25,14 +25,15 @@
 
   <section class="main-content-area">
     <app-side-view
-      [opened]="activeEmployee !== null"
-      [data]="activeEmployee"
+      [opened]="activeRow !== null"
+      [data]="activeRow"
       [title]="'Employee Intelligence'"
       [viewTemplate]="employeeDetailTemplate"
       (closed)="onCloseDetailView()"
     >
       <app-data-table
-        [data]="employees"
+        *ngIf="(employees$ | async)?.length"
+        [data]="(employees$ | async) || []"
         [columns]="tableColumns"
         [sortable]="true"
         [paginatable]="true"

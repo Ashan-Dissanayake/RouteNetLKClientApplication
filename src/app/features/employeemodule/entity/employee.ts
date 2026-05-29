@@ -1,6 +1,6 @@
 import {Gender} from './gender';
-import {Employeestatus} from './employeestatus';
-import {Employeetype} from './employeetype';
+import {EmployeeStatus} from './employeestatus';
+import {EmployeeType} from './employeetype';
 import {Designation} from './designation';
 import {Branch} from '../../branchmodule/entity/branch';
 import {Department} from './department';
@@ -22,7 +22,7 @@ export class Employee{
   doj!:string;
   department!:Department;
   designation!:Designation;
-  employeetype!:Employeetype;
-  employeestatus!:Employeestatus;
+  employeetype!:EmployeeType;
+  employeestatus!:EmployeeStatus;
 
 }

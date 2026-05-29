@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { ApiEndpoints } from '../../../core/api-endpoints';
-import { BranchType } from '../entity/branchtype';
-import { BaseHttpService } from '../../../core/basehttp.service';
-import { ApiResponse } from '../../../shared/models/apiresponse.model';
+import { ApiEndpoints } from '../../../../core/api-endpoints';
+import { BranchType } from '../../entity/branchtype';
+import { BaseHttpService } from '../../../../core/basehttp.service';
+import { ApiResponse } from '../../../../shared/models/apiresponse.model';
 
 
 @Injectable({ providedIn: 'root' })
@@ -17,7 +17,7 @@ export class BranchTypeService extends BaseHttpService<BranchType> {
 
 
   get(): Observable<ApiResponse<BranchType>> {
-    return this.getAll(ApiEndpoints.branchtypes);
+    return this.getAll(ApiEndpoints.BRANCH_TYPES);
   }
 
 }

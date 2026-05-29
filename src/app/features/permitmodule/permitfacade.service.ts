@@ -12,7 +12,7 @@ import {PermitStatusService} from './service/permitstatus.service';
 import {RegexService} from '../../core/regex.service';
 import {Regex} from '../../shared/models/regex.model';
 import {ServiceTypeService} from './service/servicetype.service';
-import {BranchService} from '../branchmodule/services/branch.service';
+import {BranchService} from '../branchmodule/services/api/branch.service';
 import {VehicleService} from '../vehiclemodule/service/vehicle.service';
 import {Vehicle} from '../vehiclemodule/entity/vehicle';
 import {Branch} from '../branchmodule/entity/branch';

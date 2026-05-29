@@ -1,4 +1,4 @@
-import {FormField} from '../../shared/models/formfieldata.model';
+import {FormField} from '../../../shared/models/formfieldata.model';
 
 export const EMPLOYEE_TABLE_META = [
   {key: 'number', label: 'Number'},

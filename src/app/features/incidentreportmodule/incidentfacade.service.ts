@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {BranchService} from '../branchmodule/services/branch.service';
+import {BranchService} from '../branchmodule/services/api/branch.service';
 import {BehaviorSubject, finalize, forkJoin, Observable, tap, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {normalizeSearchCriteria} from '../../core/search-criteria-normalizer';
@@ -7,7 +7,7 @@ import {Incident} from './entity/incident';
 import {TripExecutionService} from '../tripexecution/service/tripexecution.service';
 import {IncidentTypeService} from './service/incidenttype.service';
 import {IncidentStatusService} from './service/incidentstatus.service';
-import {RegionalOfficeService} from '../branchmodule/services/regionaloffice.service';
+import {RegionalOfficeService} from '../branchmodule/services/api/regionaloffice.service';
 import {IncidentService} from './service/incident.service';
 import {Branch} from '../branchmodule/entity/branch';
 import {IncidentType} from './entity/incidenttype';

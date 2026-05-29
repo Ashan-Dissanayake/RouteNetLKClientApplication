@@ -1,4 +1,4 @@
-export class Employeestatus{
+export class EmployeeStatus{
 
   id!:number;
   name!: string;

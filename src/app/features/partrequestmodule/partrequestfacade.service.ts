@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {BehaviorSubject, finalize, forkJoin, Observable, tap, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {Branch} from '../branchmodule/entity/branch';
-import {BranchService} from '../branchmodule/services/branch.service';
+import {BranchService} from '../branchmodule/services/api/branch.service';
 import {normalizeSearchCriteria} from '../../core/search-criteria-normalizer';
 import {PartRequest} from './entity/partrequest';
 import {PartRequestService} from './service/partrequest.service';

@@ -3,15 +3,15 @@ import {
   FARE_COLLECTION_DATA_EXPORT_META, FARE_COLLECTION_FILTER_FORM_META,
   FARE_COLLECTION_MAIN_FORM_META,
   FARE_COLLECTION_TABLE_META
-} from '../meta/farecollection.metadata';
+} from '../model/farecollection.meta';
 import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
 import {debounceTime, Observable, Subject, take, takeUntil} from 'rxjs';
 import {FareCollection} from '../entity/farecollection';
-import {FareCollectionMetadata} from '../meta/farecollection.metadata.model';
+import {FareCollectionMetadata} from '../model/farecollection.metadata.model';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {FareCollectionFacadeService} from '../service/farecollectionfacade.service';
+import {FareCollectionFacadeService} from '../service/util/farecollectionfacade.service';
 import {FormbuilderService} from '../../../core/formbuilder.service';
-import {FareCollectionFromService} from '../service/farecollectionfrom.service';
+import {FareCollectionFromService} from '../service/util/farecollectionfrom.service';
 import {DialogService} from '../../../core/dialog.service';
 import {CheckboxEvent, DataTableComponent} from '../../../shared/component/data-table/data-table.component';
 import {
@@ -24,7 +24,7 @@ import {MatProgressBar} from '@angular/material/progress-bar';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
-import {FareCollectionMetadataService} from '../service/farecollection.metadata.service';
+import {FareCollectionMetadataService} from '../service/util/farecollection.metadata.service';
 import {MatDivider} from '@angular/material/divider';
 import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
 import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
@@ -98,9 +98,9 @@ export class FareCollectionComponent implements OnInit,OnDestroy{
     private dialogService:DialogService,
   ) {
     this.fareCollections$ = this.facade.fareCollections$;
-    this.metadata$    = this.facade.metadata$;
-    this.loading$     = this.facade.loading$;
-    this.error$       = this.facade.error$;
+    this.metadata$ = this.facade.metadata$;
+    this.loading$ = this.facade.loading$;
+    this.error$ = this.facade.error$;
   }
 
   // ===== Lifecycle =====
@@ -155,7 +155,7 @@ export class FareCollectionComponent implements OnInit,OnDestroy{
     this.selectedCount = this.selectedRows.size;
   }
 
-  // ===== Row actions (status transitions) =====
+  // ===== Row actions =====
   protected onRowAction(action: string, row: FareCollection): void {
     const transitions: Record<string, [Observable<any>, string]> = {
       'reconciled':        [this.facade.reconciled(row),        'Fare Collection is Reconciled.']
@@ -230,11 +230,6 @@ export class FareCollectionComponent implements OnInit,OnDestroy{
     });
   }
 
-  // ===== Template helper =====
-  protected trackByField(_: number, field: any): any {
-    return field.key ?? _;
-  }
-
   // ===== Export =====
   protected toPdf(): void {
     this.fareCollections$.pipe(take(1)).subscribe(selectedArray => {
@@ -260,4 +255,11 @@ export class FareCollectionComponent implements OnInit,OnDestroy{
     }
     exportToExcel(Array.from(this.selectedRows), this.exportMeta, 'far-collection.xlsx');
   }
+
+  // ===== Template helper =====
+  protected trackByField(_: number, field: any): any {
+    return field.key ?? _;
+  }
+
+
 }

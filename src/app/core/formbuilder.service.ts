@@ -49,7 +49,7 @@ export class FormbuilderService {
       }
 
       group[field.name] = new FormControl(
-        { value: field.defaultValue ?? '', disabled: !!field.disabled },
+        { value: field.defaultValue ?? field.defaultValue, disabled: !!field.disabled },
         validators
       );
 

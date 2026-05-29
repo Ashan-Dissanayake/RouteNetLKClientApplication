@@ -1,5 +1,4 @@
-import {FormField} from '../../shared/models/formfieldata.model';
-import {ButtonAction} from '../../shared/component/button/button-panel/button-panel.component';
+import {FormField} from '../../../shared/models/formfieldata.model';
 
 export const BRANCH_TABLE_META= [
   { key: 'name', label: 'Name' },

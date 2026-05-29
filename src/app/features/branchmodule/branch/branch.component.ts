@@ -1,13 +1,18 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {FormbuilderService} from '../../../core/formbuilder.service';
-import {BranchFacadeService} from '../branchfacade.service';
-import {debounceTime, distinctUntilChanged, filter, forkJoin, Subject, switchMap, takeUntil} from 'rxjs';
+import {BranchFacadeService} from '../services/util/branchfacade.service';
+import {
+  async,
+  debounceTime,
+  Observable,
+  Subject,
+  take,
+  takeUntil
+} from 'rxjs';
 import {Branch} from '../entity/branch';
-import {BranchStatus} from '../entity/branchstatus';
-import {BranchType} from '../entity/branchtype';
 import {ButtonClickEvent, ButtonPanelComponent } from '../../../shared/component/button/button-panel/button-panel.component';
-import {DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
+import {AsyncPipe, DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
 import {DialogService} from '../../../core/dialog.service';
 import {MatButton} from '@angular/material/button';
@@ -23,9 +28,13 @@ import {
   BRANCH_FILTER_FORM_META,
   BRANCH_MAIN_FORM_META,
   BRANCH_TABLE_META
-} from '../branch.meta';
-import {RegionalOffice} from '../entity/regionaloffice';
-import {map} from 'rxjs/operators';
+} from '../model/branch.meta';
+import {BranchMetadata} from '../model/branch.metadata.model';
+import {BranchFormService} from '../services/util/branchform.service';
+import {BranchMetadataService} from '../services/util/branch.metadata.service';
+import {MatProgressBar} from '@angular/material/progress-bar';
+import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
+import {PART_FILTER_FORM_META} from '../../sparepartmodule/part.meta';
 
 @Component({
   selector: 'app-branch',
@@ -45,51 +54,76 @@ import {map} from 'rxjs/operators';
     NgClass,
     MatIcon,
     FormsModule,
+    AsyncPipe,
+    MatProgressBar,
+    MatCard,
+    MatCardContent,
+    MatCardTitle,
   ],
   templateUrl: './branch.component.html',
   styleUrls: ['./branch.component.scss'],
+  providers: [
+    BranchFacadeService,
+    BranchFormService,
+    BranchMetadataService,
+  ],
 })
 export class BranchComponent implements OnInit, OnDestroy {
 
-  // ===== Metadata & Configurations =====
-  protected readonly tableColumns = BRANCH_TABLE_META;
-  protected readonly filterFormMeta = BRANCH_FILTER_FORM_META;
+  // ===== Static config =====
+  protected readonly tableColumns    = BRANCH_TABLE_META;
+  protected readonly filterFormMeta  = BRANCH_FILTER_FORM_META;
+  protected readonly mainFormMeta    = BRANCH_MAIN_FORM_META;
+  protected readonly exportMeta      = BRANCH_DATA_EXPORT_META;
   protected readonly actionPanelConfig = buildActionPanel();
-  protected readonly mainFormMeta = BRANCH_MAIN_FORM_META;
-  protected readonly exportMeta = BRANCH_DATA_EXPORT_META;
 
-  // ===== Form Controls =====
+  // ===== Streams (pass-through from facade) =====
+  protected readonly branches$: Observable<Branch[]>;
+  protected readonly metadata$:  Observable<BranchMetadata>;
+  protected readonly loading$:   Observable<boolean>;
+  protected readonly error$:     Observable<any>;
+
+
+  // ===== UI state =====
+  protected activeRow:     Branch | null = null;
+  protected selectedRows   = new Set<Branch>();
+  protected selectedCount  = 0;
+  protected readonly async = async;
+
+  // ===== Forms =====
   protected filterForm: FormGroup = new FormGroup({});
-  protected mainForm: FormGroup = new FormGroup({});
-
-  // --- Data ---
-  protected branches!: Branch[];
-  protected branchStatuses!: BranchStatus[];
-  protected branchTypes!: BranchType[];
-  protected regionalOffices!: RegionalOffice[];
-  protected regexRules!: any;
-
-  protected dataInitialized = false;
-
-  protected selectedRows = new Set<Branch>();
-  protected activeBranch: Branch | null = null;
-
-  @ViewChild('printSection', {static: false}) printSectionRef!: ElementRef;
+  protected mainForm:   FormGroup = new FormGroup({});
 
   private destroy$ = new Subject<void>();
-  private lastGeneratedBranch: string | null = null;
-
 
   constructor(
-    private formBuilderService: FormbuilderService,
-    private branchFacadeService: BranchFacadeService,
-    private dialogService: DialogService
+    private facade:      BranchFacadeService,
+    private formService: BranchFormService,
+    private formBuilder: FormbuilderService,
+    private dialog:      DialogService,
   ) {
+    this.branches$ = this.facade.branches$;
+    this.metadata$  = this.facade.metadata$;
+    this.loading$   = this.facade.loading$;
+    this.error$     = this.facade.error$;
   }
 
   // ===== Lifecycle =====
-  ngOnInit() {
-    this.initialize();
+
+  ngOnInit(): void {
+    this.facade.initialize()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        error: err => this.dialog.showError('Failed to initialize module.', err),
+      });
+
+    this.facade.metadata$.pipe(
+      takeUntil(this.destroy$),
+    ).subscribe(meta => {
+      this.filterForm = this.formService.buildFilterForm(meta);
+      this.mainForm   = this.formService.buildMainForm(meta);
+      this.watchFilterForm();
+    });
   }
 
   ngOnDestroy(): void {
@@ -97,262 +131,218 @@ export class BranchComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // ===== Initialization =====
-  private initialize(): void {
-    forkJoin({
-      branchStatuses: this.branchFacadeService.loadBranchStatuses(),
-      branchTypes: this.branchFacadeService.loadBranchTypes(),
-      regionalOffices: this.branchFacadeService.loadRegionalOffices(),
-      regexes: this.branchFacadeService.loadStaticRegexes()
-    }).subscribe({
-      next: data => this.loadMetaData(data),
-      error: (err) => this.dialogService.showError('Failed to load metadata.', err),
-      complete:()=>{
-        this.loadTable();
-        this.createMainForm();
-        this.createFilterForm();
-      }
-    });
+  // ===== Filter =====
+
+  private watchFilterForm(): void {
+    this.filterForm.valueChanges.pipe(
+      debounceTime(300),
+      takeUntil(this.destroy$),
+    ).subscribe(values => this.facade.filter(values));
   }
 
-  private loadMetaData(data: any): void {
-    this.branchStatuses = data.branchStatuses;
-    this.branchTypes = data.branchTypes;
-    this.regionalOffices = data.regionalOffices;
-    this.regexRules = data.regexes;
+  // ===== Row interaction =====
+
+  protected onRowClick(row: Branch): void {
+    this.activeRow = row;
   }
 
-  private createFilterForm(): void {
-    this.filterForm = this.formBuilderService.build(this.filterFormMeta, {
-      ssbranchstatus: this.branchStatuses
-    });
-    this.onFilterFormChanged();
+  protected onCloseDetailView(): void {
+    this.activeRow = null;
   }
 
-  private createMainForm(): void {
-    this.mainForm = this.formBuilderService.build(this.mainFormMeta, {
-      branchtype: this.branchTypes,
-      regionaloffice: this.regionalOffices,
-      branchstatus: this.branchStatuses,
-      regexes: this.regexRules
-    });
-   // this.setEmail();
-   // this.setBranchCode();
-
-    this.initAutoGenerate();
+  protected onRowCheckboxChanged(event: CheckboxEvent): void {
+    event.checked ? this.selectedRows.add(event.row) : this.selectedRows.delete(event.row);
+    this.selectedCount = this.selectedRows.size;
   }
 
-  // ===== Data Loading =====
-  private loadTable(): void {
-    this.branchFacadeService.loadBranches()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(data => {
-        console.log(data)
-        this.branches = data
-      });
+  protected onSelectAll(checked: boolean): void {
+    this.selectedRows.clear();
+    if (checked) {
+      this.branches$.pipe(take(1)).subscribe(
+        rows => rows.forEach(r => this.selectedRows.add(r)),
+      );
+    }
+    this.selectedCount = this.selectedRows.size;
   }
 
+  // ===== Row actions =====
 
-  // ===== CRUD =====
-  private openMainForm(): void {
-    this.dialogService.showFormPopup({
-      heading: this.mainForm.value.id ? 'Edit Branch' : 'Create Branch',
-      form: this.mainForm,
-      meta: this.mainFormMeta
+  protected onRowAction(action: string, row: Branch): void {
+    const actions: Record<string, () => void> = {
+      'edit': () => this.openEditForm(row),
+    };
+    if (actions[action]) actions[action]();
+    else this.dialog.showWarning(`Unknown row action: ${action}`);
+  }
+
+  // ===== Action panel =====
+
+  protected onActionTriggered(event: ButtonClickEvent): void {
+    const handlers: Record<string, () => void> = {
+      'create':          () => this.openCreateForm(),
+      'bulk-deactivate': () => this.deactivateSelected(),
+      'clear-search':    () => this.formBuilder.resetForm(this.filterForm),
+    };
+    if (handlers[event.type]) handlers[event.type]();
+    else this.dialog.showWarning(`No handler for: ${event.type}`);
+  }
+
+  protected onDropdownOnlyClick(event: ButtonClickEvent): void {
+    const handlers: Record<string, () => void> = {
+      'export-pdf':   () => this.toPdf(),
+      'export-excel': () => this.toExcel(),
+    };
+    if (handlers[event.type]) handlers[event.type]();
+    else this.dialog.showWarning(`Unhandled dropdown: ${event.type}`);
+  }
+
+  protected reload(): void {
+    this.facade.reload();
+  }
+
+  // ===== Create =====
+
+  private openCreateForm(): void {
+    this.dialog.showFormPopup({
+      heading: 'Create Branch',
+      form:    this.mainForm,
+      meta:    this.mainFormMeta,
+      width:   '900px',
     }).subscribe(formData => {
       if (formData) this.save(formData);
-      else this.formBuilderService.resetForm(this.mainForm);
+      else this.formBuilder.resetForm(this.mainForm);
     });
   }
 
   private save(formData: any): void {
-    const operation$ = formData.id
-      ? this.branchFacadeService.updateBranch(formData)
-      : this.branchFacadeService.createBranch(formData);
-    operation$?.pipe(takeUntil(this.destroy$)).subscribe({
-      next: () =>this.dialogService.showSuccess('Branch saved successfully.'),
-      error: (err) => this.dialogService.showError('Failed to save branch.', JSON.stringify(err)),
-      complete:()=>{
-        this.loadTable();
-        this.createMainForm();
-        this.formBuilderService.resetForm(this.mainForm);
-      }
+    this.facade.create(formData).pipe(takeUntil(this.destroy$)).subscribe({
+      next:     () => this.dialog.showSuccess('Branch created successfully.'),
+      error: (err) => {
+        const validationMessage = err.friendlyMessage
+          || err.error?.details?.join('\n')
+          || err.message;
+        this.dialog.showMessage({
+          heading: 'Failed to create',
+          message: validationMessage
+        });
+      },
+      complete: () => {
+        this.facade.reload();
+        this.formBuilder.resetForm(this.mainForm);
+      },
     });
   }
 
-  private edit(row: Branch): void {
+  // ===== Edit =====
+  private openEditForm(row: Branch): void {
+    // Patch the existing form with the row's values then open the same popup
     this.mainForm.patchValue(row);
-    this.openMainForm();
+
+    this.dialog.showFormPopup({
+      heading: 'Edit Branch',
+      form:    this.mainForm,
+      meta:    this.mainFormMeta,
+      width:   '900px',
+    }).subscribe(formData => {
+      if (formData) this.update(formData);
+      else this.formBuilder.resetForm(this.mainForm);
+    });
   }
 
-  private deactivateSelectedRows() {
-    const toDeactivate = Array.from(this.selectedRows);
-    this.dialogService.showConfirmation({
-      heading: "Deactivation",
-      message: "Are sure ?"
+  private update(formData: any): void {
+    this.facade.update(formData).pipe(takeUntil(this.destroy$)).subscribe({
+      next:     () => this.dialog.showSuccess('Branch updated successfully.'),
+      error: (err) => {
+        const validationMessage = err.friendlyMessage
+          || err.error?.details?.join('\n')
+          || err.message;
+        this.dialog.showMessage({
+          heading: 'Failed to create',
+          message: validationMessage
+        });
+      },
+      complete: () => {
+        this.facade.reload();
+        this.formBuilder.resetForm(this.mainForm);
+      },
+    });
+  }
+
+  // ===== Bulk deactivate =====
+  private deactivateSelected(): void {
+    if (this.selectedRows.size === 0) {
+      this.dialog.showWarning(
+        'Please select at least one branch.'
+      );
+      return;
+    }
+
+    this.dialog.showConfirmation({
+      heading: 'Deactivate Branches',
+      message: 'Are you sure you want to deactivate selected branches?',
     }).subscribe(confirmed => {
       if (!confirmed) return;
-      this.branchFacadeService.deleteBranches(toDeactivate)
-        ?.pipe(takeUntil(this.destroy$))
+
+      const ids = Array.from(this.selectedRows);
+
+      this.facade.deactivate(ids)
+        .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: () => {
-            this.dialogService.showSuccess('Selected branches deactivated.');
+          next: res => {
+            this.dialog.showSuccess(
+              "Branches deactivated successfully."
+            );
+
             this.selectedRows.clear();
-            this.loadTable();
+            this.selectedCount = 0;
+
+            this.facade.reload();
           },
-          error: (err) => this.dialogService.showError('Failed to deactivate branches.', err)
-        });
-    })
-  }
-
-  private initAutoGenerate(): void {
-    const nameControl = this.mainForm.get('name');
-
-    nameControl?.valueChanges
-      .pipe(
-        debounceTime(500),
-        filter(() => nameControl.valid),
-        map(name => name?.trim()),
-        distinctUntilChanged(),
-        filter(name => name !== this.lastGeneratedBranch),
-        filter(() => !this.mainForm.get('code')?.value),
-        switchMap(name =>
-          this.branchFacadeService.loadBranchCode(name)
-        )
-      )
-      .subscribe(code => {
-        this.mainForm.patchValue(
-          {
-            code,
-            email: this.branchFacadeService.generateEmail(code)
-          },
-          { emitEvent: false }
-        );
-
-        this.lastGeneratedBranch = nameControl.value;
-      });
-  }
-  /*
-  private setBranchCode():void{
-    this.mainForm.controls['name'].valueChanges.subscribe(()=>{
-      const  branchName = this.mainForm.controls['name'].getRawValue();
-      const nameControl = this.mainForm.get('name');
-      if (nameControl?.valid){
-        this.branchFacadeService.loadBranchCode(branchName).subscribe({
-          next:(code)=>{
-              this.mainForm.controls['code'].setValue(code);
+          error: err => {
+            this.dialog.showMessage({
+              heading: 'Deactivation failed',
+              message: err.error?.details?.[0]
+                ?? err.message
+                ?? 'Unknown error'
+            });
           }
-        })
-      }
-    })
+        });
+    });
   }
 
-  private setEmail():void{
-    this.mainForm.controls['code'].valueChanges.subscribe(()=>{
-      const code = this.mainForm.controls['code'].getRawValue();
-      const codeControl = this.mainForm.get('code');
-      if (codeControl?.valid){
-        const email = this.branchFacadeService.generateEmail(code);
-        if (email){
-          this.mainForm.controls['email'].setValue(email);
-        }
+  // ===== Export =====
+  protected toPdf(): void {
+    if (this.selectedRows.size === 0) {
+      this.dialog.showWarning('Please select at least one record to print.');
+      return;
+    }
+
+    this.dialog.showPrintDialog({
+      width:   '1500px',
+      height:  '650px',
+      title:   'Branch Details',
+      mode:    'table',
+      data:    Array.from(this.selectedRows),
+      columns: this.exportMeta,
+    }).subscribe(result => {
+      if (result) {
+        this.selectedRows.clear();
+        this.selectedCount = 0;
       }
     });
   }
-**/
-  // ===== Export Operations =====
-  private toPdf() {
-    if (this.selectedRows.size > 0) {
-      this.dialogService.showPrintDialog({
-        title: 'Branch Details',
-        mode: 'table',
-        data: Array.from(this.selectedRows),
-        columns: this.exportMeta
-      }).subscribe((result) => {
-        if (result) {
-          this.selectedRows = new Set<Branch>();
-        }
-      });
-    } else {
-      this.dialogService.showWarning('Please select at least one record to print.');
+
+  protected toExcel(): void {
+    if (this.selectedRows.size === 0) {
+      this.dialog.showWarning('Please select at least one record to export.');
+      return;
     }
+    exportToExcel(Array.from(this.selectedRows), this.exportMeta, 'branch.xlsx');
   }
 
-  private toExcel(): void {
-    const selectedArray = Array.from(this.selectedRows);
-    let isExported = exportToExcel(
-      selectedArray,
-      this.exportMeta,
-      'selected-branches.xlsx'
-    );
-
-    if (!isExported) {
-      this.dialogService.showWarning('Please select at least one record to export.');
-      return
-    }
-  }
-
-// ===== Table Selection =====
-  protected onRowClick(row: any): void {
-    this.activeBranch = row;
-  }
-
-  protected onCloseDetailView(): void {
-    this.activeBranch = null;
-  }
-
-  protected onRowAction(action: string, row: any) {
-    if (action === 'edit') this.edit(row);
-  }
-
-  // Selection Handling
-  protected onRowCheckboxChanged(event: CheckboxEvent) {
-    if (event.checked) this.selectedRows.add(event.row);
-    else this.selectedRows.delete(event.row);
-  }
-
-  protected onSelectAll(checked: boolean) {
-    this.selectedRows.clear();
-    if (checked) this.branches.forEach(row => this.selectedRows.add(row));
-  }
-
-  // ===== Filtering =====
-  private onFilterFormChanged(): void {
-    this.filterForm.valueChanges
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        takeUntil(this.destroy$)
-      )
-      .subscribe((filters: Record<string, any>) => {
-        this.branchFacadeService.searchBranches(filters)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe(data => this.branches = data);
-      });
-  }
-
-  // ===== Action Panel =====
-  private actionHandlers: Record<string, () => void> = {
-    'create': () => this.openMainForm(),
-    'export-pdf': () => this.toPdf(),
-    'export-excel': () => this.toExcel(),
-    'bulk-deactivate': () => this.deactivateSelectedRows(),
-    'clear-search': () => this.filterForm.reset()
-  };
-
-  protected onActionTriggered(event: ButtonClickEvent) {
-    const handler = this.actionHandlers[event.type];
-    if (handler) handler();
-    else this.dialogService.showError(`No handler defined for action: ${event.type}`);
-  }
-
-  protected onDropdownOnlyClick(event: ButtonClickEvent) {
-    const dropdownTypes = ['export-pdf', 'export-excel'];
-    if (dropdownTypes.includes(event.type)) {
-      this.actionHandlers[event.type]?.();
-    } else {
-      this.dialogService.showWarning(`Unhandled dropdown action: ${event.type}`);
-    }
+  // ===== Template helper =====
+  protected trackByField(_: number, field: any): any {
+    return field.key ?? _;
   }
 
 }

@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {BranchService} from '../branchmodule/services/branch.service';
+import {BranchService} from '../branchmodule/services/api/branch.service';
 import {TripTypeService} from './service/triptype.service';
 import {PermitService} from '../permitmodule/service/permit.service';
 import {TripStatusService} from './service/tripstatus.service';
