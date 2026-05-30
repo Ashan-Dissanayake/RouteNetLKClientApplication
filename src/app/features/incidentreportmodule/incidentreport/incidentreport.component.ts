@@ -29,7 +29,6 @@ import {SideViewComponent} from '../../../shared/component/side-view/side-view.c
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
 import {MatIcon} from '@angular/material/icon';
 import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
-import {Trip} from '../../tripmodule/entity/trip';
 
 @Component({
   selector: 'app-incidentreport',
@@ -42,7 +41,6 @@ import {Trip} from '../../tripmodule/entity/trip';
     MatCard,
     MatCardContent,
     MatCardTitle,
-    MatChip,
     MatDivider,
     MatIcon,
     MatProgressBar,
@@ -53,7 +51,6 @@ import {Trip} from '../../tripmodule/entity/trip';
     TableCellDirective,
     MatIcon,
     NgClass,
-    DatePipe,
     MatIconButton,
     MatMenu,
     MatMenuItem,

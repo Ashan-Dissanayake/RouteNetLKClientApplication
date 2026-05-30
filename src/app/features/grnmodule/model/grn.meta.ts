@@ -1,5 +1,5 @@
-import {FormField} from '../../shared/models/formfieldata.model';
-import {InnerTableColumn} from '../../shared/component/innertable/inner-table-column.model';
+import {FormField} from '../../../shared/models/formfieldata.model';
+import {InnerTableColumn} from '../../../shared/component/innertable/inner-table-column.model';
 
 export const GRN_TABLE_META = [
   {key: 'branch.name', label: 'Branch'},

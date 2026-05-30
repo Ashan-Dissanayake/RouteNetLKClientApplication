@@ -1,41 +1,27 @@
 import { Component } from '@angular/core';
 import {ROSTER_MAIN_FORM_META, ROSTER_SHIFT_TABLE_META} from '../roster.meta';
-import {async, finalize, Observable, Subject, switchMap, takeUntil} from 'rxjs';
+import {async, finalize, Observable, Subject, takeUntil} from 'rxjs';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {DialogService} from '../../../core/dialog.service';
 import {FormbuilderService} from '../../../core/formbuilder.service';
 import {RosterFacadeService} from '../rosterfacade.service';
-import {AsyncPipe, DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
+import {AsyncPipe, DatePipe, NgForOf, NgIf} from '@angular/common';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {
   MatCard,
-  MatCardActions,
   MatCardContent,
   MatCardHeader,
-  MatCardSubtitle,
   MatCardTitle
 } from '@angular/material/card';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
 import {Roster} from '../entity/roster';
-import {MatGridList, MatGridTile} from '@angular/material/grid-list';
 import {MatFormField, MatLabel, MatOption, MatSelect} from '@angular/material/select';
 import {MatIcon} from '@angular/material/icon';
 import {RosterSummary} from '../entity/rostersummary';
 import {RosterShift} from '../entity/rostershift';
-import {
-  MatCell,
-  MatCellDef,
-  MatColumnDef,
-  MatHeaderCell, MatHeaderCellDef,
-  MatHeaderRow,
-  MatHeaderRowDef,
-  MatRow,
-  MatRowDef, MatTable
-} from '@angular/material/table';
 import {DataTableComponent} from '../../../shared/component/data-table/data-table.component';
 import {MatTooltip} from '@angular/material/tooltip';
-import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
 import {RosterShiftAssignment} from '../entity/rostershiftassignment';
 
@@ -52,8 +38,6 @@ import {RosterShiftAssignment} from '../entity/rostershiftassignment';
     DynamicFieldComponent,
     NgForOf,
     ReactiveFormsModule,
-    MatGridTile,
-    MatGridList,
     MatSelect,
     MatOption,
     MatLabel,
@@ -61,23 +45,9 @@ import {RosterShiftAssignment} from '../entity/rostershiftassignment';
     MatCardHeader,
     MatIconButton,
     MatIcon,
-    MatHeaderRow,
-    MatRow,
-    MatColumnDef,
-    MatHeaderRowDef,
-    MatRowDef,
-    MatCellDef,
-    MatHeaderCell,
-    MatCell,
-    MatTable,
-    MatHeaderCellDef,
     DatePipe,
     DataTableComponent,
-    MatCardActions,
-    MatCardSubtitle,
-    NgClass,
     MatTooltip,
-    TableCellDirective,
     MatProgressSpinner
   ],
   templateUrl: './roster.component.html',

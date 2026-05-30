@@ -4,14 +4,14 @@ import {
   GRN_FILTER_FORM_META,
   GRN_MAIN_FORM_META,
   GRN_TABLE_META
-} from '../grn.meta';
+} from '../model/grn.meta';
 import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
-import {async, Observable, Subject, take, takeUntil} from 'rxjs';
+import {debounceTime, Observable, Subject, take, takeUntil} from 'rxjs';
 import {Grn} from '../entity/grn';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {DialogService} from '../../../core/dialog.service';
 import {FormbuilderService} from '../../../core/formbuilder.service';
-import {GrnFacadeService} from '../grnfacade.service';
+import {GrnFacadeService} from '../service/util/grnfacade.service';
 import {CheckboxEvent, DataTableComponent} from '../../../shared/component/data-table/data-table.component';
 import {exportToExcel} from '../../../shared/component/export/excel-export.util';
 import {
@@ -28,6 +28,12 @@ import {MatDivider} from '@angular/material/divider';
 import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
 import {MatIcon} from '@angular/material/icon';
+import {GrnMetadata} from '../model/grn.metadata.model';
+import {GrnFormService} from '../service/util/grnfrom.service';
+import {GrnMetadataService} from '../service/util/grn.metadata.service';
+
+const NON_EDITABLE_STATUSES = ['received', 'partially received'];
+
 @Component({
   selector: 'app-grn',
   imports: [
@@ -53,52 +59,71 @@ import {MatIcon} from '@angular/material/icon';
   ],
   templateUrl: './grn.component.html',
   styleUrl: './grn.component.scss',
-  standalone:true
+  standalone:true,
+  providers: [
+    GrnFacadeService,
+    GrnFormService,
+    GrnMetadataService,
+  ],
 })
-export class GrnComponent implements OnInit, OnDestroy  {
 
-  // ===== Meta Data =====
-  protected readonly tableColumns = GRN_TABLE_META;
-  protected readonly actionPanelConfig = buildActionPanel({exclude: ['create', 'bulk-deactivate']});
-  protected readonly filterFormMeta = GRN_FILTER_FORM_META;
-  protected readonly mainFormMeta = GRN_MAIN_FORM_META;
-  protected readonly exportMeta = GRN_DATA_EXPORT_META;
+export class GrnComponent implements OnInit, OnDestroy {
 
-  // ===== Reactive State =====
-  protected grns$: Observable<Grn[]>;
-  protected metadata$: Observable<any>;
-  protected loading$: Observable<boolean>;
-  protected error$: Observable<any>;
-  private destroy$ = new Subject<void>();
+  // ===== Static config =====
+  protected readonly tableColumns    = GRN_TABLE_META;
+  protected readonly filterFormMeta  = GRN_FILTER_FORM_META;
+  protected readonly mainFormMeta    = GRN_MAIN_FORM_META;
+  protected readonly exportMeta      = GRN_DATA_EXPORT_META;
+  // No create, no bulk-deactivate in this module
+  protected readonly actionPanelConfig = buildActionPanel({ exclude: ['create', 'bulk-deactivate'] });
 
-  protected readonly async = async;
+  // ===== Streams =====
+  protected readonly grns$:     Observable<Grn[]>;
+  protected readonly metadata$: Observable<GrnMetadata>;
+  protected readonly loading$:  Observable<boolean>;
+  protected readonly error$:    Observable<any>;
 
-  // ===== UI State =====
-  protected activePartRequest: Grn | null = null;
-  protected selectedRows = new Set<Grn>();
+  // ===== UI state =====
+  protected activeRow:    Grn | null = null;
+  protected selectedRows  = new Set<Grn>();
+  protected selectedCount = 0;
 
   // ===== Forms =====
   protected filterForm: FormGroup = new FormGroup({});
-  protected mainForm: FormGroup = new FormGroup({});
+  protected mainForm:   FormGroup = new FormGroup({});
+
+  private destroy$        = new Subject<void>();
+  private currentMetadata: GrnMetadata | null = null;
 
   constructor(
-    private grnFacade: GrnFacadeService,
-    private dialogService: DialogService,
-    private formBuilderService: FormbuilderService,
-
+    private facade:      GrnFacadeService,
+    private formService: GrnFormService,
+    private formBuilder: FormbuilderService,
+    private dialog:      DialogService,
   ) {
-    // Safe assignment – BehaviorSubject guarantees a value
-    this.grns$ = this.grnFacade.grns$;
-    this.metadata$ = this.grnFacade.metadata$;
-    this.loading$ = this.grnFacade.loading$;
-    this.error$ = this.grnFacade.error$;
+    this.grns$     = this.facade.grns$;
+    this.metadata$  = this.facade.metadata$;
+    this.loading$   = this.facade.loading$;
+    this.error$     = this.facade.error$;
   }
 
+  // ===== Lifecycle =====
+
   ngOnInit(): void {
-    this.initializeModule();
-    this.metadata$.pipe(takeUntil(this.destroy$)).subscribe(metadata => {
-      this.createFilterForm(metadata);
-      this.createMainForm(metadata);
+    this.facade.initialize()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        error: err => this.dialog.showError('Failed to initialize GRN module.', err),
+      });
+
+    // Build forms once real metadata arrives — skip EMPTY_GRN_METADATA
+    this.facade.metadata$.pipe(
+      takeUntil(this.destroy$),
+    ).subscribe(meta => {
+      this.currentMetadata = meta;
+      this.filterForm = this.formService.buildFilterForm(meta);
+      this.mainForm   = this.formService.buildMainForm(meta);
+      this.watchFilterForm();
     });
   }
 
@@ -107,164 +132,141 @@ export class GrnComponent implements OnInit, OnDestroy  {
     this.destroy$.complete();
   }
 
-  private initializeModule() {
-    this.grnFacade.initializeGrnModule()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        error: err => this.dialogService.showError('Failed to initialize GRN module.', err)
-      });
+  // ===== Filter =====
+
+  private watchFilterForm(): void {
+    this.filterForm.valueChanges.pipe(
+      debounceTime(300),
+      takeUntil(this.destroy$),
+    ).subscribe(values => this.facade.filter(values));
   }
 
-  // ===== Form creation =====
-  private createFilterForm(metadata: any): void {
-    this.filterForm = this.formBuilderService.build(this.filterFormMeta, {
-      ssgrnstatus: metadata.grnStatuses,
-      sspartrequest: metadata.partRequests,
-    });
-    this.onFilterFormChanged();
+  // ===== Row interaction =====
+
+  protected onRowClick(row: Grn): void  { this.activeRow = row; }
+  protected onCloseDetailView(): void   { this.activeRow = null; }
+
+  protected onRowCheckboxChanged(event: CheckboxEvent): void {
+    event.checked ? this.selectedRows.add(event.row) : this.selectedRows.delete(event.row);
+    this.selectedCount = this.selectedRows.size;
   }
 
-  private createMainForm(metadata: any): void {
-    //M:n with addtional attributes
-    const lineField = GRN_MAIN_FORM_META.find(f => f.name === 'grnpartrequestitems');
-    if (lineField?.innerTableConfig) {
-      lineField.innerTableConfig.dataMap = { partreqiestitems: metadata.parts };
-    }
-
-    this.mainForm = this.formBuilderService.build(this.mainFormMeta, {
-     // branch: metadata.branches,
-     // grnststatus: metadata.grnststatus,
-      //partrequest: metadata.partrequest,
-    });
-  }
-
-  // ===== Filtering =====
-  private onFilterFormChanged(): void {
-    this.filterForm.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(filters => this.grnFacade.filterGrns(filters));
-  }
-
-  // ===== Row & Selection Handlers =====
-  protected onRowClick(row: Grn): void {
-    this.activePartRequest = row;
-  }
-
-  protected reload(): void { this.grnFacade.reloadGrns(); }
-
-  protected onCloseDetailView(): void {
-    this.activePartRequest = null;
-  }
-
-  protected onRowAction(action: string, row: Grn) {
-    if (action === 'edit') this.edit(row);
-  }
-
-  protected onRowCheckboxChanged(event: CheckboxEvent) {
-    if (event.checked) this.selectedRows.add(event.row);
-    else this.selectedRows.delete(event.row);
-  }
-
-  protected onSelectAll(checked: boolean) {
+  protected onSelectAll(checked: boolean): void {
     this.selectedRows.clear();
     if (checked) {
-      this.grns$.pipe(take(1)).subscribe(rows => rows.forEach(r => this.selectedRows.add(r)));
+      this.grns$.pipe(take(1)).subscribe(
+        rows => rows.forEach(r => this.selectedRows.add(r)),
+      );
     }
+    this.selectedCount = this.selectedRows.size;
   }
 
-  // ===== CRUD =====
-  private openMainForm(): void {
-    this.dialogService.showFormPopup({
-      heading: this.mainForm.value.id ? 'Edit GRN' : 'Create GRN',
-      form: this.mainForm,
-      meta: this.mainFormMeta,
-      width:'900px'
-    }).subscribe(formData => {
-      if (formData) this.save(formData);
-      else this.formBuilderService.resetForm(this.mainForm);
-    });
+  protected reload(): void { this.facade.reload(); }
+
+  // ===== Row actions =====
+
+  protected onRowAction(action: string, row: Grn): void {
+    const actions: Record<string, () => void> = {
+      'edit': () => this.openEditForm(row),
+    };
+    if (actions[action]) actions[action]();
+    else this.dialog.showWarning(`Unknown row action: ${action}`);
   }
 
-  private save(formData: any): void {
-    const operation$ = this.grnFacade.updateGrn(formData);
-    operation$?.pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => this.dialogService.showSuccess('GRN saved successfully.'),
-      error: (err) => this.dialogService.showMessage({ heading: 'Failed to save GRN', message: err.errorMessage }),
-      complete: () => {
-        this.reload();
-        this.formBuilderService.resetForm(this.mainForm);
-      }
-    });
-  }
+  // ===== Edit =====
+  //
+  // Status guard: Received and Partially Received GRNs cannot be edited.
+  // This is a UI-level guard. The component owns it because it is
+  // a UI decision (show a message) not a domain rule (the domain
+  // rule lives in the backend).
 
-  private edit(row: Grn): void {
-    const status = row.grnstatus.name;
-    if (status === 'Received'||status === 'Partially Received') {
-      this.dialogService.showMessage({
+  private openEditForm(row: Grn): void {
+    const status = row.grnstatus?.name?.toLowerCase() ?? '';
+
+    if (NON_EDITABLE_STATUSES.includes(status)) {
+      this.dialog.showMessage({
         heading: 'Edit not allowed',
-        message: 'Cannot edit a GRN that has already been Received or Partially Received.'
+        message: 'Cannot edit a GRN that has already been Received or Partially Received.',
       });
       return;
     }
-    this.mainForm.patchValue(row);
-    this.openMainForm();
+
+    if (!this.currentMetadata) return;
+
+    // FormService builds a fresh form and patches it with the row
+    this.mainForm = this.formService.buildMainFormForEdit(this.currentMetadata, row);
+
+    this.dialog.showFormPopup({
+      heading: 'Edit GRN',
+      form:    this.mainForm,
+      meta:    this.mainFormMeta,
+      width:   '900px',
+    }).subscribe(formData => {
+      if (formData) this.update(formData);
+      else {
+        // Restore a clean main form on cancel
+        this.mainForm = this.formService.buildMainForm(this.currentMetadata!);
+      }
+    });
+  }
+
+  private update(formData: any): void {
+    this.facade.update(formData).pipe(takeUntil(this.destroy$)).subscribe({
+      next:     () => this.dialog.showSuccess('GRN updated successfully.'),
+      error:    err => this.dialog.showMessage({ heading: 'Failed to update GRN', message: err.errorMessage }),
+      complete: () => {
+        this.facade.reload();
+        if (this.currentMetadata) {
+          this.mainForm = this.formService.buildMainForm(this.currentMetadata);
+        }
+      },
+    });
+  }
+
+  // ===== Action panel =====
+
+  protected onActionTriggered(event: ButtonClickEvent): void {
+    const handlers: Record<string, () => void> = {
+      'clear-search': () => this.formBuilder.resetForm(this.filterForm),
+    };
+    if (handlers[event.type]) handlers[event.type]();
+    else this.dialog.showWarning(`No handler for: ${event.type}`);
+  }
+
+  protected onDropdownOnlyClick(event: ButtonClickEvent): void {
+    const handlers: Record<string, () => void> = {
+      'export-pdf':   () => this.toPdf(),
+      'export-excel': () => this.toExcel(),
+    };
+    if (handlers[event.type]) handlers[event.type]();
+    else this.dialog.showWarning(`Unhandled dropdown: ${event.type}`);
   }
 
   // ===== Export =====
+
   protected toPdf(): void {
-    this.grns$.pipe(take(1)).subscribe(() => {
-      if (this.selectedRows.size > 0) {
-        this.dialogService.showPrintDialog({
-          width: '1500px',
-          height: '650px',
-          title: 'Grn Details',
-          mode: 'table',
-          data: Array.from(this.selectedRows),
-          columns: this.exportMeta
-        }).subscribe(result => { if (result) this.selectedRows.clear(); });
-      } else {
-        this.dialogService.showWarning('Please select at least one record to print.');
-      }
+    if (this.selectedRows.size === 0) {
+      this.dialog.showWarning('Please select at least one record to print.');
+      return;
+    }
+    this.dialog.showPrintDialog({
+      width: '1500px', height: '650px',
+      title: 'GRN Details', mode: 'table',
+      data: Array.from(this.selectedRows), columns: this.exportMeta,
+    }).subscribe(result => {
+      if (result) { this.selectedRows.clear(); this.selectedCount = 0; }
     });
   }
 
   protected toExcel(): void {
     if (this.selectedRows.size === 0) {
-      this.dialogService.showWarning('Please select at least one record to export.');
+      this.dialog.showWarning('Please select at least one record to export.');
       return;
     }
     exportToExcel(Array.from(this.selectedRows), this.exportMeta, 'grn.xlsx');
   }
 
+  // ===== Template helper =====
 
-  // ===== Action Panel =====
-  protected actionHandlers: Record<string, () => void> = {
-    'clear-search': () => this.filterForm.reset(),
-    'create': () => this.openMainForm(),
-    'export-pdf': () => this.toPdf(),
-    'export-excel': () => this.toExcel()
-  };
-
-  protected onActionTriggered(event: ButtonClickEvent) {
-    const handler = this.actionHandlers[event.type];
-    if (handler) handler();
-    else this.dialogService.showWarning(`No handler defined for action: ${event.type}`);
-  }
-
-  protected onDropdownOnlyClick(event: ButtonClickEvent) {
-    const dropdownTypes = ['export-pdf', 'export-excel'];
-    if (dropdownTypes.includes(event.type)) {
-      this.actionHandlers[event.type]?.();
-    } else {
-      this.dialogService.showWarning(`Unhandled dropdown action: ${event.type}`);
-    }
-  }
-  // ===== TrackBy for optimization =====
-
-  trackByField(index: number, field: any) {
-    return field.key || index;
-  }
-
-
-
+  protected trackByField(_: number, field: any): any { return field.key ?? _; }
 }

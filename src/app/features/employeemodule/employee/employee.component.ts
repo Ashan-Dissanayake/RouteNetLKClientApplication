@@ -33,7 +33,6 @@ import {EmployeeMetadata} from '../model/employee.metadata.model';
   standalone: true,
   imports: [
     DataTableComponent,
-    MatButton,
     MatIcon,
     SideViewComponent,
     TableCellDirective,
@@ -46,9 +45,6 @@ import {EmployeeMetadata} from '../model/employee.metadata.model';
     NgIf,
     ReactiveFormsModule,
     ButtonPanelComponent,
-    MatFormField,
-    MatSelect,
-    MatOption,
     MatIconButton,
     AsyncPipe,
   ],
