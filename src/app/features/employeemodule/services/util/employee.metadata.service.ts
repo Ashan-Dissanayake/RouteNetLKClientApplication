@@ -32,7 +32,7 @@ export class EmployeeMetadataService{
       genders:this.genderService.get().pipe(map(r=>r.data)),
       departments:this.departmentService.get().pipe(map(r=>r.data)),
       branches:this.branchService.getSummary().pipe(map(r=>r.data)),
-      regexes:this.regexService.getStaticRegexes('branches').pipe(map(r=>r.data))
+      regexes:this.regexService.getStaticRegexes('employees').pipe(map(r=>r.data))
     })
 }
 

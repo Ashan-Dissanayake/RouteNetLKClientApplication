@@ -4,18 +4,14 @@ import {
   CONDUCTOR_FILTER_FORM_META,
   CONDUCTOR_IMMUTABLE_CONTROLLERS_META, CONDUCTOR_MAIN_FORM_META,
   CONDUCTOR_TABLE_META
-} from '../conductor.meta';
+} from '../model/conductor.meta';
 import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {Conductor} from '../entity/conductor';
-import {RouteFamiliarityLevel} from '../entity/routefamiliaritylevel';
-import {CrewStatus} from '../entity/crewstatus';
-import {Employee} from '../../employeemodule/entity/employee';
-import {debounceTime, distinctUntilChanged, forkJoin, Subject, takeUntil} from 'rxjs';
-import {ConductorFacadeService} from '../conductorfacade.service';
+import {async, debounceTime, filter, Observable, Subject, take, takeUntil} from 'rxjs';
+import {ConductorFacadeService} from '../service/util/conductorfacade.service';
 import {FormbuilderService} from '../../../core/formbuilder.service';
 import {DialogService} from '../../../core/dialog.service';
-import {ConductorMapper} from '../../../shared/mappers/ConductorMapper';
 import {exportToExcel} from '../../../shared/component/export/excel-export.util';
 import {CheckboxEvent, DataTableComponent} from '../../../shared/component/data-table/data-table.component';
 import {
@@ -25,10 +21,16 @@ import {
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
 import {MatButton} from '@angular/material/button';
 import {MatDivider} from '@angular/material/divider';
-import {NgClass, NgForOf, NgIf} from '@angular/common';
+import {AsyncPipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
 import {MatIcon} from '@angular/material/icon';
+import {ConductorMetadata} from '../model/conductor.metadata.model';
+import {ConductorFormService} from '../service/util/conductorformservice';
+import {ConductorMetadataService} from '../service/util/conductor.metadata.service';
+import {MatProgressBar} from '@angular/material/progress-bar';
+import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
+import {DRIVER_FILTER_FORM_META} from '../model/driver.meta';
 
 @Component({
   selector: 'app-conductor',
@@ -45,49 +47,78 @@ import {MatIcon} from '@angular/material/icon';
     SideViewComponent,
     TableCellDirective,
     MatIcon,
-    NgClass
+    NgClass,
+    AsyncPipe,
+    MatProgressBar,
+    MatCard,
+    MatCardContent,
+    MatCardTitle
+  ],
+  providers: [
+    ConductorFacadeService,
+    ConductorFormService,
+    ConductorMetadataService,
   ],
   templateUrl: './conductor.component.html',
   styleUrl: './conductor.component.scss'
 })
-export class ConductorComponent implements OnInit,OnDestroy {
+export class ConductorComponent implements OnInit, OnDestroy {
 
-  // ===== Metadata & Configurations =====
-  protected readonly tableColumns = CONDUCTOR_TABLE_META;
-  protected readonly filterFormMeta = CONDUCTOR_FILTER_FORM_META;
-  protected readonly actionPanelConfig = buildActionPanel({exclude: ['bulk-deactivate']});
-  protected readonly mainFormMeta = CONDUCTOR_MAIN_FORM_META;
+  // ===== Static config =====
+  protected readonly tableColumns         = CONDUCTOR_TABLE_META;
+  protected readonly filterFormMeta       = CONDUCTOR_FILTER_FORM_META;
+  protected readonly mainFormMeta         = CONDUCTOR_MAIN_FORM_META;
   protected readonly immutableControllers = CONDUCTOR_IMMUTABLE_CONTROLLERS_META;
-  protected readonly exportMeta = CONDUCTOR_DATA_EXPORT_META;
+  protected readonly exportMeta           = CONDUCTOR_DATA_EXPORT_META;
+  protected readonly actionPanelConfig    = buildActionPanel({ exclude: ['bulk-deactivate'] });
+
+  // ===== Streams =====
+  protected readonly conductors$: Observable<Conductor[]>;
+  protected readonly metadata$:   Observable<ConductorMetadata>;
+  protected readonly loading$:    Observable<boolean>;
+  protected readonly error$:      Observable<any>;
+
+  // ===== UI state =====
+  protected activeRow:    Conductor | null = null;
+  protected selectedRows  = new Set<Conductor>();
+  protected selectedCount = 0;
 
   // ===== Forms =====
   protected filterForm: FormGroup = new FormGroup({});
-  protected mainForm: FormGroup = new FormGroup({});
+  protected mainForm:   FormGroup = new FormGroup({});
 
-  // --- Data ---
-  protected conductors!: Conductor[];
-  protected routeFamiliarityLevels!: RouteFamiliarityLevel[];
-  protected crewStatuses!: CrewStatus[];
-  protected employees!: Employee[];
-  protected regexRules!: any;
-
-  protected dataInitialized = false;
-
-  private destroy$ = new Subject<void>();
-
-  protected selectedRows = new Set<Conductor>();
-  protected activeRow: Conductor | null = null;
+  private destroy$        = new Subject<void>();
+  private currentMetadata: ConductorMetadata | null = null;
 
   constructor(
-    private conductorFacadeService:ConductorFacadeService,
-    private formBuilderService: FormbuilderService,
-    private dialogService: DialogService
+    private facade:      ConductorFacadeService,
+    private formService: ConductorFormService,
+    private formBuilder: FormbuilderService,
+    private dialog:      DialogService,
   ) {
+    this.conductors$ = this.facade.conductors$;
+    this.metadata$   = this.facade.metadata$;
+    this.loading$    = this.facade.loading$;
+    this.error$      = this.facade.error$;
   }
 
   // ===== Lifecycle =====
+
   ngOnInit(): void {
-    this.initialize();
+    this.facade.initialize()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        error: err => this.dialog.showError('Failed to initialize module.', err),
+      });
+
+    this.facade.metadata$.pipe(
+      takeUntil(this.destroy$),
+    ).subscribe(meta => {
+      this.currentMetadata = meta;
+      this.filterForm = this.formService.buildFilterForm(meta);
+      this.mainForm   = this.formService.buildMainForm(meta);
+      this.watchFilterForm();
+    });
   }
 
   ngOnDestroy(): void {
@@ -95,196 +126,175 @@ export class ConductorComponent implements OnInit,OnDestroy {
     this.destroy$.complete();
   }
 
-  // ===== Initialization =====
-  private initialize(): void {
-    forkJoin({
-      crewStatuses: this.conductorFacadeService.loadCrewStatuses(),
-      routeFamiliarityLevels: this.conductorFacadeService.loadRouteFamiliarityLevels(),
-      employees:this.conductorFacadeService.loadEmployeesByDesignation(),
-      regexes:this.conductorFacadeService.loadStaticRegexes()
-    }).subscribe({
-      next: data => this.loadMetaData(data),
-      error: (err) => this.dialogService.showError('Failed to load metadata.', err),
-      complete:()=>{
-        this.loadTable();
-        this.createMainForm();
-        this.createFilterForm();
-      }
-    });
+  // ===== Filter =====
+
+  private watchFilterForm(): void {
+    this.filterForm.valueChanges.pipe(
+      debounceTime(300),
+      takeUntil(this.destroy$),
+    ).subscribe(values => this.facade.filter(values));
   }
 
-  private loadMetaData(data: any): void {
-    this.crewStatuses = data.crewStatuses;
-    this.routeFamiliarityLevels = data.routeFamiliarityLevels;
-    this.employees = data.employees;
-    this.regexRules = data.regexes;
+  // ===== Row interaction =====
 
-    this.dataInitialized = true;
+  protected onRowClick(row: Conductor): void    { this.activeRow = row; }
+  protected onCloseDetailView(): void           { this.activeRow = null; }
 
-    this.createMainForm();
-    this.createFilterForm();
+  protected onRowCheckboxChanged(event: CheckboxEvent): void {
+    event.checked ? this.selectedRows.add(event.row) : this.selectedRows.delete(event.row);
+    this.selectedCount = this.selectedRows.size;
   }
 
-  private createFilterForm(): void {
-    this.filterForm = this.formBuilderService.build(this.filterFormMeta, {
-      sscrewstatus:this.crewStatuses,
-      ssroutefamilitylevel:this.routeFamiliarityLevels,
-    });
-    this.onFilterFormChanged();
+  protected onSelectAll(checked: boolean): void {
+    this.selectedRows.clear();
+    if (checked) {
+      this.conductors$.pipe(take(1)).subscribe(
+        rows => rows.forEach(r => this.selectedRows.add(r)),
+      );
+    }
+    this.selectedCount = this.selectedRows.size;
   }
 
-  private createMainForm(): void {
-    this.mainForm = this.formBuilderService.build(this.mainFormMeta, {
-      employee:this.employees,
-      crewstatus:this.crewStatuses,
-      routefamiliaritylevel:this.routeFamiliarityLevels,
-      regexes: this.regexRules
-    });
+  // ===== Row actions =====
+
+  protected onRowAction(action: string, row: Conductor): void {
+    const actions: Record<string, () => void> = {
+      'edit': () => this.openEditForm(row),
+    };
+    if (actions[action]) actions[action]();
+    else this.dialog.showWarning(`Unknown row action: ${action}`);
   }
 
-  // ===== Data Loading =====
-  private loadTable(): void {
-    this.conductorFacadeService.loadConductors()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(data => this.conductors = data);
+  // ===== Action panel =====
+
+  protected onActionTriggered(event: ButtonClickEvent): void {
+    const handlers: Record<string, () => void> = {
+      'create':       () => this.openCreateForm(),
+      'clear-search': () => this.formBuilder.resetForm(this.filterForm),
+    };
+    if (handlers[event.type]) handlers[event.type]();
+    else this.dialog.showWarning(`No handler for: ${event.type}`);
   }
 
-  // ===== CRUD =====
-  private openMainForm(): void {
-    this.mainForm.value.id?
-      this.formBuilderService.setControlsState(this.mainForm,this.immutableControllers,true):
-      this.formBuilderService.setControlsState(this.mainForm,this.immutableControllers,false);
-    this.dialogService.showFormPopup({
-      heading: this.mainForm.value.id ? 'Edit Conductor' : 'Create Conductor',
-      form: this.mainForm,
-      meta: this.mainFormMeta
+  protected onDropdownOnlyClick(event: ButtonClickEvent): void {
+    const handlers: Record<string, () => void> = {
+      'export-pdf':   () => this.toPdf(),
+      'export-excel': () => this.toExcel(),
+    };
+    if (handlers[event.type]) handlers[event.type]();
+    else this.dialog.showWarning(`Unhandled dropdown: ${event.type}`);
+  }
+
+  protected reload(): void { this.facade.reload(); }
+
+  // ===== Create =====
+
+  private openCreateForm(): void {
+    this.formBuilder.setControlsState(this.mainForm, this.immutableControllers, false);
+
+    this.dialog.showFormPopup({
+      heading: 'Create Conductor',
+      form:    this.mainForm,
+      meta:    this.mainFormMeta,
+      width:   '900px',
     }).subscribe(formData => {
       if (formData) this.save(formData);
-      else{
-        this.formBuilderService.resetForm(this.mainForm);
-      }
+      else this.formBuilder.resetForm(this.mainForm);
     });
   }
 
   private save(formData: any): void {
-    const operation$ = formData.id
-      ? this.conductorFacadeService.updateConductor(formData)
-      : this.conductorFacadeService.createConductor(formData);
-    operation$?.pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => {
-        this.dialogService.showSuccess('Conductor saved successfully.');
+    this.facade.create(formData).pipe(takeUntil(this.destroy$)).subscribe({
+      next:     () => this.dialog.showSuccess('Conductor created successfully.'),
+      error: (err) => {
+        const validationMessage = err.friendlyMessage
+          || err.error?.details?.join('\n')
+          || err.message;
+        this.dialog.showMessage({
+          heading: 'Failed to create',
+          message: validationMessage
+        });
+      },      complete: () => {
+        this.facade.reload();
+        if (this.currentMetadata) {
+          this.mainForm = this.formService.buildMainForm(this.currentMetadata);
+        }
+        this.formBuilder.setControlsState(this.mainForm, this.immutableControllers, false);
       },
-      error: (err) =>{
-        this.dialogService.showMessage({heading:'Failed to save Conductor.', message:err.errorMessage})
-      },
-      complete:()=>{
-        this.loadTable();
-        this.createMainForm();
-        this.formBuilderService.resetForm(this.mainForm);
-        this.formBuilderService.setControlsState(this.mainForm, this.immutableControllers, false);
+    });
+  }
+
+  // ===== Edit =====
+
+  private openEditForm(row: Conductor): void {
+    if (!this.currentMetadata) return;
+
+    this.mainForm = this.formService.buildMainFormForEdit(this.currentMetadata, row);
+    this.formBuilder.setControlsState(this.mainForm, this.immutableControllers, true);
+
+    this.dialog.showFormPopup({
+      heading: 'Edit Conductor',
+      form:    this.mainForm,
+      meta:    this.mainFormMeta,
+      width:   '900px',
+    }).subscribe(formData => {
+      if (formData) this.update(formData);
+      else {
+        this.mainForm = this.formService.buildMainForm(this.currentMetadata!);
+        this.formBuilder.setControlsState(this.mainForm, this.immutableControllers, false);
       }
     });
   }
 
-  private edit(row: Conductor): void {
-    this.employees = this.conductors.map(conductor => conductor.employee);
-    this.createMainForm();
-    const  mappedRow = ConductorMapper.toForm(row);
-    this.mainForm.patchValue(mappedRow);
-    this.openMainForm();
-  }
-
-  // ===== Export Operations =====
-  private toPdf():void {
-    if (this.selectedRows.size > 0) {
-      this.dialogService.showPrintDialog({
-        width:'1500px',
-        height:'650px',
-        title: 'Conductor Details',
-        mode: 'table',
-        data: Array.from(this.selectedRows),
-        columns: this.exportMeta
-      }).subscribe((result) => {
-        if (result) {
-          this.selectedRows = new Set<Conductor>();
+  private update(formData: any): void {
+    this.facade.update(formData).pipe(takeUntil(this.destroy$)).subscribe({
+      next:     () => this.dialog.showSuccess('Conductor updated successfully.'),
+      error: (err) => {
+        const validationMessage = err.friendlyMessage
+          || err.error?.details?.join('\n')
+          || err.message;
+        this.dialog.showMessage({
+          heading: 'Failed to Update',
+          message: validationMessage
+        });
+      },      complete: () => {
+        this.facade.reload();
+        if (this.currentMetadata) {
+          this.mainForm = this.formService.buildMainForm(this.currentMetadata);
         }
-      });
-    } else {
-      this.dialogService.showWarning('Please select at least one record to print.');
+        this.formBuilder.setControlsState(this.mainForm, this.immutableControllers, false);
+      },
+    });
+  }
+
+  // ===== Export =====
+
+  protected toPdf(): void {
+    if (this.selectedRows.size === 0) {
+      this.dialog.showWarning('Please select at least one record to print.');
+      return;
     }
+    this.dialog.showPrintDialog({
+      width: '1500px', height: '650px',
+      title: 'Conductor Details', mode: 'table',
+      data: Array.from(this.selectedRows), columns: this.exportMeta,
+    }).subscribe(result => {
+      if (result) { this.selectedRows.clear(); this.selectedCount = 0; }
+    });
   }
 
-  private toExcel(): void {
-    const selectedArray = Array.from(this.selectedRows);
-
-    let isExported = exportToExcel(
-      selectedArray,
-      this.exportMeta,
-      'selected-conductors.xlsx'
-    );
-
-    if (!isExported) {
-      this.dialogService.showWarning('Please select at least one record to export.');
-      return
+  protected toExcel(): void {
+    if (this.selectedRows.size === 0) {
+      this.dialog.showWarning('Please select at least one record to export.');
+      return;
     }
+    exportToExcel(Array.from(this.selectedRows), this.exportMeta, 'conductors.xlsx');
   }
 
-  // ===== Table Selection =====
-  protected onRowClick(row: any): void {
-    this.activeRow = row;
-  }
+  // ===== Template helper =====
 
-  protected onCloseDetailView(): void {
-    this.activeRow = null;
-  }
+  protected trackByField(_: number, field: any): any { return field.key ?? _; }
 
-  protected onRowAction(action: string, row: any):void {
-    if (action === 'edit') this.edit(row);
-  }
-
-  // ===== Selection Handling =====
-  protected onRowCheckboxChanged(event: CheckboxEvent):void {
-    if (event.checked) this.selectedRows.add(event.row);
-    else this.selectedRows.delete(event.row);
-  }
-
-  protected onSelectAll(checked: boolean):void {
-    this.selectedRows.clear();
-    if (checked) this.conductors.forEach(row => this.selectedRows.add(row));
-  }
-
-  // ===== Filtering =====
-  private onFilterFormChanged(): void {
-    this.filterForm.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe((filters: Record<string, any>) => {
-        this.conductorFacadeService.searchConductor(filters)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe(data => (this.conductors = data));
-      });
-  }
-
-  // ===== Action Panel =====
-  private actionHandlers: Record<string, () => void> = {
-    'clear-search': () => this.filterForm.reset(),
-    'create': () => this.openMainForm(),
-    'export-pdf': () => this.toPdf(),
-    'export-excel': () => this.toExcel()
-  };
-
-  protected onActionTriggered(event: ButtonClickEvent):void {
-    const handler = this.actionHandlers[event.type];
-    if (handler) handler();
-    else this.dialogService.showWarning(`No handler defined for action: ${event.type}`);
-  }
-
-  protected onDropdownOnlyClick(event: ButtonClickEvent):void {
-    const dropdownTypes = ['export-pdf', 'export-excel'];
-    if (dropdownTypes.includes(event.type)) {
-      this.actionHandlers[event.type]?.();
-    } else {
-      this.dialogService.showWarning(`Unhandled dropdown action: ${event.type}`);
-    }
-  }
-
+  protected readonly async = async;
+  protected readonly DRIVER_FILTER_FORM_META = DRIVER_FILTER_FORM_META;
 }

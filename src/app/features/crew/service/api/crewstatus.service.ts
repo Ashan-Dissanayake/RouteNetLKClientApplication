@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
-import {BaseHttpService} from '../../../core/basehttp.service';
+import {BaseHttpService} from '../../../../core/basehttp.service';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {ApiResponse} from '../../../shared/models/apiresponse.model';
-import {ApiEndpoints} from '../../../core/api-endpoints';
-import {CrewStatus} from '../entity/crewstatus';
+import {ApiResponse} from '../../../../shared/models/apiresponse.model';
+import {ApiEndpoints} from '../../../../core/api-endpoints';
+import {CrewStatus} from '../../entity/crewstatus';
 
 
 @Injectable({ providedIn: 'root' })
@@ -15,7 +15,7 @@ export class CrewStatusService extends BaseHttpService <CrewStatus>{
   }
 
   get():Observable<ApiResponse<CrewStatus>>{
-    return  this.getAll(ApiEndpoints.crewStatuses);
+    return  this.getAll(ApiEndpoints.CREW_STATUSES);
   }
 
 }

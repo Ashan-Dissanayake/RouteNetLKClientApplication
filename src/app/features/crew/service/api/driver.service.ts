@@ -1,11 +1,10 @@
 import {Injectable} from '@angular/core';
-import {BaseHttpService} from '../../../core/basehttp.service';
-import {Driver} from '../entity/driver';
+import {BaseHttpService} from '../../../../core/basehttp.service';
+import {Driver} from '../../entity/driver';
 import {HttpClient} from '@angular/common/http';
-import {ApiResponse} from '../../../shared/models/apiresponse.model';
+import {ApiResponse} from '../../../../shared/models/apiresponse.model';
 import {Observable} from 'rxjs';
-import {ApiEndpoints} from '../../../core/api-endpoints';
-import {Vehicle} from '../../vehiclemodule/entity/vehicle';
+import {ApiEndpoints} from '../../../../core/api-endpoints';
 
 
 @Injectable({ providedIn: 'root' })
@@ -16,15 +15,15 @@ export class DriverService extends BaseHttpService <Driver>{
   }
 
   get(params?:any):Observable<ApiResponse<Driver>>{
-    return  this.getAll(ApiEndpoints.drivers,params);
+    return  this.getAll(ApiEndpoints.DRIVERS,params);
   }
 
   save(driver:Driver):Observable<Driver>{
-    return this.post(ApiEndpoints.drivers,driver);
+    return this.post(ApiEndpoints.DRIVERS,driver);
   }
 
   update(driver:Driver):Observable<Driver>{
-    return this.put(ApiEndpoints.drivers,driver);
+    return this.put(ApiEndpoints.DRIVERS,driver);
   }
 
 }

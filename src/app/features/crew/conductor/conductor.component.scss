@@ -1,21 +1,16 @@
-// Variables - Typography & Colors
-$font-family-base: Roboto, 'Segoe UI', sans-serif;
-$color-text-main: #333;
-$color-text-muted: #666;
-$color-text-label: #777;
-$color-value: #222;
+$text-main: #333;
+$text-muted: #666;
+$text-label: #777;
+$font-family: Roboto, 'Segoe UI', sans-serif;
 
 // Status Colors
-$status-success: (text: #28a745, bg: #d4edda);
-$status-warning: (text: #ffc107, bg: #fff3cd);
-$status-info: (text: #4632be, bg: #cce5ff);
-$status-danger: (text: #dc3545, bg: #f8d7da);
+$status-colors: (
+  'ELIGIBLE': (color: #28a745, bg: #d4edda),
+  'INELIGIBLE': (color: #ffc107, bg: #fff3cd),
+  'ACTIVE': (color: #4632be, bg: #cce5ff),
+  'INACTIVE': (color: #dc3545, bg: #f8d7da)
+);
 
-// Mixins
-@mixin status-variant($colors) {
-  color: map-get($colors, text);
-  background: map-get($colors, bg);
-}
 
 .container {
   padding: 10px;
@@ -28,20 +23,13 @@ $status-danger: (text: #dc3545, bg: #f8d7da);
   }
 }
 
-::ng-deep .conductor-table {
-  mat-cell:first-of-type,
-  mat-header-cell:first-of-type {
-    padding-left: 8px !important;
-  }
-}
-
-.conductor-detail-container {
+conductor-detail-container {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
   padding: 1rem;
-  color: $color-text-main;
-  font-family: $font-family-base;
+  color: $text-main;
+  font-family: $font-family;
 
   .header {
     display: flex;
@@ -53,24 +41,19 @@ $status-danger: (text: #dc3545, bg: #f8d7da);
       align-items: center;
       gap: 0.75rem;
 
-      .conductor-icon {
-        font-size: 40px;
-        padding-right: 20px;
-        padding-bottom: 20px;
+      conductor-icon {
+        font-size: 25px;
+      }
+      conductor-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin: 0;
       }
 
-      .conductor-info-text {
-        .conductor-title {
-          font-size: 1.4rem;
-          font-weight: 600;
-          margin: 0;
-        }
-
-        .conductor-subtitle {
-          font-size: 0.9rem;
-          color: $color-text-muted;
-          margin: 0;
-        }
+      conductor-subtitle {
+        font-size: 0.9rem;
+        color: $text-muted;
+        margin: 0;
       }
     }
   }
@@ -83,20 +66,11 @@ $status-danger: (text: #dc3545, bg: #f8d7da);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 
-    &.eligible {
-      @include status-variant($status-success);
-    }
-
-    &.ineligible {
-      @include status-variant($status-warning);
-    }
-
-    &.active {
-      @include status-variant($status-info);
-    }
-
-    &.out-of-inactive {
-      @include status-variant($status-danger);
+    @each $status, $colors in $status-colors {
+      &.#{$status} {
+        color: map-get($colors, color);
+        background: map-get($colors, bg);
+      }
     }
   }
 
@@ -111,7 +85,7 @@ $status-danger: (text: #dc3545, bg: #f8d7da);
 
       .label {
         font-size: 0.8rem;
-        color: $color-text-label;
+        color: $text-label;
         margin-bottom: 2px;
         text-transform: uppercase;
       }
@@ -119,7 +93,7 @@ $status-danger: (text: #dc3545, bg: #f8d7da);
       .value {
         font-size: 1rem;
         font-weight: 500;
-        color: $color-value;
+        color: #222;
         word-break: break-word;
       }
     }
@@ -127,8 +101,8 @@ $status-danger: (text: #dc3545, bg: #f8d7da);
 }
 
 /* Responsive adjustments */
-.document-grid {
-  display: grid;
+.coverage-grid {
+  display: grid; // Assumed layout base
 
   @media (max-width: 1200px) {
     grid-template-columns: repeat(3, 1fr);

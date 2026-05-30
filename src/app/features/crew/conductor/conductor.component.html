@@ -1,26 +1,37 @@
-
 <div class="container">
   <h2>Conductor Details Management</h2>
 </div>
 
+<!-- Loading -->
+<mat-progress-bar *ngIf="loading$ | async" mode="indeterminate"></mat-progress-bar>
+
+<!-- Error -->
+<div *ngIf="error$ | async as error" id="error-window">
+  <mat-card>
+    <mat-card-title>Error loading Trips</mat-card-title>
+    <mat-card-content>{{ error?.message }}</mat-card-content>
+    <button mat-raised-button color="primary" (click)="reload()">Retry</button>
+  </mat-card>
+</div>
+
 <!-- ===== Action Panel ===== -->
 <app-button-panel
+  *ngIf="metadata$ | async as metadata"
   [buttons]="actionPanelConfig"
   (actionClicked)="onActionTriggered($event)"
   (dropdownClicked)="onDropdownOnlyClick($event)"
-  [contextData]="{ selectedRows: this.selectedRows }"
+  [contextData]="{ selectedRows: selectedRows }"
 >
 </app-button-panel>
 
 <!-- ===== Filter Section ===== -->
-<div *ngIf="filterForm && dataInitialized" id="serverSearch">
+<div *ngIf="metadata$ | async as metadata" id="serverSearch">
   <form [formGroup]="filterForm">
     <dynamic-field
-      *ngFor="let field of filterFormMeta"
+      *ngFor="let field of filterFormMeta; trackBy: trackByField"
       [formInstance]="filterForm"
       [field]="field"
-    >
-    </dynamic-field>
+    ></dynamic-field>
   </form>
 </div>
 
@@ -33,7 +44,8 @@
 >
   <app-data-table
     tableClass="conductor-table"
-    [data]="conductors"
+    *ngIf="(conductors$ | async)?.length"
+    [data]="(conductors$ | async) || []"
     [columns]="tableColumns"
     [sortable]="true"
     [paginatable]="true"
@@ -67,10 +79,10 @@
       <span
         class="status-chip"
         [ngClass]="{
-        'eligible': row.crewstatus.name === 'Eligible',
-        'ineligible': row.crewstatus.name === 'Ineligible',
-        'active': row.crewstatus.name === 'Active',
-        'inactive': row.crewstatus.name === 'Inactive'
+        'ELIGIBLE': row.crewstatus.name === 'Eligible',
+        'INELIGIBLE': row.crewstatus.name === 'Ineligible',
+        'ACTIVE': row.crewstatus.name === 'Active',
+        'INACTIVE': row.crewstatus.name === 'Inactive'
       }">
       {{ row.crewstatus.name }}
       </span>
