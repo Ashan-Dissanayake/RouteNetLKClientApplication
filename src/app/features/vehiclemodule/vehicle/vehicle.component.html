@@ -2,36 +2,49 @@
   <h2>Vehicle Details Management</h2>
 </div>
 
+<!-- Loading -->
+<mat-progress-bar *ngIf="loading$ | async" mode="indeterminate"></mat-progress-bar>
+
+<!-- Error -->
+<div *ngIf="error$ | async as error" id="error-window">
+  <mat-card>
+    <mat-card-title>Error loading Trips</mat-card-title>
+    <mat-card-content>{{ error?.message }}</mat-card-content>
+    <button mat-raised-button color="primary" (click)="reload()">Retry</button>
+  </mat-card>
+</div>
+
 <!-- ===== Action Panel ===== -->
 <app-button-panel
+  *ngIf="metadata$ | async as metadata"
   [buttons]="actionPanelConfig"
   (actionClicked)="onActionTriggered($event)"
   (dropdownClicked)="onDropdownOnlyClick($event)"
-  [contextData]="{ selectedRows: this.selectedRows }"
+  [contextData]="{ selectedRows: selectedRows }"
 >
 </app-button-panel>
 
 <!-- ===== Filter Section ===== -->
-<div *ngIf="filterForm && dataInitialized" id="serverSearch">
+<div *ngIf="metadata$ | async as metadata" id="serverSearch">
   <form [formGroup]="filterForm">
     <dynamic-field
-      *ngFor="let field of filterFormMeta"
+      *ngFor="let field of filterFormMeta; trackBy: trackByField"
       [formInstance]="filterForm"
       [field]="field"
-    >
-    </dynamic-field>
+    ></dynamic-field>
   </form>
 </div>
 
 <app-side-view
-  [opened]="activeVehicle !== null"
-  [data]="activeVehicle"
+  [opened]="activeRow !== null"
+  [data]="activeRow"
   [title]="'Vehicle Details'"
   (closed)="onCloseDetailView()"
   [viewTemplate]="vehicleDetailTemplate"
 >
 <app-data-table
-  [data]="vehicles"
+  *ngIf="(vehicles$ | async)?.length"
+  [data]="(vehicles$ | async) || []"
   [columns]="tableColumns"
   [sortable]="true"
   [paginatable]="true"
@@ -66,12 +79,12 @@
       <span
         class="status-chip"
         [ngClass]="{
-        'available': row.vehiclestatus.name === 'Available',
-        'in-service': row.vehiclestatus.name === 'In Service',
-        'under-maintenance': row.vehiclestatus.name === 'Maintenance',
-        'out-of-service': row.vehiclestatus.name === 'Out of Service',
-        'decommissioned': row.vehiclestatus.name === 'Decommissioned',
-        'reserved': row.vehiclestatus.name === 'Reserved',
+        'AVAILABLE': row.vehiclestatus.name === 'Available',
+        'IN-SERVICE': row.vehiclestatus.name === 'In Service',
+        'UNDER-MAINTENANCE': row.vehiclestatus.name === 'Maintenance',
+        'OUT-OF-SERVICE': row.vehiclestatus.name === 'Out of Service',
+        'DECOMMISSIONED': row.vehiclestatus.name === 'Decommissioned',
+        'RESERVED': row.vehiclestatus.name === 'Reserved',
       }">
       {{ row.vehiclestatus.name }}
       </span>

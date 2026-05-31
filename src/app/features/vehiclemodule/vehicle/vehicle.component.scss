@@ -1,15 +1,16 @@
-// Variables for colors and typography
 $text-main: #333;
-$text-secondary: #666;
-$text-muted: #777;
-$text-dark: #222;
+$text-muted: #666;
+$text-label: #777;
 $font-family: Roboto, 'Segoe UI', sans-serif;
 
-// Mixin for status chips
-@mixin status-variant($color, $bg) {
-  color: $color;
-  background: $bg;
-}
+$status-colors: (
+  'AVAILABLE': (color: #28a745, bg: #d4edda),
+  'IN-SERVICE': (color: #000000, bg: #cce5ff),
+  'UNDER-MAINTENANCE': (color: #fd7e14, bg: #ffe5cc),
+  'OUT-OF-SERVICE': (color: #dc3545, bg: #f8d7da),
+  'DECOMMISSIONED': (color: #6c757d, bg: #e2e3e5),
+  'RESERVED': (color: #ffc107, bg: #fff3cd)
+);
 
 .container {
   padding: 10px;
@@ -22,7 +23,6 @@ $font-family: Roboto, 'Segoe UI', sans-serif;
   }
 }
 
-// Sideview
 .vehicle-detail-container {
   display: flex;
   flex-direction: column;
@@ -55,7 +55,7 @@ $font-family: Roboto, 'Segoe UI', sans-serif;
 
       .vehicle-subtitle {
         font-size: 0.9rem;
-        color: $text-secondary;
+        color: $text-muted;
         margin: 0;
       }
     }
@@ -69,28 +69,11 @@ $font-family: Roboto, 'Segoe UI', sans-serif;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 
-    &.available {
-      @include status-variant(#28a745, #d4edda);
-    }
-
-    &.in-service {
-      @include status-variant(#000, #cce5ff);
-    }
-
-    &.under-maintenance {
-      @include status-variant(#fd7e14, #ffe5cc);
-    }
-
-    &.out-of-service {
-      @include status-variant(#dc3545, #f8d7da);
-    }
-
-    &.decommissioned {
-      @include status-variant(#6c757d, #e2e3e5);
-    }
-
-    &.reserved {
-      @include status-variant(#ffc107, #fff3cd);
+    @each $status, $colors in $status-colors {
+      &.#{$status} {
+        color: map-get($colors, color);
+        background: map-get($colors, bg);
+      }
     }
   }
 
@@ -105,7 +88,7 @@ $font-family: Roboto, 'Segoe UI', sans-serif;
 
       .label {
         font-size: 0.8rem;
-        color: $text-muted;
+        color: $text-label;
         margin-bottom: 2px;
         text-transform: uppercase;
       }
@@ -113,7 +96,7 @@ $font-family: Roboto, 'Segoe UI', sans-serif;
       .value {
         font-size: 1rem;
         font-weight: 500;
-        color: $text-dark;
+        color: #222;
         word-break: break-word;
       }
     }
@@ -123,14 +106,16 @@ $font-family: Roboto, 'Segoe UI', sans-serif;
 /* Responsive adjustments */
 .document-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); // Default
+  grid-template-columns: repeat(4, 1fr);
 
   @media (max-width: 1200px) {
     grid-template-columns: repeat(3, 1fr);
   }
+
   @media (max-width: 800px) {
     grid-template-columns: repeat(2, 1fr);
   }
+
   @media (max-width: 500px) {
     grid-template-columns: 1fr;
   }

@@ -1,4 +1,4 @@
-import {FormField} from '../../shared/models/formfieldata.model';
+import {FormField} from '../../../shared/models/formfieldata.model';
 
 export const VEHICLE_TABLE_META = [
   {key: 'number', label: 'Plate Number'},
@@ -8,7 +8,7 @@ export const VEHICLE_TABLE_META = [
   {key: 'fueltype.name', label: 'Fuel Type'},
   {key: 'conditionrate.name', label: 'Condition'},
   {key: 'vehiclestatus.name', label: 'Status'},
-  {key: 'actions', label: 'Actions'} // provide a template for this column below
+  {key: 'actions', label: 'Actions'}
 ];
 
 export const VEHICLE_FILTER_FORM_META: FormField[] = [

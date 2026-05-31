@@ -184,7 +184,15 @@ export class PermitComponent implements OnInit, OnDestroy {
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next:     () => this.dialog.showSuccess('Permit transferred successfully.'),
-          error:    err => this.dialog.showError('Failed to transfer permit.', err),
+          error: (err) => {
+            const validationMessage = err.friendlyMessage
+              || err.error?.details?.join('\n')
+              || err.message;
+            this.dialog.showMessage({
+              heading: 'Failed to create',
+              message: validationMessage
+            });
+          },
           complete: () => this.facade.reload(),
         });
     });
@@ -206,8 +214,15 @@ export class PermitComponent implements OnInit, OnDestroy {
   private save(formData: any): void {
     this.facade.create(formData).pipe(takeUntil(this.destroy$)).subscribe({
       next:     () => this.dialog.showSuccess('Permit created successfully.'),
-      error:    err => this.dialog.showMessage({ heading: 'Failed to create Permit', message: err.errorMessage }),
-      complete: () => {
+      error: (err) => {
+        const validationMessage = err.friendlyMessage
+          || err.error?.details?.join('\n')
+          || err.message;
+        this.dialog.showMessage({
+          heading: 'Failed to create',
+          message: validationMessage
+        });
+      },      complete: () => {
         this.facade.reload();
         this.formBuilder.resetForm(this.mainForm);
       },

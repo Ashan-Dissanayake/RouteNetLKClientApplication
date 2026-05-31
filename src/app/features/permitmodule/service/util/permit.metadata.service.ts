@@ -3,7 +3,7 @@ import {BranchService} from '../../../branchmodule/services/api/branch.service';
 import {PermitStatusService} from '../api/permitstatus.service';
 import {ServiceTypeService} from '../api/servicetype.service';
 import {RouteService} from '../api/route.service';
-import {VehicleService} from '../../../vehiclemodule/service/vehicle.service';
+import {VehicleService} from '../../../vehiclemodule/service/api/vehicle.service';
 import {RegexService} from '../../../../core/regex.service';
 import {PermitMetadata} from '../../model/permit.metadata.model';
 import {forkJoin, Observable} from 'rxjs';
