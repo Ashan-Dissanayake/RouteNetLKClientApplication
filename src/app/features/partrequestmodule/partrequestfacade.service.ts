@@ -8,9 +8,9 @@ import {PartRequest} from './entity/partrequest';
 import {PartRequestService} from './service/partrequest.service';
 import {PartRequestStatusService} from './service/partrequeststatus.service';
 import {PartRequestStatus} from './entity/partrequeststatus';
-import {PartMasterService} from '../sparepartmodule/service/partmaster.service';
+import {PartMasterService} from '../sparepartmodule/service/api/partmaster.service';
 import {PartMaster} from '../sparepartmodule/entity/partmaster';
-import {PartService} from '../sparepartmodule/service/part.service';
+import {PartService} from '../sparepartmodule/service/api/part.service';
 import {Part} from '../sparepartmodule/entity/part';
 
 @Injectable({

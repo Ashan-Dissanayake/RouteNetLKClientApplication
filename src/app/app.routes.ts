@@ -23,7 +23,7 @@ export const routes: Routes = [
         then(m => m.PermitComponent)
       },
       { path: 'part', loadComponent: () => import('./features/sparepartmodule/sparepart/sparepart.component').
-        then(m => m.SparepartComponent)
+        then(m => m.SparePartComponent)
       },
       { path: 'part-request', loadComponent: () => import('./features/partrequestmodule/partrequest/partrequest.component').
         then(m => m.PartRequestComponent)

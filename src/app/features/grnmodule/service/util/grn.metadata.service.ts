@@ -5,7 +5,7 @@ import {forkJoin, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {GrnStatusService} from '../api/grnstatus.service';
 import {PartRequestService} from '../../../partrequestmodule/service/partrequest.service';
-import {PartService} from '../../../sparepartmodule/service/part.service';
+import {PartService} from '../../../sparepartmodule/service/api/part.service';
 import {GrnMetadata} from '../../model/grn.metadata.model';
 
 @Injectable()

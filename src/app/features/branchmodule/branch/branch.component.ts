@@ -34,7 +34,7 @@ import {BranchFormService} from '../services/util/branchform.service';
 import {BranchMetadataService} from '../services/util/branch.metadata.service';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
-import {PART_FILTER_FORM_META} from '../../sparepartmodule/part.meta';
+import {PART_FILTER_FORM_META} from '../../sparepartmodule/model/part.meta';
 
 @Component({
   selector: 'app-branch',

@@ -1,10 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { PART_DATA_EXPORT_META, PART_FILTER_FORM_META, PART_IMMUTABLE_CONTROLLERS_META, PART_MAIN_FORM_META, PART_TABLE_META } from '../part.meta';
+import { PART_DATA_EXPORT_META, PART_FILTER_FORM_META, PART_IMMUTABLE_CONTROLLERS_META, PART_MAIN_FORM_META, PART_TABLE_META } from '../model/part.meta';
 import { buildActionPanel } from '../../../shared/component/button/action-panel.factory';
-import {async, Observable, Subject, take, takeUntil} from 'rxjs';
+import {async, debounceTime, Observable, Subject, take, takeUntil} from 'rxjs';
 import { Part } from '../entity/part';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
-import { PartFacadeService } from '../partfacade.service';
+import { PartFacadeService } from '../service/util/partfacade.service';
 import { DialogService } from '../../../core/dialog.service';
 import { FormbuilderService } from '../../../core/formbuilder.service';
 import {CheckboxEvent, DataTableComponent} from '../../../shared/component/data-table/data-table.component';
@@ -19,6 +19,9 @@ import {MatDivider} from '@angular/material/divider';
 import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
 import {MatIcon} from '@angular/material/icon';
+import {PartMetadata} from '../model/sparepart.metadata.model';
+import {PartFormService} from '../service/util/sparepartform.service';
+import {PartMetadataService} from '../service/util/sparepart.metadata.service';
 
 @Component({
   selector: 'app-sparepart',
@@ -43,56 +46,70 @@ import {MatIcon} from '@angular/material/icon';
   ],
   templateUrl: './sparepart.component.html',
   styleUrl: './sparepart.component.scss',
-  standalone: true
+  standalone: true,
+  providers: [
+    PartFacadeService,
+    PartFormService,
+    PartMetadataService,
+  ],
 })
-export class SparepartComponent implements OnInit, OnDestroy {
+export class SparePartComponent implements OnInit, OnDestroy {
 
-  // ===== Meta Data =====
-  protected readonly tableColumns = PART_TABLE_META;
-  protected readonly actionPanelConfig = buildActionPanel();
-  protected readonly filterFormMeta = PART_FILTER_FORM_META;
-  protected readonly mainFormMeta = PART_MAIN_FORM_META;
+  // ===== Static config =====
+  protected readonly tableColumns         = PART_TABLE_META;
+  protected readonly filterFormMeta       = PART_FILTER_FORM_META;
+  protected readonly mainFormMeta         = PART_MAIN_FORM_META;
   protected readonly immutableControllers = PART_IMMUTABLE_CONTROLLERS_META;
-  protected readonly exportMeta = PART_DATA_EXPORT_META;
+  protected readonly exportMeta           = PART_DATA_EXPORT_META;
+  protected readonly actionPanelConfig    = buildActionPanel();
 
+  // ===== Streams =====
+  protected readonly parts$:    Observable<Part[]>;
+  protected readonly metadata$: Observable<PartMetadata>;
+  protected readonly loading$:  Observable<boolean>;
+  protected readonly error$:    Observable<any>;
+
+  // ===== UI state =====
+  protected activeRow:    Part | null = null;
+  protected selectedRows  = new Set<Part>();
+  protected selectedCount = 0;
   protected readonly async = async;
-
-
-  // ===== Reactive State =====
-  protected parts$: Observable<Part[]>;
-  protected metadata$: Observable<any>;
-  protected loading$: Observable<boolean>;
-  protected error$: Observable<any>;
-  private destroy$ = new Subject<void>();
-
-  // ===== UI State =====
-  protected activePart: Part | null = null;
-  protected selectedRows = new Set<Part>();
 
   // ===== Forms =====
   protected filterForm: FormGroup = new FormGroup({});
-  protected mainForm: FormGroup = new FormGroup({});
+  protected mainForm:   FormGroup = new FormGroup({});
+
+  private destroy$         = new Subject<void>();
+  private currentMetadata: PartMetadata | null = null;
 
   constructor(
-    private partFacade: PartFacadeService,
-    private dialogService: DialogService,
-    private formBuilderService: FormbuilderService,
-
+    private facade:      PartFacadeService,
+    private formService: PartFormService,
+    private formBuilder: FormbuilderService,
+    private dialog:      DialogService,
   ) {
-    // Safe assignment – BehaviorSubject guarantees a value
-    this.parts$ = this.partFacade.parts$;
-    this.metadata$ = this.partFacade.metadata$;
-    this.loading$ = this.partFacade.loading$;
-    this.error$ = this.partFacade.error$;
+    this.parts$    = this.facade.parts$;
+    this.metadata$  = this.facade.metadata$;
+    this.loading$   = this.facade.loading$;
+    this.error$     = this.facade.error$;
   }
 
+  // ===== Lifecycle =====
 
   ngOnInit(): void {
-    this.initializeModule();
-    this.metadata$.pipe(takeUntil(this.destroy$)).subscribe(metadata => {
-      console.log(metadata)
-      this.createFilterForm(metadata);
-      this.createMainForm(metadata);
+    this.facade.initialize()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        error: err => this.dialog.showError('Failed to initialize part module.', err),
+      });
+
+    this.facade.metadata$.pipe(
+      takeUntil(this.destroy$),
+    ).subscribe(meta => {
+      this.currentMetadata = meta;
+      this.filterForm = this.formService.buildFilterForm(meta);
+      this.mainForm   = this.formService.buildMainForm(meta);
+      this.watchFilterForm();
     });
   }
 
@@ -101,178 +118,209 @@ export class SparepartComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private initializeModule() {
-    this.partFacade.initializePartModule()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        error: err => this.dialogService.showError('Failed to initialize part module.', err)
-      });
+  // ===== Filter =====
+
+  private watchFilterForm(): void {
+    this.filterForm.valueChanges.pipe(
+      debounceTime(300),
+      takeUntil(this.destroy$),
+    ).subscribe(values => this.facade.filter(values));
   }
 
-  // ===== Form creation =====
-  private createFilterForm(metadata: any): void {
-    this.filterForm = this.formBuilderService.build(this.filterFormMeta, {
-      sspartstatus: metadata.partStatuses,
-      sscategory: metadata.partCategories
-    });
-    this.onFilterFormChanged();
+  // ===== Row interaction =====
+
+  protected onRowClick(row: Part): void  { this.activeRow = row; }
+  protected onCloseDetailView(): void    { this.activeRow = null; }
+
+  protected onRowCheckboxChanged(event: CheckboxEvent): void {
+    event.checked ? this.selectedRows.add(event.row) : this.selectedRows.delete(event.row);
+    this.selectedCount = this.selectedRows.size;
   }
 
-  private createMainForm(metadata: any): void {
-    this.mainForm = this.formBuilderService.build(this.mainFormMeta, {
-      branch: metadata.branches,
-      partstatus: metadata.partStatuses,
-      partmaster: metadata.partMasters,
-      regexes: metadata.regexes
-    });
-  }
-
-  // ===== Filtering =====
-  private onFilterFormChanged(): void {
-    this.filterForm.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(filters => this.partFacade.filterParts(filters));
-  }
-
-  // ===== Row & Selection Handlers =====
-  protected onRowClick(row: Part): void {
-    this.activePart = row;
-  }
-
-  protected reload(): void { this.partFacade.reloadParts(); }
-
-  protected onCloseDetailView(): void {
-    this.activePart = null;
-  }
-
-  protected onRowAction(action: string, row: Part) {
-    if (action === 'edit') this.edit(row);
-  }
-
-  protected onRowCheckboxChanged(event: CheckboxEvent) {
-    if (event.checked) this.selectedRows.add(event.row);
-    else this.selectedRows.delete(event.row);
-  }
-
-  protected onSelectAll(checked: boolean) {
+  protected onSelectAll(checked: boolean): void {
     this.selectedRows.clear();
     if (checked) {
-      this.parts$.pipe(take(1)).subscribe(rows => rows.forEach(r => this.selectedRows.add(r)));
+      this.parts$.pipe(take(1)).subscribe(
+        rows => rows.forEach(r => this.selectedRows.add(r)),
+      );
     }
+    this.selectedCount = this.selectedRows.size;
   }
 
-  // ===== CRUD =====
-  private openMainForm(): void {
-    this.mainForm.value.id
-      ? this.formBuilderService.setControlsState(this.mainForm, this.immutableControllers, true)
-      : this.formBuilderService.setControlsState(this.mainForm, this.immutableControllers, false);
+  protected reload(): void { this.facade.reload(); }
 
-    this.dialogService.showFormPopup({
-      heading: this.mainForm.value.id ? 'Edit part' : 'Create part',
-      form: this.mainForm,
-      meta: this.mainFormMeta
+  // ===== Row actions =====
+
+  protected onRowAction(action: string, row: Part): void {
+    const actions: Record<string, () => void> = {
+      'edit': () => this.openEditForm(row),
+    };
+    if (actions[action]) actions[action]();
+    else this.dialog.showWarning(`Unknown row action: ${action}`);
+  }
+
+  // ===== Action panel =====
+
+  protected onActionTriggered(event: ButtonClickEvent): void {
+    const handlers: Record<string, () => void> = {
+      'create':          () => this.openCreateForm(),
+      'bulk-deactivate': () => this.deactivateSelected(),
+      'clear-search':    () => this.formBuilder.resetForm(this.filterForm),
+    };
+    if (handlers[event.type]) handlers[event.type]();
+    else this.dialog.showWarning(`No handler for: ${event.type}`);
+  }
+
+  protected onDropdownOnlyClick(event: ButtonClickEvent): void {
+    const handlers: Record<string, () => void> = {
+      'export-pdf':   () => this.toPdf(),
+      'export-excel': () => this.toExcel(),
+    };
+    if (handlers[event.type]) handlers[event.type]();
+    else this.dialog.showWarning(`Unhandled dropdown: ${event.type}`);
+  }
+
+  // ===== Create =====
+
+  private openCreateForm(): void {
+    this.formBuilder.setControlsState(this.mainForm, this.immutableControllers, false);
+
+    this.dialog.showFormPopup({
+      heading: 'Create Part',
+      form:    this.mainForm,
+      meta:    this.mainFormMeta,
+      width:   '900px',
     }).subscribe(formData => {
       if (formData) this.save(formData);
-      else this.formBuilderService.resetForm(this.mainForm);
+      else this.formBuilder.resetForm(this.mainForm);
     });
   }
 
   private save(formData: any): void {
-    const operation$ = formData.id
-      ? this.partFacade.updatePart(formData)
-      : this.partFacade.createPart(formData);
+    this.facade.create(formData).pipe(takeUntil(this.destroy$)).subscribe({
+      next:     () => this.dialog.showSuccess('Part created successfully.'),
+      error: (err) => {
+        const validationMessage = err.friendlyMessage
+          || err.error?.details?.join('\n')
+          || err.message;
+        this.dialog.showMessage({
+          heading: 'Failed to create',
+          message: validationMessage
+        });
+      },      complete: () => {
+        this.facade.reload();
+        if (this.currentMetadata) {
+          this.mainForm = this.formService.buildMainForm(this.currentMetadata);
+        }
+        this.formBuilder.setControlsState(this.mainForm, this.immutableControllers, false);
+      },
+    });
+  }
 
-    operation$?.pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => this.dialogService.showSuccess('part saved successfully.'),
-      error: (err) => this.dialogService.showMessage({ heading: 'Failed to save part', message: err.errorMessage }),
-      complete: () => {
-        this.partFacade.reloadParts();
-        this.formBuilderService.resetForm(this.mainForm);
-        this.formBuilderService.setControlsState(this.mainForm, this.immutableControllers, false);
+  // ===== Edit =====
+
+  private openEditForm(row: Part): void {
+    if (!this.currentMetadata) return;
+
+    this.mainForm = this.formService.buildMainFormForEdit(this.currentMetadata, row);
+    this.formBuilder.setControlsState(this.mainForm, this.immutableControllers, true);
+
+    this.dialog.showFormPopup({
+      heading: 'Edit Part',
+      form:    this.mainForm,
+      meta:    this.mainFormMeta,
+      width:   '900px',
+    }).subscribe(formData => {
+      if (formData) this.update(formData);
+      else {
+        this.mainForm = this.formService.buildMainForm(this.currentMetadata!);
+        this.formBuilder.setControlsState(this.mainForm, this.immutableControllers, false);
       }
     });
   }
 
-  private edit(row: Part): void {
-    const normalizedRow = this.formBuilderService.mapNestedValues(row, [
-      { from: 'seatingcapacity.make', to: 'make', remove: false }
-    ]);
-    this.mainForm.patchValue(normalizedRow);
-    this.openMainForm();
+  private update(formData: any): void {
+    this.facade.update(formData).pipe(takeUntil(this.destroy$)).subscribe({
+      next:     () => this.dialog.showSuccess('Part updated successfully.'),
+      error: (err) => {
+        const validationMessage = err.friendlyMessage
+          || err.error?.details?.join('\n')
+          || err.message;
+        this.dialog.showMessage({
+          heading: 'Failed to create',
+          message: validationMessage
+        });
+      },      complete: () => {
+        this.facade.reload();
+        if (this.currentMetadata) {
+          this.mainForm = this.formService.buildMainForm(this.currentMetadata);
+        }
+        this.formBuilder.setControlsState(this.mainForm, this.immutableControllers, false);
+      },
+    });
   }
 
-  protected deactivateSelectedRows(): void {
-    const toDeactivate = Array.from(this.selectedRows);
-    this.dialogService.showConfirmation({ heading: 'Deactivation', message: 'Are you sure?' })
-      .subscribe(confirmed => {
-        if (!confirmed) return;
-        this.partFacade.deactivateParts(toDeactivate)
-          ?.pipe(takeUntil(this.destroy$))
-          .subscribe({
-            next: () =>{
-              this.dialogService.showSuccess('Selected parts deactivated.');
-              this.partFacade.reloadParts();
-            } ,
-            error: (err) => this.dialogService.showError('Failed to deactivate parts.', err),
-            complete: () => this.selectedRows.clear()
-          });
-      });
+  // ===== Bulk deactivate =====
+
+  private deactivateSelected(): void {
+    if (this.selectedRows.size === 0) {
+      this.dialog.showWarning('Please select at least one record to deactivate.');
+      return;
+    }
+
+    this.dialog.showConfirmation({
+      heading: 'Deactivate Parts',
+      message: 'Selected parts will be deactivated. Are you sure?',
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
+
+      this.facade.deactivate(Array.from(this.selectedRows))
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => this.dialog.showSuccess('Selected parts deactivated successfully.'),
+          error: (err) => {
+            const validationMessage = err.friendlyMessage
+              || err.error?.details?.join('\n')
+              || err.message;
+            this.dialog.showMessage({
+              heading: 'Failed to create',
+              message: validationMessage
+            });
+          },
+          complete: () => {
+            this.selectedRows.clear();
+            this.selectedCount = 0;
+            this.facade.reload();
+          },
+        });
+    });
   }
 
   // ===== Export =====
+
   protected toPdf(): void {
-    this.parts$.pipe(take(1)).subscribe(selectedArray => {
-      if (this.selectedRows.size > 0) {
-        this.dialogService.showPrintDialog({
-          width: '1500px',
-          height: '650px',
-          title: 'Part Details',
-          mode: 'table',
-          data: Array.from(this.selectedRows),
-          columns: this.exportMeta
-        }).subscribe(result => { if (result) this.selectedRows.clear(); });
-      } else {
-        this.dialogService.showWarning('Please select at least one record to print.');
-      }
+    if (this.selectedRows.size === 0) {
+      this.dialog.showWarning('Please select at least one record to print.');
+      return;
+    }
+    this.dialog.showPrintDialog({
+      width: '1500px', height: '650px',
+      title: 'Part Details', mode: 'table',
+      data: Array.from(this.selectedRows), columns: this.exportMeta,
+    }).subscribe(result => {
+      if (result) { this.selectedRows.clear(); this.selectedCount = 0; }
     });
   }
 
   protected toExcel(): void {
     if (this.selectedRows.size === 0) {
-      this.dialogService.showWarning('Please select at least one record to export.');
+      this.dialog.showWarning('Please select at least one record to export.');
       return;
     }
-    exportToExcel(Array.from(this.selectedRows), this.exportMeta, 'sparts.xlsx');
+    exportToExcel(Array.from(this.selectedRows), this.exportMeta, 'spare-parts.xlsx');
   }
 
-  // ===== Action Panel =====
-  protected actionHandlers: Record<string, () => void> = {
-    'clear-search': () => this.filterForm.reset(),
-    'create': () => this.openMainForm(),
-    'bulk-deactivate': () => this.deactivateSelectedRows(),
-    'export-pdf': () => this.toPdf(),
-    'export-excel': () => this.toExcel()
-  };
+  // ===== Template helper =====
 
-  protected onActionTriggered(event: ButtonClickEvent) {
-    const handler = this.actionHandlers[event.type];
-    if (handler) handler();
-    else this.dialogService.showWarning(`No handler defined for action: ${event.type}`);
-  }
-
-  protected onDropdownOnlyClick(event: ButtonClickEvent) {
-    const dropdownTypes = ['export-pdf', 'export-excel'];
-    if (dropdownTypes.includes(event.type)) {
-      this.actionHandlers[event.type]?.();
-    } else {
-      this.dialogService.showWarning(`Unhandled dropdown action: ${event.type}`);
-    }
-  }
-
-  // ===== TrackBy for optimization ====
-  trackByField(index: number, field: any) {
-    return field.key || index;
-  }
-
-
+  protected trackByField(_: number, field: any): any { return field.key ?? _; }
 }

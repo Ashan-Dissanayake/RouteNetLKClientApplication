@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
-import {BaseHttpService} from '../../../core/basehttp.service';
+import {BaseHttpService} from '../../../../core/basehttp.service';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {ApiResponse} from '../../../shared/models/apiresponse.model';
-import {ApiEndpoints} from '../../../core/api-endpoints';
-import {Part} from '../entity/part';
+import {ApiResponse} from '../../../../shared/models/apiresponse.model';
+import {ApiEndpoints} from '../../../../core/api-endpoints';
+import {Part} from '../../entity/part';
 
 @Injectable({ providedIn: 'root' })
 export class PartService extends BaseHttpService <Part>{

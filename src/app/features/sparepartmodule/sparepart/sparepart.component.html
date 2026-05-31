@@ -35,8 +35,8 @@
 
 <!-- ===== Main Table with Side View ===== -->
 <app-side-view
-  [opened]="activePart !== null"
-  [data]="activePart"
+  [opened]="activeRow !== null"
+  [data]="activeRow"
   [title]="'Part Details'"
   [viewTemplate]="partDetailTemplate"
   (closed)="onCloseDetailView()"

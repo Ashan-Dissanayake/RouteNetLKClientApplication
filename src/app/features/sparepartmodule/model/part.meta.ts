@@ -1,4 +1,4 @@
-import {FormField} from '../../shared/models/formfieldata.model';
+import {FormField} from '../../../shared/models/formfieldata.model';
 
 export const PART_TABLE_META = [
   {key: 'branch.name', label: 'Branch'},
