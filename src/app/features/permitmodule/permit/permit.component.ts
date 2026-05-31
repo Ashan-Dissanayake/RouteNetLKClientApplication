@@ -1,16 +1,17 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {
+  PERMIT_EXPORT_META,
   PERMIT_FILTER_FORM_META,
   PERMIT_MAIN_FORM_META,
   PERMIT_TABLE_META
-} from '../permit.meta';
-import {PermitFacadeService} from '../permitfacade.service';
-import {Observable, Subject, take, takeUntil} from 'rxjs';
+} from '../model/permit.meta';
+import {PermitFacadeService} from '../service/util/permitfacade.service';
+import {debounceTime, Observable, Subject, take, takeUntil} from 'rxjs';
 import {DialogService} from '../../../core/dialog.service';
 import {CheckboxEvent, DataTableComponent} from '../../../shared/component/data-table/data-table.component';
 import {Permit} from '../entity/permit';
 import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
-import {AsyncPipe, DatePipe, NgClass, NgFor, NgIf} from '@angular/common';
+import {AsyncPipe, NgClass, NgFor, NgIf} from '@angular/common';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {MatButton} from '@angular/material/button';
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
@@ -25,6 +26,10 @@ import {MatDivider} from '@angular/material/divider';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {FormbuilderService} from '../../../core/formbuilder.service';
+import {PermitMetadata} from '../model/permit.metadata.model';
+import {PermitFormService} from '../service/util/permitfrom.service';
+import {PermitMetadataService} from '../service/util/permit.metadata.service';
+import {exportToExcel} from '../../../shared/component/export/excel-export.util';
 
 @Component({
   selector: 'app-permit',
@@ -50,49 +55,68 @@ import {FormbuilderService} from '../../../core/formbuilder.service';
   templateUrl: './permit.component.html',
   styleUrl: './permit.component.scss',
   standalone:true,
+  providers: [
+    PermitFacadeService,
+    PermitFormService,
+    PermitMetadataService,
+  ],
 })
-export class PermitComponent implements OnInit, OnDestroy{
+export class PermitComponent implements OnInit, OnDestroy {
 
-  // ===== Meta Data =====
-  protected readonly tableColumns = PERMIT_TABLE_META;
+  // ===== Static config =====
+  protected readonly tableColumns    = PERMIT_TABLE_META;
+  protected readonly filterFormMeta  = PERMIT_FILTER_FORM_META;
+  protected readonly mainFormMeta    = PERMIT_MAIN_FORM_META;
+  protected readonly exportMeta    = PERMIT_EXPORT_META;
   protected readonly actionPanelConfig = buildActionPanel();
-  protected readonly filterFormMeta = PERMIT_FILTER_FORM_META;
-  protected readonly mainFormMeta = PERMIT_MAIN_FORM_META;
 
-  // ===== Reactive State =====
-  protected permits$: Observable<Permit[]>;
-  protected metadata$: Observable<any>;
-  protected loading$: Observable<boolean>;
-  protected error$: Observable<any>;
-  private destroy$ = new Subject<void>();
+  // ===== Streams =====
+  protected readonly permits$:  Observable<Permit[]>;
+  protected readonly metadata$: Observable<PermitMetadata>;
+  protected readonly loading$:  Observable<boolean>;
+  protected readonly error$:    Observable<any>;
 
-  // ===== UI State =====
-  protected activePermit: Permit | null = null;
-  protected selectedRows = new Set<Permit>();
+  // ===== UI state =====
+  protected activeRow:    Permit | null = null;
+  protected selectedRows  = new Set<Permit>();
+  protected selectedCount = 0;
 
   // ===== Forms =====
   protected filterForm: FormGroup = new FormGroup({});
-  protected mainForm: FormGroup = new FormGroup({});
+  protected mainForm:   FormGroup = new FormGroup({});
+
+  private destroy$         = new Subject<void>();
+  private currentMetadata: PermitMetadata | null = null;
 
   constructor(
-    private permitFacade:PermitFacadeService,
-    private dialogService: DialogService,
-    private formBuilderService: FormbuilderService,
-
+    private facade:      PermitFacadeService,
+    private formService: PermitFormService,
+    private formBuilder: FormbuilderService,
+    private dialog:      DialogService,
   ) {
-    // Safe assignment – BehaviorSubject guarantees a value
-    this.permits$ = this.permitFacade.permits$;
-    this.metadata$ = this.permitFacade.metadata$;
-    this.loading$ = this.permitFacade.loading$;
-    this.error$ = this.permitFacade.error$;
+    this.permits$  = this.facade.permits$;
+    this.metadata$  = this.facade.metadata$;
+    this.loading$   = this.facade.loading$;
+    this.error$     = this.facade.error$;
   }
 
+  // ===== Lifecycle =====
+
   ngOnInit(): void {
-    this.initializeModule();
-    this.metadata$.pipe(takeUntil(this.destroy$)).subscribe(metadata => {
-      console.log(metadata)
-      this.createFilterForm(metadata);
-      this.createMainForm(metadata);
+    this.facade.initialize()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        error: err => this.dialog.showError('Failed to initialize permit module.', err),
+      });
+
+    // Build forms once real metadata arrives — skip EMPTY_PERMIT_METADATA
+    this.facade.metadata$.pipe(
+      takeUntil(this.destroy$),
+    ).subscribe(meta => {
+      this.currentMetadata = meta;
+      this.filterForm = this.formService.buildFilterForm(meta);
+      this.mainForm   = this.formService.buildMainForm(meta);
+      this.watchFilterForm();
     });
   }
 
@@ -101,136 +125,145 @@ export class PermitComponent implements OnInit, OnDestroy{
     this.destroy$.complete();
   }
 
-  private initializeModule() {
-    this.permitFacade.initializePermitModule()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        error: err => this.dialogService.showError('Failed to initialize permit module.', err)
-      });
+  // ===== Filter =====
+
+  private watchFilterForm(): void {
+    this.filterForm.valueChanges.pipe(
+      debounceTime(300),
+      takeUntil(this.destroy$),
+    ).subscribe(values => this.facade.filter(values));
   }
 
-  // ===== Form creation =====
-  private createFilterForm(metadata: any): void {
-    this.filterForm = this.formBuilderService.build(this.filterFormMeta, {
-      sspermitstatus: metadata.permitStatuses,
-      ssroute: metadata.routes
-    });
-    this.onFilterFormChanged();
+  // ===== Row interaction =====
+
+  protected onRowClick(row: Permit): void  { this.activeRow = row; }
+  protected onCloseDetailView(): void      { this.activeRow = null; }
+
+  protected onRowCheckboxChanged(event: CheckboxEvent): void {
+    event.checked ? this.selectedRows.add(event.row) : this.selectedRows.delete(event.row);
+    this.selectedCount = this.selectedRows.size;
   }
 
-  private createMainForm(metadata: any): void {
-    this.mainForm = this.formBuilderService.build(this.mainFormMeta, {
-      vehicle: metadata.vehicles,
-      branch: metadata.branches,
-      permitestatus: metadata.permitStatuses,
-      servicetype: metadata.serviceTypes,
-      route: metadata.routes,
-      regexes: metadata.regexes
-    });
-  }
-
-  // ===== Filtering =====
-  private onFilterFormChanged(): void {
-    this.filterForm.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(filters => this.permitFacade.filterPermits(filters));
-  }
-
-  protected reload(): void { this.permitFacade.reloadPermits(); }
-
-  protected onCloseDetailView(): void {
-    this.activePermit = null;
-  }
-
-  // ===== Row & Selection Handlers =====
-  protected onRowClick(row: Permit): void {
-    this.activePermit = row;
-  }
-
-  protected onRowCheckboxChanged(event: CheckboxEvent) {
-    if (event.checked) this.selectedRows.add(event.row);
-    else this.selectedRows.delete(event.row);
-  }
-
-  protected onSelectAll(checked: boolean) {
+  protected onSelectAll(checked: boolean): void {
     this.selectedRows.clear();
     if (checked) {
       this.permits$.pipe(take(1)).subscribe(
-        rows => rows.forEach(r => this.selectedRows.add(r))
+        rows => rows.forEach(r => this.selectedRows.add(r)),
       );
     }
+    this.selectedCount = this.selectedRows.size;
   }
 
-  // ===== CRUD =====
-  private openMainForm(): void {
-    this.dialogService.showFormPopup({
-      heading: this.mainForm.value.id ? 'Edit Permit' : 'Create Permit',
-      form: this.mainForm,
-      meta: this.mainFormMeta
+  protected reload(): void { this.facade.reload(); }
+
+  // ===== Row actions =====
+
+  protected onRowAction(action: string, row: Permit): void {
+    const actions: Record<string, () => void> = {
+      'transfer': () => this.transferPermit(row),
+    };
+    if (actions[action]) actions[action]();
+    else this.dialog.showWarning(`Unknown row action: ${action}`);
+  }
+
+  // ===== Transfer =====
+  //
+  // Transfer is a domain-level status transition on an existing permit.
+  // The confirmation dialog lives here because showing UI feedback
+  // is a component responsibility. The actual operation delegates
+  // to the facade.
+
+  private transferPermit(row: Permit): void {
+    this.dialog.showConfirmation({
+      heading: 'Permit Transfer',
+      message: `Are you sure you want to transfer Permit ${row.number}?`,
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
+
+      this.facade.transfer(row.id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next:     () => this.dialog.showSuccess('Permit transferred successfully.'),
+          error:    err => this.dialog.showError('Failed to transfer permit.', err),
+          complete: () => this.facade.reload(),
+        });
+    });
+  }
+
+  // ===== Create =====
+  private openCreateForm(): void {
+    this.dialog.showFormPopup({
+      heading: 'Create Permit',
+      form:    this.mainForm,
+      meta:    this.mainFormMeta,
+      width:   '900px',
     }).subscribe(formData => {
       if (formData) this.save(formData);
-      else this.formBuilderService.resetForm(this.mainForm);
+      else this.formBuilder.resetForm(this.mainForm);
     });
   }
 
   private save(formData: any): void {
-    const operation$ = this.permitFacade.createPermit(formData);
-    operation$?.pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => this.dialogService.showSuccess('Permit saved successfully.'),
-      error: (err) => this.dialogService.showMessage({ heading: 'Failed to save Permit', message: err.errorMessage }),
+    this.facade.create(formData).pipe(takeUntil(this.destroy$)).subscribe({
+      next:     () => this.dialog.showSuccess('Permit created successfully.'),
+      error:    err => this.dialog.showMessage({ heading: 'Failed to create Permit', message: err.errorMessage }),
       complete: () => {
-        this.permitFacade.reloadPermits();
-        this.formBuilderService.resetForm(this.mainForm);
+        this.facade.reload();
+        this.formBuilder.resetForm(this.mainForm);
+      },
+    });
+  }
+
+  // ===== Action panel =====
+
+  protected onActionTriggered(event: ButtonClickEvent): void {
+    const handlers: Record<string, () => void> = {
+      'create':       () => this.openCreateForm(),
+      'clear-search': () => this.formBuilder.resetForm(this.filterForm),
+    };
+    if (handlers[event.type]) handlers[event.type]();
+    else this.dialog.showWarning(`No handler for: ${event.type}`);
+  }
+
+  protected onDropdownOnlyClick(event: ButtonClickEvent): void {
+    const handlers: Record<string, () => void> = {
+      'export-pdf':   () => this.toPdf(),
+      'export-excel': () => this.toExcel(),
+    };
+    if (handlers[event.type]) handlers[event.type]();
+    else this.dialog.showWarning(`Unhandled dropdown: ${event.type}`);
+  }
+
+  // ===== Export =====
+  protected toPdf(): void {
+    if (this.selectedRows.size === 0) {
+      this.dialog.showWarning('Please select at least one record to print.');
+      return;
+    }
+
+    this.dialog.showPrintDialog({
+      width:   '1500px',
+      height:  '650px',
+      title:   'Permit Details',
+      mode:    'table',
+      data:    Array.from(this.selectedRows),
+      columns: this.exportMeta,
+    }).subscribe(result => {
+      if (result) {
+        this.selectedRows.clear();
+        this.selectedCount = 0;
       }
     });
   }
 
-  private transferPermit(row:Permit): void {
-    this.dialogService.showConfirmation({
-      heading:"Permit Transfer",
-      message:"Are you sure to TRANSFERRED this Permit-"+row.number
-    }).subscribe(confirmed=>{
-      if (!confirmed) return;
-      this.permitFacade.transferPermit(row.id)
-        ?.pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: () => this.dialogService.showSuccess('Transferred.'),
-          error: (err) => this.dialogService.showError('Failed to transferred.', err),
-          complete:()=>{
-            this.reload();
-          }
-        });
-    })
-  }
-
-  // ===== Action Panel =====
-  protected actionHandlers: Record<string,  (row?: Permit) => void> = {
-    'clear-search': () => this.filterForm.reset(),
-    'create': () => this.openMainForm(),
-    'export-pdf': () => console.log("topdf"),
-    'export-excel': () => console.log("toexcel")
-  };
-
-  protected onActionTriggered(event: ButtonClickEvent) {
-    const handler = this.actionHandlers[event.type];
-    if (handler) handler();
-    else this.dialogService.showWarning(`No handler defined for action: ${event.type}`);
-  }
-
-  protected onDropdownOnlyClick(event: ButtonClickEvent) {
-    const dropdownTypes = ['export-pdf', 'export-excel'];
-    if (dropdownTypes.includes(event.type)) {
-      this.actionHandlers[event.type]?.();
-    } else {
-      this.dialogService.showWarning(`Unhandled dropdown action: ${event.type}`);
+  protected toExcel(): void {
+    if (this.selectedRows.size === 0) {
+      this.dialog.showWarning('Please select at least one record to export.');
+      return;
     }
+    exportToExcel(Array.from(this.selectedRows), this.exportMeta, 'branch.xlsx');
   }
 
-  protected onRowAction(action: string, row: any) {
-    if (action === 'transfer') this.transferPermit(row);
-  }
-
-  // ===== TrackBy for optimization =====
-  protected trackByField(index: number, field: any): string { return field.name; }
-
+  // ===== Template helper =====
+  protected trackByField(_: number, field: any): any { return field.name ?? _; }
 }

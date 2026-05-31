@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {BranchService} from '../branchmodule/services/api/branch.service';
 import {TripTypeService} from './service/triptype.service';
-import {PermitService} from '../permitmodule/service/permit.service';
+import {PermitService} from '../permitmodule/service/api/permit.service';
 import {TripStatusService} from './service/tripstatus.service';
 import {OriginTerminalService} from './service/originterminal.service';
 import {BehaviorSubject, finalize, forkJoin, Observable, tap, throwError} from 'rxjs';

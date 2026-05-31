@@ -1,4 +1,4 @@
-import {FormField} from '../../shared/models/formfieldata.model';
+import {FormField} from '../../../shared/models/formfieldata.model';
 
 export const PERMIT_TABLE_META = [
   {key: 'number', label: 'Permit Number'},
@@ -11,7 +11,6 @@ export const PERMIT_TABLE_META = [
   {key: 'permitestatus.name', label: 'Status'},
   {key: 'actions', label: 'Actions'}
 ];
-
 
 export const PERMIT_FILTER_FORM_META: FormField[] = [
   {name: 'ssnumber', type: 'text', label: 'Permit Number', required: false, mode: "none"},
@@ -34,3 +33,14 @@ export const PERMIT_MAIN_FORM_META: FormField[] = [
   {name: 'servicetype', type: 'select', label: 'Service Type', required: true, mode: 'options'},
   {name: 'permitestatus', type: 'select', label: 'Permit Status', required: true, mode: 'options'}
 ] as FormField[];
+
+export const PERMIT_EXPORT_META = [
+  {key: 'number', header: 'Permit Number'},
+  {key: 'route.name', header: 'Route'},
+  {key: 'vehicle.number', header: 'Plate Number'},
+  {key: 'doissued', header: 'Issue Date'},
+  {key: 'doexpired', header: 'Exp Date'},
+  {key: 'branch.name', header: 'Branch'},
+  {key: 'servicetype.name', header: 'Service Type'},
+  {key: 'permitestatus.name', header: 'Status'},
+];

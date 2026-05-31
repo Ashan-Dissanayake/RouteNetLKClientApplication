@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
-import {BaseHttpService} from '../../../core/basehttp.service';
+import {BaseHttpService} from '../../../../core/basehttp.service';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {ApiResponse} from '../../../shared/models/apiresponse.model';
-import {ApiEndpoints} from '../../../core/api-endpoints';
-import {Permit} from '../entity/permit';
-import {Branch} from '../../branchmodule/entity/branch';
+import {ApiResponse} from '../../../../shared/models/apiresponse.model';
+import {ApiEndpoints} from '../../../../core/api-endpoints';
+import {Permit} from '../../entity/permit';
+import {Branch} from '../../../branchmodule/entity/branch';
 
 @Injectable({ providedIn: 'root' })
 export class PermitService extends BaseHttpService <Permit>{

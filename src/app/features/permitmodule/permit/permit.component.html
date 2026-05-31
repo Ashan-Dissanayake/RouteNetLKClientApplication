@@ -36,8 +36,8 @@
 
 <!-- ===== Main Table with Side View ===== -->
 <app-side-view
-  [opened]="activePermit !== null"
-  [data]="activePermit"
+  [opened]="activeRow !== null"
+  [data]="activeRow"
   [title]="'Permit Details'"
   [viewTemplate]="permitDetailTemplate"
   (closed)="onCloseDetailView()"
