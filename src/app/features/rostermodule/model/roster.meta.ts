@@ -1,4 +1,4 @@
-import {FormField} from '../../shared/models/formfieldata.model';
+import {FormField} from '../../../shared/models/formfieldata.model';
 
 
 export const ROSTER_SHIFT_TABLE_META = [

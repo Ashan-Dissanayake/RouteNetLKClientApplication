@@ -48,7 +48,7 @@
           matTooltip="Assign Crew"
           style="color: #3677d0;"
           [disabled]="!selectedRosterId || isAssigning"
-          (click)="assignedCrew()">
+          (click)="assignCrew()">
 
           <mat-icon *ngIf="!isAssigning">how_to_reg</mat-icon>
           <mat-spinner *ngIf="isAssigning" diameter="20" style="display: inline-block;"></mat-spinner>
@@ -82,7 +82,7 @@
     </mat-card-header>
 
     <mat-card-content class="panel-body">
-      <div class="assignment-list" *ngIf="rosterShiftsAssignments$ | async as assignments">
+      <div class="assignment-list" *ngIf="rosterShiftAssignments$ | async as assignments">
         <div class="assignment-item" *ngFor="let item of assignments" [class]="item.status">
           <div class="item-header">
             <span class="emp-name">{{ item.employeeName || 'Unassigned' }}</span>
@@ -98,10 +98,10 @@
           </div>
 
           <div class="item-actions">
-            <button (click)="approvedAss(item.id)" mat-icon-button matTooltip="Approve">
+            <button (click)="approveAssignment(item.id)" mat-icon-button matTooltip="Approve">
               <mat-icon style="color: green">check_circle</mat-icon>
             </button>
-            <button (click)="rejectAss(item.id)" mat-icon-button matTooltip="Reject">
+            <button (click)="rejectAssignment(item.id)" mat-icon-button matTooltip="Reject">
               <mat-icon style="color: orange">cancel</mat-icon>
             </button>
           </div>
