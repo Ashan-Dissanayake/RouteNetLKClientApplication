@@ -35,8 +35,8 @@
 
 <!-- ===== Main Table with Side View ===== -->
 <app-side-view
-  [opened]="activeTrip !== null"
-  [data]="activeTrip"
+  [opened]="activeRow !== null"
+  [data]="activeRow"
   [title]="'Trip Details'"
   [viewTemplate]="tripDetailTemplate"
   (closed)="onCloseDetailView()"
