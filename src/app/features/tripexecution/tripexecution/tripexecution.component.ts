@@ -11,7 +11,7 @@ import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {DialogService} from '../../../core/dialog.service';
 import {FormbuilderService} from '../../../core/formbuilder.service';
 import {TripExecutionFacadeService} from '../tripexecutionfacade.service';
-import {PART_REQUEST_MAIN_FORM_META} from '../../partrequestmodule/partrequest.meta';
+import {PART_REQUEST_MAIN_FORM_META} from '../../partrequestmodule/model/partrequest.meta';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
 import {AsyncPipe, formatDate, LowerCasePipe, NgClass, NgForOf, NgIf, UpperCasePipe} from '@angular/common';
 import {DataTableComponent} from '../../../shared/component/data-table/data-table.component';
