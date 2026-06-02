@@ -35,8 +35,8 @@
 
 <!-- ===== Main Table with Side View ===== -->
 <app-side-view
-  [opened]="activeIncident !== null"
-  [data]="activeIncident"
+  [opened]="activeRow !== null"
+  [data]="activeRow"
   [title]="'Incident Details'"
   [viewTemplate]="incidentDetailTemplate"
   (closed)="onCloseDetailView()"

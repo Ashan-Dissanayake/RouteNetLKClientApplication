@@ -5,30 +5,32 @@ import {
   INCIDENT_FILTER_FORM_META,
   INCIDENT_MAIN_FORM_META,
   INCIDENT_TABLE_META
-} from '../incident.meta';
-import {async, Observable, Subject, take, takeUntil} from 'rxjs';
+} from '../model/incident.meta';
+import {async, debounceTime, Observable, Subject, take, takeUntil} from 'rxjs';
 import {Incident} from '../entity/incident';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {DialogService} from '../../../core/dialog.service';
 import {FormbuilderService} from '../../../core/formbuilder.service';
-import {IncidentFacadeService} from '../incidentfacade.service';
+import {IncidentFacadeService} from '../service/util/incidentfacade.service';
 import {exportToExcel} from '../../../shared/component/export/excel-export.util';
 import {
   ButtonClickEvent,
   ButtonPanelComponent
 } from '../../../shared/component/button/button-panel/button-panel.component';
 import {CheckboxEvent, DataTableComponent} from '../../../shared/component/data-table/data-table.component';
-import {AsyncPipe, DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
+import {AsyncPipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
-import {MatChip} from '@angular/material/chips';
 import {MatDivider} from '@angular/material/divider';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
 import {MatIcon} from '@angular/material/icon';
 import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
+import {IncidentMetadata} from '../model/incidentreport.metadata.model';
+import {IncidentFormService} from '../service/util/incidentform.service';
+import {IncidentMetadataService} from '../service/util/incident.metadata.service';
 
 @Component({
   selector: 'app-incidentreport',
@@ -58,52 +60,68 @@ import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
   ],
   templateUrl: './incidentreport.component.html',
   styleUrl: './incidentreport.component.scss',
-  standalone:true
+  standalone:true,
+  providers: [
+    IncidentFacadeService,
+    IncidentFormService,
+    IncidentMetadataService,
+  ],
 })
-export class IncidentReportComponent implements OnInit, OnDestroy   {
+export class IncidentReportComponent implements OnInit, OnDestroy {
 
-  // ===== Meta Data =====
-  protected readonly tableColumns = INCIDENT_TABLE_META;
+  // ===== Static config =====
+  protected readonly tableColumns    = INCIDENT_TABLE_META;
+  protected readonly filterFormMeta  = INCIDENT_FILTER_FORM_META;
+  protected readonly mainFormMeta    = INCIDENT_MAIN_FORM_META;
+  protected readonly exportMeta      = INCIDENT_DATA_EXPORT_META;
   protected readonly actionPanelConfig = buildActionPanel();
-  protected readonly filterFormMeta = INCIDENT_FILTER_FORM_META;
-  protected readonly mainFormMeta = INCIDENT_MAIN_FORM_META;
-  protected readonly exportMeta = INCIDENT_DATA_EXPORT_META;
 
-  // ===== Reactive State =====
-  protected incidents$: Observable<Incident[]>;
-  protected metadata$: Observable<any>;
-  protected loading$: Observable<boolean>;
-  protected error$: Observable<any>;
-  private destroy$ = new Subject<void>();
+  // ===== Streams =====
+  protected readonly incidents$: Observable<Incident[]>;
+  protected readonly metadata$:  Observable<IncidentMetadata>;
+  protected readonly loading$:   Observable<boolean>;
+  protected readonly error$:     Observable<any>;
 
-  protected readonly async = async;
-
-  // ===== UI State =====
-  protected activeIncident: Incident | null = null;
-  protected selectedRows = new Set<Incident>();
+  // ===== UI state =====
+  protected activeRow:    Incident | null = null;
+  protected selectedRows  = new Set<Incident>();
+  protected selectedCount = 0;
 
   // ===== Forms =====
   protected filterForm: FormGroup = new FormGroup({});
-  protected mainForm: FormGroup = new FormGroup({});
+  protected mainForm:   FormGroup = new FormGroup({});
+
+  private destroy$         = new Subject<void>();
+  private currentMetadata: IncidentMetadata | null = null;
 
   constructor(
-    private incidentFacade: IncidentFacadeService,
-    private dialogService: DialogService,
-    private formBuilderService: FormbuilderService,
-
+    private facade:      IncidentFacadeService,
+    private formService: IncidentFormService,
+    private formBuilder: FormbuilderService,
+    private dialog:      DialogService,
   ) {
-    // Safe assignment – BehaviorSubject guarantees a value
-    this.incidents$ = this.incidentFacade.incident$;
-    this.metadata$ = this.incidentFacade.metadata$;
-    this.loading$ = this.incidentFacade.loading$;
-    this.error$ = this.incidentFacade.error$;
+    this.incidents$ = this.facade.incidents$;
+    this.metadata$   = this.facade.metadata$;
+    this.loading$    = this.facade.loading$;
+    this.error$      = this.facade.error$;
   }
 
+  // ===== Lifecycle =====
+
   ngOnInit(): void {
-    this.initializeModule();
-    this.metadata$.pipe(takeUntil(this.destroy$)).subscribe(metadata => {
-      this.createFilterForm(metadata);
-      this.createMainForm(metadata);
+    this.facade.initialize()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        error: err => this.dialog.showError('Failed to initialize module.', err),
+      });
+
+    this.facade.metadata$.pipe(
+      takeUntil(this.destroy$),
+    ).subscribe(meta => {
+      this.currentMetadata = meta;
+      this.filterForm = this.formService.buildFilterForm(meta);
+      this.mainForm   = this.formService.buildMainForm(meta);
+      this.watchFilterForm();
     });
   }
 
@@ -112,206 +130,143 @@ export class IncidentReportComponent implements OnInit, OnDestroy   {
     this.destroy$.complete();
   }
 
-  private initializeModule() {
-    this.incidentFacade.initializeIncidentModule()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        error: err => this.dialogService.showError('Failed to initialize module.', err)
-      });
+  // ===== Filter =====
+
+  private watchFilterForm(): void {
+    this.filterForm.valueChanges.pipe(
+      debounceTime(300),
+      takeUntil(this.destroy$),
+    ).subscribe(values => this.facade.filter(values));
   }
 
-  // ===== Form creation =====
-  private createFilterForm(metadata: any): void {
-    this.filterForm = this.formBuilderService.build(this.filterFormMeta, {
-      ssincidenttype: metadata.incidentTypes,
-      sstripexecution: metadata.tripExecutions,
-    });
-    this.onFilterFormChanged();
+  // ===== Row interaction =====
+
+  protected onRowClick(row: Incident): void  { this.activeRow = row; }
+  protected onCloseDetailView(): void        { this.activeRow = null; }
+
+  protected onRowCheckboxChanged(event: CheckboxEvent): void {
+    event.checked ? this.selectedRows.add(event.row) : this.selectedRows.delete(event.row);
+    this.selectedCount = this.selectedRows.size;
   }
 
-  private createMainForm(metadata: any): void {
-    this.mainForm = this.formBuilderService.build(this.mainFormMeta, {
-      branch: metadata.branches,
-      tripexecution: metadata.tripExecutions,
-      incidenttype: metadata.incidentTypes,
-      incidentstatus: metadata.incidentStatuses,
-      regionalarea: metadata.regionalOffices,
-    });
-  }
-
-  // ===== Filtering =====
-  private onFilterFormChanged(): void {
-    this.filterForm.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(filters => this.incidentFacade.filterIncident(filters));
-  }
-
-  // ===== Row & Selection Handlers =====
-  protected onRowClick(row: Incident): void {
-    this.activeIncident = row;
-  }
-
-  protected onRowAction(action: string, row: Incident) {
-    if (action === 'in-progress') this.inProgress(row);
-    if (action === 'vehicle-recovery') this.vehicleRecovery(row);
-    if (action === 'pending-allocation') this.pendingAllocation(row);
-    if (action === 'resolved') this.resolved(row);
-    if (action === 'closed') this.closed(row);
-  }
-
-  protected reload(): void { this.incidentFacade.reloadIncidents(); }
-
-  protected onCloseDetailView(): void { this.activeIncident = null; }
-
-  protected onRowCheckboxChanged(event: CheckboxEvent) {
-    if (event.checked) this.selectedRows.add(event.row);
-    else this.selectedRows.delete(event.row);
-  }
-
-  protected onSelectAll(checked: boolean) {
+  protected onSelectAll(checked: boolean): void {
     this.selectedRows.clear();
     if (checked) {
-      this.incidents$.pipe(
-        take(1)
-      ).subscribe(
-        rows => rows.forEach(
-          r => this.selectedRows.add(r)
-        ));
+      this.incidents$.pipe(take(1)).subscribe(
+        rows => rows.forEach(r => this.selectedRows.add(r)),
+      );
     }
+    this.selectedCount = this.selectedRows.size;
   }
 
-  // ===== CRUD =====
-  private openMainForm(): void {
-    this.dialogService.showFormPopup({
-      heading: this.mainForm.value.id ? 'Edit Incident' : 'Create Incident',
-      form: this.mainForm,
-      meta: this.mainFormMeta,
-      width:'900px'
+  protected reload(): void { this.facade.reload(); }
+
+  // ===== Row actions — status transitions =====
+  //
+  // Five transitions collapsed into executeTransition() via a map.
+  // Adding a new status is one line in the transitions map.
+
+  protected onRowAction(action: string, row: Incident): void {
+    const transitions: Record<string, [Observable<any>, string]> = {
+      'in-progress':        [this.facade.inProgress(row),        'Incident set to in progress.'],
+      'vehicle-recovery':   [this.facade.vehicleRecovery(row),   'Vehicle recovery initiated.'],
+      'pending-allocation': [this.facade.pendingAllocation(row), 'Incident pending allocation.'],
+      'resolved':           [this.facade.resolved(row),          'Incident resolved.'],
+      'closed':             [this.facade.closed(row),            'Incident closed.'],
+    };
+
+    const match = transitions[action];
+    if (match) this.executeTransition(match[0], match[1], row);
+    else this.dialog.showWarning(`Unknown row action: ${action}`);
+  }
+
+  private executeTransition(
+    operation$: Observable<any>,
+    successMessage: string,
+    row: Incident,
+  ): void {
+    operation$.pipe(takeUntil(this.destroy$)).subscribe({
+      next:     () => this.dialog.showSuccess(successMessage),
+      error:    err => this.dialog.showMessage({ heading: 'Failed to execute', message: err.errorMessage }),
+      complete: () => {
+        this.facade.reload();
+        if (this.activeRow?.id === row.id) this.activeRow = null;
+      },
+    });
+  }
+
+  // ===== Create =====
+
+  private openCreateForm(): void {
+    this.dialog.showFormPopup({
+      heading: 'Create Incident',
+      form:    this.mainForm,
+      meta:    this.mainFormMeta,
+      width:   '900px',
     }).subscribe(formData => {
       if (formData) this.save(formData);
-      else this.formBuilderService.resetForm(this.mainForm);
+      else this.formBuilder.resetForm(this.mainForm);
     });
   }
 
   private save(formData: any): void {
-    const operation$ = this.incidentFacade.createIncident(formData);
-    operation$?.pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => this.dialogService.showSuccess('Incident Reported successfully.'),
-      error: (err) => this.dialogService.showMessage({ heading: 'Failed to report Incident', message: err.errorMessage }),
+    this.facade.create(formData).pipe(takeUntil(this.destroy$)).subscribe({
+      next:     () => this.dialog.showSuccess('Incident reported successfully.'),
+      error:    err => this.dialog.showMessage({ heading: 'Failed to report incident', message: err.errorMessage }),
       complete: () => {
-        this.reload();
-        this.formBuilderService.resetForm(this.mainForm);
-      }
+        this.facade.reload();
+        if (this.currentMetadata) {
+          this.mainForm = this.formService.buildMainForm(this.currentMetadata);
+        }
+      },
     });
   }
 
-  private inProgress(row:Incident): void {
-    this.incidentFacade.inProgress(row).pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => this.dialogService.showSuccess('Incident in In Progress.'),
-      error: (err) => this.dialogService.showMessage({ heading: 'Failed to execute', message: err.errorMessage }),
-      complete: () => {
-        this.reload();
-        if (this.activeIncident?.id === row.id) this.activeIncident = null;
-      }
-    });
+  // ===== Action panel =====
+
+  protected onActionTriggered(event: ButtonClickEvent): void {
+    const handlers: Record<string, () => void> = {
+      'create':       () => this.openCreateForm(),
+      'clear-search': () => this.formBuilder.resetForm(this.filterForm),
+    };
+    if (handlers[event.type]) handlers[event.type]();
+    else this.dialog.showWarning(`No handler for: ${event.type}`);
   }
 
-  private vehicleRecovery(row:Incident): void {
-    this.incidentFacade.vehicleRecovery(row).pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => this.dialogService.showSuccess('Vehicle in Recovery.'),
-      error: (err) => this.dialogService.showMessage({ heading: 'Failed to execute', message: err.errorMessage }),
-      complete: () => {
-        this.reload();
-        if (this.activeIncident?.id === row.id) this.activeIncident = null;
-      }
-    });
-  }
-
-  private pendingAllocation(row:Incident): void {
-    this.incidentFacade.pendingAllocation(row).pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => this.dialogService.showSuccess('Pending Allocation.'),
-      error: (err) => this.dialogService.showMessage({ heading: 'Failed to execute', message: err.errorMessage }),
-      complete: () => {
-        this.reload();
-        if (this.activeIncident?.id === row.id) this.activeIncident = null;
-      }
-    });
-  }
-
-  private resolved(row:Incident): void {
-    this.incidentFacade.resolved(row).pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => this.dialogService.showSuccess('Incident Resolved.'),
-      error: (err) => this.dialogService.showMessage({ heading: 'Failed to execute', message: err.errorMessage }),
-      complete: () => {
-        this.reload();
-        if (this.activeIncident?.id === row.id) this.activeIncident = null;
-      }
-    });
-  }
-
-  private closed(row:Incident): void {
-    this.incidentFacade.closed(row).pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => this.dialogService.showSuccess('Incident Closed.'),
-      error: (err) => this.dialogService.showMessage({ heading: 'Failed to execute', message: err.errorMessage }),
-      complete: () => {
-        this.reload();
-        if (this.activeIncident?.id === row.id) this.activeIncident = null;
-      }
-    });
+  protected onDropdownOnlyClick(event: ButtonClickEvent): void {
+    const handlers: Record<string, () => void> = {
+      'export-pdf':   () => this.toPdf(),
+      'export-excel': () => this.toExcel(),
+    };
+    if (handlers[event.type]) handlers[event.type]();
+    else this.dialog.showWarning(`Unhandled dropdown: ${event.type}`);
   }
 
   // ===== Export =====
+
   protected toPdf(): void {
-    this.incidents$.pipe(take(1)).subscribe(() => {
-      if (this.selectedRows.size > 0) {
-        this.dialogService.showPrintDialog({
-          width: '1500px',
-          height: '650px',
-          title: 'Incident Details',
-          mode: 'table',
-          data: Array.from(this.selectedRows),
-          columns: this.exportMeta
-        }).subscribe(result => { if (result) this.selectedRows.clear(); });
-      } else {
-        this.dialogService.showWarning('Please select at least one record to print.');
-      }
+    if (this.selectedRows.size === 0) {
+      this.dialog.showWarning('Please select at least one record to print.');
+      return;
+    }
+    this.dialog.showPrintDialog({
+      width: '1500px', height: '650px',
+      title: 'Incident Details', mode: 'table',
+      data: Array.from(this.selectedRows), columns: this.exportMeta,
+    }).subscribe(result => {
+      if (result) { this.selectedRows.clear(); this.selectedCount = 0; }
     });
   }
 
   protected toExcel(): void {
     if (this.selectedRows.size === 0) {
-      this.dialogService.showWarning('Please select at least one record to export.');
+      this.dialog.showWarning('Please select at least one record to export.');
       return;
     }
-    exportToExcel(Array.from(this.selectedRows), this.exportMeta, 'incident.xlsx');
+    exportToExcel(Array.from(this.selectedRows), this.exportMeta, 'incidents.xlsx');
   }
 
-  // ===== Action Panel =====
-  protected actionHandlers: Record<string, () => void> = {
-    'clear-search': () => this.formBuilderService.resetForm(this.filterForm),
-    'create': () => this.openMainForm(),
-    'export-pdf': () => this.toPdf(),
-    'export-excel': () => this.toExcel()
-  };
+  // ===== Template helper =====
 
-  protected onActionTriggered(event: ButtonClickEvent) {
-    const handler = this.actionHandlers[event.type];
-    if (handler) handler();
-    else this.dialogService.showWarning(`No handler defined for action: ${event.type}`);
-  }
-
-  protected onDropdownOnlyClick(event: ButtonClickEvent) {
-    const dropdownTypes = ['export-pdf', 'export-excel'];
-    if (dropdownTypes.includes(event.type)) {
-      this.actionHandlers[event.type]?.();
-    } else {
-      this.dialogService.showWarning(`Unhandled dropdown action: ${event.type}`);
-    }
-  }
-
-  // ===== TrackBy for optimization =====
-  trackByField(index: number, field: any) {
-    return field.key || index;
-  }
-
+  protected trackByField(_: number, field: any): any { return field.key ?? _; }
 }

@@ -8,7 +8,7 @@ import {IncidentVehicleAllocationStatusService} from './service/incidenvehicleal
 import {IncidentVehicleAllocationService} from './service/incidentvehicleallocation.service';
 import {VehicleService} from '../vehiclemodule/service/api/vehicle.service';
 import {BranchService} from '../branchmodule/services/api/branch.service';
-import {IncidentService} from '../incidentreportmodule/service/incident.service';
+import {IncidentService} from '../incidentreportmodule/service/api/incident.service';
 import {IncidentVehicleAllocationStatus} from './entity/incidentvehicleallocationstatus';
 import {Incident} from '../incidentreportmodule/entity/incident';
 import {Vehicle} from '../vehiclemodule/entity/vehicle';
