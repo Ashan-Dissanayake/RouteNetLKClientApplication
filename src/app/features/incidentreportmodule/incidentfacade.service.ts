@@ -4,7 +4,7 @@ import {BehaviorSubject, finalize, forkJoin, Observable, tap, throwError} from '
 import {catchError, map} from 'rxjs/operators';
 import {normalizeSearchCriteria} from '../../core/search-criteria-normalizer';
 import {Incident} from './entity/incident';
-import {TripExecutionService} from '../tripexecution/service/tripexecution.service';
+import {TripExecutionService} from '../tripexecution/service/api/tripexecution.service';
 import {IncidentTypeService} from './service/incidenttype.service';
 import {IncidentStatusService} from './service/incidentstatus.service';
 import {RegionalOfficeService} from '../branchmodule/services/api/regionaloffice.service';

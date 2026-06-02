@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {BranchService} from '../../../branchmodule/services/api/branch.service';
-import {TripExecutionService} from '../../../tripexecution/service/tripexecution.service';
+import {TripExecutionService} from '../../../tripexecution/service/api/tripexecution.service';
 import {TicketMachineService} from '../api/ticketmachine.service';
 import {forkJoin, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';

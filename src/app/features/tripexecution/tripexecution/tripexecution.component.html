@@ -31,54 +31,54 @@
     <mat-card>
       <mat-card-header>
         <p class="section-title">Execution Summary</p>
-        <mat-basic-chip *ngIf="activeTripExecution" class="status-badge" [ngClass]="activeTripExecution.status | lowercase" >
-          {{ activeTripExecution.status }} </mat-basic-chip>
+        <mat-basic-chip *ngIf="activeRow" class="status-badge" [ngClass]="activeRow.status | lowercase" >
+          {{ activeRow.status }} </mat-basic-chip>
       </mat-card-header>
       <mat-card-content>
-        <div *ngIf="activeTripExecution; else noSelection">
+        <div *ngIf="activeRow; else noSelection">
           <div class="info-group">
             <div class="info-row">
               <span class="label">Route</span>
-              <span class="value">{{ activeTripExecution.routeName }}</span>
+              <span class="value">{{ activeRow.routeName }}</span>
             </div>
             <div class="info-row">
               <span class="label">Bus Number</span>
-              <span class="value" style="color: #048f98;">{{ activeTripExecution.vehicleNumber || 'N/A'}}</span>
+              <span class="value" style="color: #048f98;">{{ activeRow.vehicleNumber || 'N/A'}}</span>
             </div>
           </div>
           <div class="info-group">
             <div class="info-row">
               <span class="label">Planned Departure</span>
-              <span class="value">{{ activeTripExecution.plannedDeparture }}</span>
+              <span class="value">{{ activeRow.plannedDeparture }}</span>
             </div>
             <div class="info-row">
               <span class="label">Planned Arrival</span>
-              <span class="value">{{ activeTripExecution.plannedArrival }}</span>
+              <span class="value">{{ activeRow.plannedArrival }}</span>
             </div>
           </div>
           <div class="info-group">
             <div class="info-row">
               <span class="label">Driver</span>
-              <span class="value">{{ activeTripExecution.driverName || 'N/A' }}</span>
+              <span class="value">{{ activeRow.driverName || 'N/A' }}</span>
             </div>
             <div class="info-row">
               <span class="label">Conductor</span>
-              <span class="value">{{ activeTripExecution.conductorName || 'N/A' }}</span>
+              <span class="value">{{ activeRow.conductorName || 'N/A' }}</span>
             </div>
           </div>
 
           <div class="info-group">
             <div class="info-row">
               <span class="label">Start Odo:</span>
-              <span class="value">{{ activeTripExecution.startodometer || 'N/A' }}</span>
+              <span class="value">{{ activeRow.startodometer || 'N/A' }}</span>
             </div>
             <div class="info-row">
               <span class="label">End Odo:</span>
-              <span class="value">{{ activeTripExecution.endodometer || 'N/A' }}</span>
+              <span class="value">{{ activeRow.endodometer || 'N/A' }}</span>
             </div>
             <div class="info-row">
               <span class="label">Passenger Count</span>
-              <span class="value">{{ activeTripExecution.passengercount || 'N/A' }}</span>
+              <span class="value">{{ activeRow.passengercount || 'N/A' }}</span>
             </div>
           </div>
 

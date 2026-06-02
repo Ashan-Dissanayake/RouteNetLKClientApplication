@@ -8,7 +8,7 @@ import {EMPTY_PART_METADATA, PartMetadata} from '../../model/sparepart.metadata.
 import {PartMetadataService} from './sparepart.metadata.service';
 
 @Injectable()
-export class PartFacadeService implements OnDestroy {
+export class SparePartFacadeService implements OnDestroy {
 
   // ===== State =====
   private partSubject     = new BehaviorSubject<Part[]>([]);
