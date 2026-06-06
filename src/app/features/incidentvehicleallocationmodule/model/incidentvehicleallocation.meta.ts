@@ -1,4 +1,4 @@
-import {FormField} from '../../shared/models/formfieldata.model';
+import {FormField} from '../../../shared/models/formfieldata.model';
 
 export const INCIDENT_VEHICLE_ALLOCATION_TABLE_META = [
   {key: 'incident.name', label: 'Incident'},
@@ -20,12 +20,6 @@ export const INCIDENT_VEHICLE_ALLOCATION_MAIN_FORM_META: FormField[] = [
   {name: 'incident', type: 'select', label: 'Incident', required: true, mode: 'options'},
   {name: 'providedbranch', type: 'select', label: 'Provided Branch', required: true, mode: 'options'},
   {name: 'vehicle', type: 'select', label: 'Vehicle', required: true, mode: 'options',optionLabelKey:'number'},
-  // {name: 'doreported', type: 'date', label: 'Reported Date', required: true, mode: 'none',
-  //   dateConfig:{ maxDate:new Date() }
-  // },
-  // {name: 'doreleased', type: 'date', label: 'Reported Date', required: true, mode: 'none',
-  //   dateConfig:{ maxDate:new Date() }
-  // },
   {name: 'incidentvehicleallocationstatus', type: 'select', label: 'status', required: true, mode: 'options'},
 ] as FormField[];
 
