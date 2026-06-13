@@ -8,6 +8,7 @@ import {MessageComponent} from '../shared/component/message/message.component';
 import {ConfirmComponent} from '../shared/component/confirm/confirm.component';
 import {FormpopupComponent} from '../shared/component/form/formpopup/formpopup.component';
 import {PrintTableComponent} from '../shared/component/export/print/print-table.component';
+import {getErrorMessage} from './error.util';
 
 const DEFAULT_CONFIG = {
     DIALOG_WIDTH: '500px',
@@ -74,6 +75,13 @@ export class DialogService {
 
     showError(message: string, action = 'Close', duration = DEFAULT_CONFIG.SNACKBAR_DURATION) {
         this.showSnackBar(message, action, {duration, panelClass: ['snackbar-error']});
+    }
+
+    showErrorMessage(heading: string, err: any) {
+        this.showMessage({
+            heading,
+            message: getErrorMessage(err)
+        });
     }
 
     private showSnackBar(message: string, action: string, config: MatSnackBarConfig) {

@@ -14,24 +14,24 @@ export class VehicleService extends BaseHttpService <Vehicle>{
   }
 
   get(params?:any):Observable<ApiResponse<Vehicle>>{
-    return  this.getAll(ApiEndpoints.vehicles,params);
+    return  this.getAll(ApiEndpoints.VEHICLES,params);
   }
 
   getSummary():Observable<ApiResponse<Vehicle>>{
-    return  this.getAll(ApiEndpoints.vehiclessummaries);
+    return  this.getAll(ApiEndpoints.VEHICLES_SUMMARIES);
   }
 
   save(vehicle:Vehicle):Observable<Vehicle>{
-    return this.post(ApiEndpoints.vehicles,vehicle);
+    return this.post(ApiEndpoints.VEHICLES,vehicle);
   }
 
   update(vehicle:Vehicle):Observable<Vehicle>{
-    return this.put(ApiEndpoints.vehicles,vehicle);
+    return this.put(ApiEndpoints.VEHICLES,vehicle);
   }
 
   deactivate(ids: number[] | number): Observable<number[]> {
     const payload = Array.isArray(ids) ? ids : [ids];
-    return this.http.post<number[]>(ApiEndpoints.vehicledeactivate,ids);
+    return this.http.post<number[]>(ApiEndpoints.VEHICLE_DEACTIVATE,ids);
   }
 
 }

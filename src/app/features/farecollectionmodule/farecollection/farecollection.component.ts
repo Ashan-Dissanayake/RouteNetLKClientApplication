@@ -11,7 +11,7 @@ import {FareCollectionMetadata} from '../model/farecollection.metadata.model';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {FareCollectionFacadeService} from '../service/util/farecollectionfacade.service';
 import {FormbuilderService} from '../../../core/formbuilder.service';
-import {FareCollectionFromService} from '../service/util/farecollectionfrom.service';
+import {FareCollectionFormService} from '../service/util/farecollectionform.service';
 import {DialogService} from '../../../core/dialog.service';
 import {CheckboxEvent, DataTableComponent} from '../../../shared/component/data-table/data-table.component';
 import {
@@ -61,7 +61,7 @@ import {MatIcon} from '@angular/material/icon';
   standalone:true,
   providers: [
     FareCollectionFacadeService,
-    FareCollectionFromService,
+    FareCollectionFormService,
     FareCollectionMetadataService,
   ]
 })
@@ -90,12 +90,13 @@ export class FareCollectionComponent implements OnInit,OnDestroy{
   protected mainForm   = new FormGroup({});
 
   private destroy$ = new Subject<void>();
+  private currentMetadata: FareCollectionMetadata | null = null;
 
   constructor(
     private facade:FareCollectionFacadeService,
-    private formService: FareCollectionFromService,
+    private formService: FareCollectionFormService,
     private formBuilder: FormbuilderService,
-    private dialogService:DialogService,
+    private dialog:DialogService,
   ) {
     this.fareCollections$ = this.facade.fareCollections$;
     this.metadata$ = this.facade.metadata$;
@@ -107,11 +108,12 @@ export class FareCollectionComponent implements OnInit,OnDestroy{
   ngOnInit(): void {
     this.facade.initialize()
       .pipe(takeUntil(this.destroy$))
-      .subscribe({ error: err => this.dialogService.showError('Failed to initialize module.', err) });
+      .subscribe({ error: err => this.dialog.showErrorMessage('Failed to initialize module.', err) });
 
     this.facade.metadata$.pipe(
       takeUntil(this.destroy$),
     ).subscribe(meta => {
+      this.currentMetadata = meta;
       this.filterForm = this.formService.buildFilterForm(meta);
       this.mainForm   = this.formService.buildMainForm(meta);
       this.watchFilterForm();
@@ -163,7 +165,7 @@ export class FareCollectionComponent implements OnInit,OnDestroy{
 
     const match = transitions[action];
     if (match) this.executeRowAction(match[0], match[1], row);
-    else this.dialogService.showWarning(`Unknown action: ${action}`);
+    else this.dialog.showWarning(`Unknown action: ${action}`);
   }
 
   private executeRowAction(
@@ -172,8 +174,8 @@ export class FareCollectionComponent implements OnInit,OnDestroy{
     row: FareCollection,
   ): void {
     operation$.pipe(takeUntil(this.destroy$)).subscribe({
-      next:     () => this.dialogService.showSuccess(successMessage),
-      error:    err => this.dialogService.showMessage({ heading: 'Failed to execute', message: err.errorMessage }),
+      next:     () => this.dialog.showSuccess(successMessage),
+      error:    err => this.dialog.showErrorMessage('Failed to execute', err),
       complete: () => {
         this.facade.reload();
         if (this.activeRow?.id === row.id) this.activeRow = null;
@@ -189,7 +191,7 @@ export class FareCollectionComponent implements OnInit,OnDestroy{
     };
 
     if (handlers[event.type]) handlers[event.type]();
-    else this.dialogService.showWarning(`No handler for: ${event.type}`);
+    else this.dialog.showWarning(`No handler for: ${event.type}`);
   }
 
   protected onDropdownOnlyClick(event: ButtonClickEvent): void {
@@ -199,7 +201,7 @@ export class FareCollectionComponent implements OnInit,OnDestroy{
     };
 
     if (handlers[event.type]) handlers[event.type]();
-    else this.dialogService.showWarning(`Unhandled dropdown: ${event.type}`);
+    else this.dialog.showWarning(`Unhandled dropdown: ${event.type}`);
   }
 
   protected reload(): void {
@@ -208,24 +210,30 @@ export class FareCollectionComponent implements OnInit,OnDestroy{
 
   // ===== Form dialog =====
   private openCreateForm(): void {
-    this.dialogService.showFormPopup({
+    this.dialog.showFormPopup({
       heading: 'Create Fare Collection',
       form:    this.mainForm,
       meta:    this.mainFormMeta,
       width:   '900px',
     }).subscribe(formData => {
       if (formData) this.save(formData);
-      else this.formBuilder.resetForm(this.mainForm);
+      else {
+        if (this.currentMetadata) {
+          this.mainForm = this.formService.buildMainForm(this.currentMetadata);
+        }
+      }
     });
   }
 
   private save(formData: any): void {
     this.facade.create(formData).pipe(takeUntil(this.destroy$)).subscribe({
-      next:     () => this.dialogService.showSuccess('Fare Collection created successfully.'),
-      error:    err => this.dialogService.showMessage({ heading: 'Failed to create', message: err.errorMessage }),
+      next:     () => this.dialog.showSuccess('Fare Collection created successfully.'),
+      error:    err => this.dialog.showErrorMessage('Failed to create', err),
       complete: () => {
         this.facade.reload();
-        this.formBuilder.resetForm(this.mainForm);
+        if (this.currentMetadata) {
+          this.mainForm = this.formService.buildMainForm(this.currentMetadata);
+        }
       },
     });
   }
@@ -234,7 +242,7 @@ export class FareCollectionComponent implements OnInit,OnDestroy{
   protected toPdf(): void {
     this.fareCollections$.pipe(take(1)).subscribe(selectedArray => {
       if (this.selectedRows.size > 0) {
-        this.dialogService.showPrintDialog({
+        this.dialog.showPrintDialog({
           width: '1500px',
           height: '650px',
           title: 'Fare Collection Details',
@@ -243,14 +251,14 @@ export class FareCollectionComponent implements OnInit,OnDestroy{
           columns: this.exportMeta
         }).subscribe(result => { if (result) this.selectedRows.clear(); });
       } else {
-        this.dialogService.showWarning('Please select at least one record to print.');
+        this.dialog.showWarning('Please select at least one record to print.');
       }
     });
   }
 
   protected toExcel(): void {
     if (this.selectedRows.size === 0) {
-      this.dialogService.showWarning('Please select at least one record to export.');
+      this.dialog.showWarning('Please select at least one record to export.');
       return;
     }
     exportToExcel(Array.from(this.selectedRows), this.exportMeta, 'far-collection.xlsx');

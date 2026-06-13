@@ -9,14 +9,14 @@ import {Model} from '../../entity/model';
 import {Bustype} from '../../entity/bustype';
 
 @Injectable({ providedIn: 'root' })
-export class BustypeService extends BaseHttpService <Bustype>{
+export class BusTypeService extends BaseHttpService <Bustype>{
 
   constructor(protected override http: HttpClient) {
     super(http);
   }
 
   get():Observable<ApiResponse<Bustype>>{
-    return  this.getAll(ApiEndpoints.bustype);
+    return  this.getAll(ApiEndpoints.BUS_TYPE);
   }
 
 }

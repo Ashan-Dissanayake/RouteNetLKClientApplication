@@ -29,7 +29,7 @@ import {SideViewComponent} from '../../../shared/component/side-view/side-view.c
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
 import {MatIcon} from '@angular/material/icon';
 import {GrnMetadata} from '../model/grn.metadata.model';
-import {GrnFormService} from '../service/util/grnfrom.service';
+import {GrnFormService} from '../service/util/grnform.service';
 import {GrnMetadataService} from '../service/util/grn.metadata.service';
 
 const NON_EDITABLE_STATUSES = ['received', 'partially received'];
@@ -113,7 +113,7 @@ export class GrnComponent implements OnInit, OnDestroy {
     this.facade.initialize()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        error: err => this.dialog.showError('Failed to initialize GRN module.', err),
+        error: err => this.dialog.showErrorMessage('Failed to initialize GRN module.', err),
       });
 
     // Build forms once real metadata arrives — skip EMPTY_GRN_METADATA
@@ -213,7 +213,7 @@ export class GrnComponent implements OnInit, OnDestroy {
   private update(formData: any): void {
     this.facade.update(formData).pipe(takeUntil(this.destroy$)).subscribe({
       next:     () => this.dialog.showSuccess('GRN updated successfully.'),
-      error:    err => this.dialog.showMessage({ heading: 'Failed to update GRN', message: err.errorMessage }),
+      error:    err => this.dialog.showErrorMessage('Failed to update GRN', err),
       complete: () => {
         this.facade.reload();
         if (this.currentMetadata) {

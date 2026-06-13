@@ -23,7 +23,7 @@ import {exportToExcel} from '../../../shared/component/export/excel-export.util'
 import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
 import {VehicleMetadata} from '../model/vehicle.metadata.model';
 import {VehicleFormService} from '../service/util/vehicleform.service';
-import {VehicleMetadataService} from '../service/util/vehicle.metadat.service';
+import {VehicleMetadataService} from '../service/util/vehicle.metadata.service';
 import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {BRANCH_FILTER_FORM_META, BRANCH_TABLE_META} from '../../branchmodule/model/branch.meta';
@@ -106,7 +106,7 @@ export class VehicleComponent implements OnInit, OnDestroy {
     this.facade.initialize()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        error: err => this.dialog.showError('Failed to initialize module.', err),
+        error: err => this.dialog.showErrorMessage('Failed to initialize module.', err),
       });
 
     // Build forms once real metadata arrives — skip EMPTY_VEHICLE_METADATA
@@ -206,15 +206,8 @@ export class VehicleComponent implements OnInit, OnDestroy {
   private save(formData: any): void {
     this.facade.create(formData).pipe(takeUntil(this.destroy$)).subscribe({
       next:     () => this.dialog.showSuccess('Vehicle created successfully.'),
-      error: (err) => {
-        const validationMessage = err.friendlyMessage
-          || err.error?.details?.join('\n')
-          || err.message;
-        this.dialog.showMessage({
-          heading: 'Failed to create',
-          message: validationMessage
-        });
-      },      complete: () => {
+      error: err => this.dialog.showErrorMessage('Failed to create', err),
+      complete: () => {
         this.facade.reload();
         if (this.currentMetadata) {
           this.mainForm = this.formService.buildMainForm(this.currentMetadata);
@@ -253,15 +246,8 @@ export class VehicleComponent implements OnInit, OnDestroy {
   private update(formData: any): void {
     this.facade.update(formData).pipe(takeUntil(this.destroy$)).subscribe({
       next:     () => this.dialog.showSuccess('Vehicle updated successfully.'),
-      error: (err) => {
-        const validationMessage = err.friendlyMessage
-          || err.error?.details?.join('\n')
-          || err.message;
-        this.dialog.showMessage({
-          heading: 'Failed to create',
-          message: validationMessage
-        });
-      },      complete: () => {
+      error: err => this.dialog.showErrorMessage('Failed to update', err),
+      complete: () => {
         this.facade.reload();
         if (this.currentMetadata) {
           this.mainForm = this.formService.buildMainForm(this.currentMetadata);
@@ -289,15 +275,8 @@ export class VehicleComponent implements OnInit, OnDestroy {
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => this.dialog.showSuccess('Selected vehicles deactivated successfully.'),
-          error: (err) => {
-            const validationMessage = err.friendlyMessage
-              || err.error?.details?.join('\n')
-              || err.message;
-            this.dialog.showMessage({
-              heading: 'Failed to create',
-              message: validationMessage
-            });
-          },
+          error: err => this.dialog.showErrorMessage('Failed to deactivate', err),
+
           complete: () => {
             this.selectedRows.clear();
             this.selectedCount = 0;

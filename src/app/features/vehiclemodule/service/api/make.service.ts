@@ -14,7 +14,7 @@ export class MakeService extends BaseHttpService <Make>{
   }
 
   get():Observable<ApiResponse<Make>>{
-    return  this.getAll(ApiEndpoints.make);
+    return  this.getAll(ApiEndpoints.MAKE);
   }
 
 }

@@ -42,7 +42,7 @@ export class GrnFormService implements OnDestroy {
     if (lineField?.innerTableConfig) {
       lineField.innerTableConfig = {
         ...lineField.innerTableConfig,
-        dataMap: { partreqiestitems: metadata.parts },
+        dataMap: { part: metadata.parts },   // key = field name inside inner table
       };
     }
 

@@ -1,0 +1,137 @@
+<div class="container">
+  <h2>Vehicle Service Management</h2>
+</div>
+<!-- Loading -->
+<mat-progress-bar *ngIf="loading$ | async" mode="indeterminate"></mat-progress-bar>
+
+<!-- Error -->
+<div *ngIf="error$ | async as error" id="error-window">
+  <mat-card>
+    <mat-card-title>Error loading parts</mat-card-title>
+    <mat-card-content>{{ error?.message }}</mat-card-content>
+    <button mat-raised-button color="primary" (click)="reload()">Retry</button>
+  </mat-card>
+</div>
+
+<!-- ===== Action Panel ===== -->
+<app-button-panel
+  *ngIf="metadata$ | async as metadata"
+  [buttons]="actionPanelConfig"
+  (actionClicked)="onActionTriggered($event)"
+  (dropdownClicked)="onDropdownOnlyClick($event)"
+  [contextData]="{ selectedRows: selectedRows }"
+>
+</app-button-panel>
+
+<div *ngIf="metadata$ | async as metadata" id="serverSearch">
+  <form [formGroup]="filterForm">
+    <dynamic-field
+      *ngFor="let field of filterFormMeta; trackBy: trackByField"
+      [formInstance]="filterForm"
+      [field]="field"
+    ></dynamic-field>
+  </form>
+</div>
+
+<!-- ===== Main Table with Side View ===== -->
+<app-side-view
+  [opened]="activeRow !== null"
+  [data]="activeRow"
+  [title]="'Vehicle Service Details'"
+  [viewTemplate]="vehicleServiceDetailTemplate"
+  (closed)="onCloseDetailView()"
+>
+  <app-data-table
+    *ngIf="(vehicleServices$ | async)?.length"
+    [data]="(vehicleServices$ | async) || []"
+    [columns]="tableColumns"
+    [sortable]="true"
+    [paginatable]="true"
+    [pageSizeOptions]="[10, 20]"
+    (rowClick)="onRowClick($event)"
+    (checkBoxClick)="onRowCheckboxChanged($event)"
+    (selectAllClick)="onSelectAll($event)"
+    (actionClick)="onRowAction($event.action, $event.row)"
+  >
+    <!-- Row Actions -->
+    <ng-template tableCell="actions" let-row let-action="action">
+      <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
+        <mat-icon>more_vert</mat-icon> </button>
+
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="action('execute', row)">
+          <mat-icon style="color: #22543d;">play_circle</mat-icon>
+          <span>Execute</span>
+        </button>
+
+        <button mat-menu-item (click)="action('parts-on-hold', row)">
+          <mat-icon style="color: #744210;">pause_circle</mat-icon>
+          <span>Parts On Hold</span>
+        </button>
+
+        <mat-divider></mat-divider>
+
+        <button mat-menu-item (click)="action('completed', row)">
+          <mat-icon style="color: #c53030;">dangerous</mat-icon>
+          <span>Complete</span>
+        </button>
+      </mat-menu>
+    </ng-template>
+  </app-data-table>
+</app-side-view>
+
+<!--Template for detail view -->
+<ng-template #vehicleServiceDetailTemplate let-row>
+  <div  class="vehicle-service-detail-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="title-section">
+        <mat-icon color="primary" class="vehicle-service-icon">precision_manufacturing</mat-icon>
+        <div>
+          <h6 class="vehicle-service">{{ row.branch.name }}</h6>
+          <p class="vehicle-service">Number: {{ row.number }}</p>
+        </div>
+      </div>
+
+      <span
+        class="status-chip"
+        [ngClass]="{
+        'PENDING': row.vehicleservicestatus.name === 'Pending',
+        'IN_PROGRESS': row.vehicleservicestatus.name === 'In Progress',
+        'ON_HOLD_PARTS': row.vehicleservicestatus.name === 'On Hold Parts',
+        'COMPLETE': row.vehicleservicestatus.name === 'Complete',
+        'CANCELLED': row.vehicleservicestatus.name === 'Cancelled'
+      }">
+      {{ row.vehicleservicestatus.name }}
+      </span>
+    </div>
+    <mat-divider></mat-divider>
+
+    <!-- General Info -->
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="label">Vehicle</span>
+        <span class="value">{{ row.vehicle.number || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Type</span>
+        <span class="value">{{ row.vehicleservicetype.name || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Incident</span>
+        <span class="value">{{ row.incident?.name || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Priority</span>
+        <span class="value">{{ row.vehicleservicepriority.name || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Created Date</span>
+        <span class="value">{{ row.docreated || '-' }}</span>
+      </div>
+    </div>
+    <mat-divider></mat-divider>
+  </div>
+</ng-template>
+
+

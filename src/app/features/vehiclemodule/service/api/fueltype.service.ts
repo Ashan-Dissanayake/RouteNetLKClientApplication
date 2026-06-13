@@ -7,14 +7,14 @@ import {ApiEndpoints} from '../../../../core/api-endpoints';
 import {Fueltype} from '../../entity/fueltype';
 
 @Injectable({ providedIn: 'root' })
-export class FueltypeService extends BaseHttpService <Fueltype>{
+export class FuelTypeService extends BaseHttpService <Fueltype>{
 
   constructor(protected override http: HttpClient) {
     super(http);
   }
 
   get():Observable<ApiResponse<Fueltype>>{
-    return  this.getAll(ApiEndpoints.fueltype);
+    return  this.getAll(ApiEndpoints.FUEL_TYPE);
   }
 
 }

@@ -34,7 +34,6 @@ import {BranchFormService} from '../services/util/branchform.service';
 import {BranchMetadataService} from '../services/util/branch.metadata.service';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
-import {PART_FILTER_FORM_META} from '../../sparepartmodule/model/part.meta';
 
 @Component({
   selector: 'app-branch',
@@ -83,7 +82,6 @@ export class BranchComponent implements OnInit, OnDestroy {
   protected readonly loading$:   Observable<boolean>;
   protected readonly error$:     Observable<any>;
 
-
   // ===== UI state =====
   protected activeRow:     Branch | null = null;
   protected selectedRows   = new Set<Branch>();
@@ -114,7 +112,7 @@ export class BranchComponent implements OnInit, OnDestroy {
     this.facade.initialize()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        error: err => this.dialog.showError('Failed to initialize module.', err),
+        error: err => this.dialog.showErrorMessage('Failed to initialize module.', err),
       });
 
     this.facade.metadata$.pipe(
@@ -217,15 +215,8 @@ export class BranchComponent implements OnInit, OnDestroy {
   private save(formData: any): void {
     this.facade.create(formData).pipe(takeUntil(this.destroy$)).subscribe({
       next:     () => this.dialog.showSuccess('Branch created successfully.'),
-      error: (err) => {
-        const validationMessage = err.friendlyMessage
-          || err.error?.details?.join('\n')
-          || err.message;
-        this.dialog.showMessage({
-          heading: 'Failed to create',
-          message: validationMessage
-        });
-      },
+      error: (err) => this.dialog.showErrorMessage('Failed to create', err),
+
       complete: () => {
         this.facade.reload();
         this.formBuilder.resetForm(this.mainForm);
@@ -252,15 +243,7 @@ export class BranchComponent implements OnInit, OnDestroy {
   private update(formData: any): void {
     this.facade.update(formData).pipe(takeUntil(this.destroy$)).subscribe({
       next:     () => this.dialog.showSuccess('Branch updated successfully.'),
-      error: (err) => {
-        const validationMessage = err.friendlyMessage
-          || err.error?.details?.join('\n')
-          || err.message;
-        this.dialog.showMessage({
-          heading: 'Failed to create',
-          message: validationMessage
-        });
-      },
+      error: (err) => this.dialog.showErrorMessage('Failed to update', err),
       complete: () => {
         this.facade.reload();
         this.formBuilder.resetForm(this.mainForm);
@@ -298,14 +281,8 @@ export class BranchComponent implements OnInit, OnDestroy {
 
             this.facade.reload();
           },
-          error: err => {
-            this.dialog.showMessage({
-              heading: 'Deactivation failed',
-              message: err.error?.details?.[0]
-                ?? err.message
-                ?? 'Unknown error'
-            });
-          }
+          error: err => this.dialog.showErrorMessage('Deactivation failed', err)
+
         });
     });
   }

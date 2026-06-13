@@ -18,12 +18,14 @@ export const GRN_FILTER_FORM_META: FormField[] = [
 
 
 export const GRN_LINE_META:FormField[] = [
-  {name: 'partrequestitem.part.name', type: 'text', label: 'Part', required: true, mode: 'none'},
+  // {name: 'partrequestitem.part.name', type: 'text', label: 'Part', required: true, mode: 'none'},
+  {name: 'part', type: 'select', label: 'Part', required: true, mode: 'options'},
   {name: 'quantity', type: 'text', label: 'Quantity', required: true, mode: 'none',},
 ] as FormField[]
 
 export const GRN_LINE_COLUMNS:InnerTableColumn[] = [
-  { field: 'partrequestitem.part.name',header: 'Part'},
+  // { field: 'partrequestitem.part.name',header: 'Part'},
+  { field: 'part.name', header: 'Part'    },
   { field: 'quantity',header: 'Quantity'},
 ];
 

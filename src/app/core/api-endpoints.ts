@@ -3,6 +3,7 @@ const BASE_URL = 'http://localhost:8080';
 export const ApiEndpoints = {
 
     regexes: `${BASE_URL}/regexes`,
+    LOGIN: `${BASE_URL}/login`,
 
     //Branch
     BRANCH_STATUSES:`${BASE_URL}/branch-statuses/summaries`,
@@ -26,7 +27,6 @@ export const ApiEndpoints = {
     EMPLOYEES_DEACTIVATE: `${BASE_URL}/employees/deactivate`,
     EMPLOYEE_NUMBER:`${BASE_URL}/number-generator/employee`,
 
-
     //Crew
     DRIVERS:`${BASE_URL}/drivers`,
     CONDUCTORS:`${BASE_URL}/conductors`,
@@ -36,15 +36,15 @@ export const ApiEndpoints = {
     LICENSE_CATEGORIES:`${BASE_URL}/license-categories/summaries`,
 
     //Vehicle
-    vehicles:`${BASE_URL}/vehicles`,
-    vehiclessummaries:`${BASE_URL}/vehicles/summaries`,
-    conditionrate:`${BASE_URL}/condition-rates/summaries`,
-    fueltype:`${BASE_URL}/fuel-types/summaries`,
-    vehiclestatus:`${BASE_URL}/vehicle-statuses/summaries`,
-    make:`${BASE_URL}/makes/summaries`,
-    model:`${BASE_URL}/models/summaries`,
-    bustype:`${BASE_URL}/bus-types/summaries`,
-    vehicledeactivate: `${BASE_URL}/vehicles/deactivate`,
+    VEHICLES:`${BASE_URL}/vehicles`,
+    VEHICLES_SUMMARIES:`${BASE_URL}/vehicles/summaries`,
+    CONDITION_RATE:`${BASE_URL}/condition-rates/summaries`,
+    FUEL_TYPE:`${BASE_URL}/fuel-types/summaries`,
+    VEHICLE_STATUS:`${BASE_URL}/vehicle-statuses/summaries`,
+    MAKE:`${BASE_URL}/makes/summaries`,
+    MODEL:`${BASE_URL}/models/summaries`,
+    BUS_TYPE:`${BASE_URL}/bus-types/summaries`,
+    VEHICLE_DEACTIVATE: `${BASE_URL}/vehicles/deactivate`,
 
     //permit
     SERVICE_TYPE:`${BASE_URL}/service-types/summaries`,
@@ -106,5 +106,11 @@ export const ApiEndpoints = {
     //FARE COLLECTION
     FARE_COLLECTION:`${BASE_URL}/fare-collections`,
     TICKET_MACHINES:`${BASE_URL}/ticket-machines/summaries`,
+
+    //VEHICLE SERVICE
+    VEHICLE_SERVICE:`${BASE_URL}/vehicle-services`,
+    VEHICLE_SERVICE_TYPE:`${BASE_URL}/vehicle-service-types/summaries`,
+    VEHICLE_SERVICE_STATUS:`${BASE_URL}/vehicle-service-statuses/summaries`,
+    VEHICLE_SERVICE_PRIORITY:`${BASE_URL}/vehicle-service-priorities/summaries`,
 
 } as const;

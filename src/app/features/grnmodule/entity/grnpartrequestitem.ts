@@ -1,4 +1,3 @@
-import {Part} from '../../sparepartmodule/entity/part';
 import {PartRequestItem} from '../../partrequestmodule/entity/partrequestitem';
 
 export class GrnPartRequestItem {

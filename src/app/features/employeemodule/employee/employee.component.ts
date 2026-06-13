@@ -100,7 +100,7 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     this.facade.initialize()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        error: err => this.dialog.showError('Failed to initialize module.', err),
+        error: err => this.dialog.showErrorMessage('Failed to initialize module.', err),
       });
 
     this.facade.metadata$.pipe(
@@ -201,15 +201,8 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   private save(formData: any): void {
     this.facade.create(formData).pipe(takeUntil(this.destroy$)).subscribe({
       next:     () => this.dialog.showSuccess('Employee created successfully.'),
-      error: (err) => {
-        const validationMessage = err.friendlyMessage
-          || err.error?.details?.join('\n')
-          || err.message;
-        this.dialog.showMessage({
-          heading: 'Failed to create',
-          message: validationMessage
-        });
-      },
+      error: (err) => this.dialog.showErrorMessage('Failed to create', err),
+
       complete: () => {
         this.facade.reload();
         this.formBuilder.resetForm(this.mainForm);
@@ -241,15 +234,8 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   private update(formData: any): void {
     this.facade.update(formData).pipe(takeUntil(this.destroy$)).subscribe({
       next:     () => this.dialog.showSuccess('Employee updated successfully.'),
-      error: (err) => {
-        const validationMessage = err.friendlyMessage
-          || err.error?.details?.join('\n')
-          || err.message;
-        this.dialog.showMessage({
-          heading: 'Failed to create',
-          message: validationMessage
-        });
-      },      complete: () => {
+      error: (err) => this.dialog.showErrorMessage('Failed to update', err),
+      complete: () => {
         this.facade.reload();
         this.formBuilder.resetForm(this.mainForm);
         this.formBuilder.setControlsState(this.mainForm, this.immutableControllers, false);
@@ -274,10 +260,8 @@ export class EmployeeComponent implements OnInit, OnDestroy {
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => this.dialog.showSuccess('Selected employees deactivated successfully.'),
-          error: err => this.dialog.showMessage({
-            heading: 'Deactivation failed',
-            message: err.message ?? err.errorMessage,
-          }),
+          error: err => this.dialog.showErrorMessage('Deactivation failed', err),
+
           complete: () => {
             this.selectedRows.clear();
             this.selectedCount = 0;

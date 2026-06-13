@@ -1,53 +1,61 @@
-<mat-toolbar color="primary">
-  <button mat-icon-button aria-label="Toggle sidenav" (click)="toggleSidenav()">
-    <mat-icon>menu</mat-icon>
-  </button>
-  <span>RouteNetLK</span>
-</mat-toolbar>
+@if (isAuthenticated()) {
+  <mat-toolbar color="primary">
+    <button mat-icon-button aria-label="Toggle sidenav" (click)="toggleSidenav()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span>RouteNetLK</span>
+    <span class="toolbar-spacer"></span>
+    <button mat-icon-button (click)="logout()" aria-label="Logout">
+      <mat-icon>logout</mat-icon>
+    </button>
+  </mat-toolbar>
 
-<mat-sidenav-container>
-  <mat-sidenav #sidenav [mode]="isMobile ? 'over' : 'side'" [opened]="!isCollapsed">
-    <mat-nav-list>
-      @for (item of menuItems; track item.label) {
-        <div>
-          <a
-            mat-list-item
-            [routerLink]="item.route || null"
-            (click)="item.children ? toggleSubMenu(item) : (isMobile && sidenav.close())"
-            [attr.aria-expanded]="item.children ? item.expanded : null"
-            [attr.aria-label]="item.label"
-            routerLinkActive="active"
-          >
-            <mat-icon matListItemIcon>{{item.icon}}</mat-icon>
-            <span *ngIf="!isCollapsed || isMobile">{{item.label}}</span>
-            <mat-icon *ngIf="item.children && (!isCollapsed || isMobile)" class="expand-icon">
-              {{item.expanded ? 'expand_less' : 'expand_more'}}
-            </mat-icon>
-          </a>
-          @if (item.children && item.expanded) {
-            <mat-nav-list class="sub-menu">
-              @for (child of item.children; track child.route) {
-                <a
-                  mat-list-item
-                  class="sub-item"
-                  routerLink="{{child.route}}"
-                  (click)="isMobile && sidenav.close()"
-                  [attr.aria-label]="child.label"
-                  routerLinkActive="active"
-                >
-                  <mat-icon matListItemIcon>{{child.icon}}</mat-icon>
-                  <span *ngIf="!isCollapsed || isMobile">{{child.label}}</span>
-                </a>
-              }
-            </mat-nav-list>
-          }
-        </div>
-      }
-    </mat-nav-list>
-  </mat-sidenav>
-  <mat-sidenav-content>
-    <div class="content">
-      <router-outlet></router-outlet>
-    </div>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+  <mat-sidenav-container>
+    <mat-sidenav #sidenav [mode]="isMobile ? 'over' : 'side'" [opened]="!isCollapsed">
+      <mat-nav-list>
+        @for (item of menuItems; track item.label) {
+          <div>
+            <a
+              mat-list-item
+              [routerLink]="item.route || null"
+              (click)="item.children ? toggleSubMenu(item) : (isMobile && sidenav.close())"
+              [attr.aria-expanded]="item.children ? item.expanded : null"
+              [attr.aria-label]="item.label"
+              routerLinkActive="active"
+            >
+              <mat-icon matListItemIcon>{{item.icon}}</mat-icon>
+              <span *ngIf="!isCollapsed || isMobile">{{item.label}}</span>
+              <mat-icon *ngIf="item.children && (!isCollapsed || isMobile)" class="expand-icon">
+                {{item.expanded ? 'expand_less' : 'expand_more'}}
+              </mat-icon>
+            </a>
+            @if (item.children && item.expanded) {
+              <mat-nav-list class="sub-menu">
+                @for (child of item.children; track child.route) {
+                  <a
+                    mat-list-item
+                    class="sub-item"
+                    routerLink="{{child.route}}"
+                    (click)="isMobile && sidenav.close()"
+                    [attr.aria-label]="child.label"
+                    routerLinkActive="active"
+                  >
+                    <mat-icon matListItemIcon>{{child.icon}}</mat-icon>
+                    <span *ngIf="!isCollapsed || isMobile">{{child.label}}</span>
+                  </a>
+                }
+              </mat-nav-list>
+            }
+          </div>
+        }
+      </mat-nav-list>
+    </mat-sidenav>
+    <mat-sidenav-content>
+      <div class="content">
+        <router-outlet></router-outlet>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+} @else {
+  <router-outlet></router-outlet>
+}

@@ -1,8 +1,14 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './security/auth.guard';
 
 export const routes: Routes = [
   {
+    path: 'login',
+    loadComponent: () => import('./features/login/login.component').then(m => m.LoginComponent)
+  },
+  {
     path: 'admin',
+    canActivate: [authGuard],
     children: [
       { path: 'branch', loadComponent: () => import('./features/branchmodule/branch/branch.component').
         then(m => m.BranchComponent)
@@ -48,7 +54,19 @@ export const routes: Routes = [
       } ,
       { path: 'fare-collection', loadComponent: () => import('./features/farecollectionmodule/farecollection/farecollection.component').
         then(m => m.FareCollectionComponent)
+      } ,
+      { path: 'vehicle-service', loadComponent: () => import('./features/vehicleservicemodule/vehicleservice/vehicleservice.component').
+        then(m => m.VehicleServiceComponent)
       }
     ]
   },
+  {
+    path: '',
+    redirectTo: 'admin/branch',
+    pathMatch: 'full'
+  },
+  {
+    path: '**',
+    redirectTo: 'admin/branch'
+  }
 ];

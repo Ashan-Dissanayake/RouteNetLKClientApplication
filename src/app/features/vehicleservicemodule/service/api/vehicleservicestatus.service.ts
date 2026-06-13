@@ -4,17 +4,18 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../../core/api-endpoints';
-import {Vehiclestatus} from '../../entity/vehiclestatus';
+import {VehicleServiceType} from '../../entity/vehicleservicetype';
+import {VehicleServiceStatus} from '../../entity/vehicleservicestatus';
 
 @Injectable({ providedIn: 'root' })
-export class VehicleStatusService extends BaseHttpService <Vehiclestatus>{
+export class VehicleServiceStatusService extends BaseHttpService <VehicleServiceStatus>{
 
   constructor(protected override http: HttpClient) {
     super(http);
   }
 
-  get():Observable<ApiResponse<Vehiclestatus>>{
-    return  this.getAll(ApiEndpoints.VEHICLE_STATUS);
+  get():Observable<ApiResponse<VehicleServiceStatus>>{
+    return  this.getAll(ApiEndpoints.VEHICLE_SERVICE_STATUS);
   }
 
 }

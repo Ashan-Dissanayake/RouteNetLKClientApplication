@@ -14,7 +14,7 @@ export class ConditionRateService extends BaseHttpService <Conditionrate>{
   }
 
   get():Observable<ApiResponse<Conditionrate>>{
-    return  this.getAll(ApiEndpoints.conditionrate);
+    return  this.getAll(ApiEndpoints.CONDITION_RATE);
   }
 
 }

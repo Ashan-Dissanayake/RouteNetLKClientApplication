@@ -27,12 +27,6 @@ export class PartRequestFormService implements OnDestroy {
   }
 
   // ===== Main form =====
-  //
-  // The inner table field (partrequestitems) requires its dataMap
-  // to be set before build() so the inner table columns render
-  // with the correct parts list.
-  // We operate on a shallow copy to avoid mutating the shared constant.
-
   buildMainForm(metadata: PartRequestMetadata): FormGroup {
     const metaCopy = PART_REQUEST_MAIN_FORM_META.map(f => ({ ...f }));
 
@@ -40,8 +34,9 @@ export class PartRequestFormService implements OnDestroy {
     if (lineField?.innerTableConfig) {
       lineField.innerTableConfig = {
         ...lineField.innerTableConfig,
-        dataMap: { part: metadata.parts },
+        dataMap: { part: metadata.parts },   // same pattern
       };
+      console.log('innerTableConfig:', lineField.innerTableConfig);
     }
 
     return this.formBuilder.build(metaCopy, {

@@ -7,7 +7,7 @@ import {FARE_COLLECTION_FILTER_FORM_META, FARE_COLLECTION_MAIN_FORM_META} from '
 
 
 @Injectable()
-export class FareCollectionFromService{
+export class FareCollectionFormService{
 
   private destroy$ = new Subject<void>();
 

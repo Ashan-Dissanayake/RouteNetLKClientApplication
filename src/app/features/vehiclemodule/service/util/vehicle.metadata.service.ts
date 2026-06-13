@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
-import {VehiclestatusService} from '../api/vehiclestatus.service';
+import {VehicleStatusService} from '../api/vehiclestatus.service';
 import {MakeService} from '../api/make.service';
 import {ModelService} from '../api/model.service';
-import {FueltypeService} from '../api/fueltype.service';
-import {BustypeService} from '../api/bustype.service';
+import {FuelTypeService} from '../api/fueltype.service';
+import {BusTypeService} from '../api/bustype.service';
 import {BranchService} from '../../../branchmodule/services/api/branch.service';
 import {ConditionRateService} from '../api/conditionrate.service';
 import {RegexService} from '../../../../core/regex.service';
@@ -15,11 +15,11 @@ import {map} from 'rxjs/operators';
 export class VehicleMetadataService {
 
   constructor(
-    private vehicleStatusService: VehiclestatusService,
+    private vehicleStatusService: VehicleStatusService,
     private makeService:MakeService,
     private modelService:ModelService,
-    private fuelTypeService:FueltypeService,
-    private busTypeService:BustypeService,
+    private fuelTypeService:FuelTypeService,
+    private busTypeService:BusTypeService,
     private conditionRateService:ConditionRateService,
     private branchService:BranchService,
     private regexService:RegexService,

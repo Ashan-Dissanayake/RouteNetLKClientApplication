@@ -5,7 +5,7 @@ import {catchError, map} from 'rxjs/operators';
 import {Vehicle} from '../../entity/vehicle';
 import {normalizeSearchCriteria} from '../../../../core/search-criteria-normalizer';
 import {EMPTY_VEHICLE_METADATA, VehicleMetadata} from '../../model/vehicle.metadata.model';
-import {VehicleMetadataService} from './vehicle.metadat.service';
+import {VehicleMetadataService} from './vehicle.metadata.service';
 
 @Injectable()
 export class VehicleFacadeService implements OnDestroy {

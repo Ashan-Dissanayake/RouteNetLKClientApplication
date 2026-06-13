@@ -1,13 +1,16 @@
-import {Component, ViewChild} from '@angular/core';
+import {Component, ViewChild, inject} from '@angular/core';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import {NgIf} from '@angular/common';
+import {NgIf, NgFor} from '@angular/common';
 import {MAT_DATE_FORMATS, MatDateFormats, provideNativeDateAdapter} from "@angular/material/core";
+import {AuthService} from './security/auth.service';
+import {NgxPermissionsModule} from 'ngx-permissions';
+
 
 
 interface MenuItem {
@@ -49,17 +52,21 @@ const formats: MatDateFormats = {
     MatButtonModule,
     MatListModule,
     RouterModule,
-    //NgClass,
-    NgIf
+    NgIf,
+    NgFor,
+    NgxPermissionsModule
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
   @ViewChild('sidenav') sidenav!: MatSidenav;
   isMobile = false;
   isCollapsed = false;
+  isAuthenticated = this.authService.isAuthenticated;
 
   menuItems: MenuItem[] = [
     { icon: 'home', label: 'Home', route: '/' },
@@ -83,6 +90,7 @@ export class AppComponent {
         { icon: 'report_problem', label: 'Incident Report', route: '/admin/incident-report' },
         { icon: 'settings_backup_restore', label: 'Incident Vehicle Allocation', route: '/admin/incident-vehicle-allocation' },
         { icon: 'money', label: 'Fare Collection', route: '/admin/fare-collection' },
+        { icon: 'money', label: 'Vehicle Service', route: '/admin/vehicle-service' },
       ],
       expanded: false
     },
@@ -116,6 +124,11 @@ export class AppComponent {
         if (i !== item) i.expanded = false; // Collapse other sub-menus
       });
     }
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }
 

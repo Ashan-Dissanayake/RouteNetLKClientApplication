@@ -322,5 +322,4 @@ export class DriverComponent implements OnInit, OnDestroy {
   }
 
   protected readonly async = async;
-  protected readonly BRANCH_FILTER_FORM_META = BRANCH_FILTER_FORM_META;
 }

@@ -15,7 +15,7 @@ export class ModelService extends BaseHttpService <Model>{
   }
 
   get():Observable<ApiResponse<Model>>{
-    return  this.getAll(ApiEndpoints.model);
+    return  this.getAll(ApiEndpoints.MODEL);
   }
 
 }

@@ -86,7 +86,7 @@ export class SparePartComponent implements OnInit, OnDestroy {
     private facade:      SparePartFacadeService,
     private formService: PartFormService,
     private formBuilder: FormbuilderService,
-    private dialogService:      DialogService,
+    private dialog:      DialogService,
   ) {
     this.parts$    = this.facade.parts$;
     this.metadata$  = this.facade.metadata$;
@@ -100,7 +100,7 @@ export class SparePartComponent implements OnInit, OnDestroy {
     this.facade.initialize()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        error: err => this.dialogService.showError('Failed to initialize part module.', err),
+        error: err => this.dialog.showErrorMessage('Failed to initialize part module.', err),
       });
 
     this.facade.metadata$.pipe(
@@ -156,7 +156,7 @@ export class SparePartComponent implements OnInit, OnDestroy {
       'edit': () => this.openEditForm(row),
     };
     if (actions[action]) actions[action]();
-    else this.dialogService.showWarning(`Unknown row action: ${action}`);
+    else this.dialog.showWarning(`Unknown row action: ${action}`);
   }
 
   // ===== Action panel =====
@@ -168,7 +168,7 @@ export class SparePartComponent implements OnInit, OnDestroy {
       'clear-search':    () => this.formBuilder.resetForm(this.filterForm),
     };
     if (handlers[event.type]) handlers[event.type]();
-    else this.dialogService.showWarning(`No handler for: ${event.type}`);
+    else this.dialog.showWarning(`No handler for: ${event.type}`);
   }
 
   protected onDropdownOnlyClick(event: ButtonClickEvent): void {
@@ -177,7 +177,7 @@ export class SparePartComponent implements OnInit, OnDestroy {
       'export-excel': () => this.toExcel(),
     };
     if (handlers[event.type]) handlers[event.type]();
-    else this.dialogService.showWarning(`Unhandled dropdown: ${event.type}`);
+    else this.dialog.showWarning(`Unhandled dropdown: ${event.type}`);
   }
 
   // ===== Create =====
@@ -185,7 +185,7 @@ export class SparePartComponent implements OnInit, OnDestroy {
   private openCreateForm(): void {
     this.formBuilder.setControlsState(this.mainForm, this.immutableControllers, false);
 
-    this.dialogService.showFormPopup({
+    this.dialog.showFormPopup({
       heading: 'Create Part',
       form:    this.mainForm,
       meta:    this.mainFormMeta,
@@ -198,16 +198,9 @@ export class SparePartComponent implements OnInit, OnDestroy {
 
   private save(formData: any): void {
     this.facade.create(formData).pipe(takeUntil(this.destroy$)).subscribe({
-      next:     () => this.dialogService.showSuccess('Part created successfully.'),
-      error: (err) => {
-        const validationMessage = err.friendlyMessage
-          || err.error?.details?.join('\n')
-          || err.message;
-        this.dialogService.showMessage({
-          heading: 'Failed to create',
-          message: validationMessage
-        });
-      },      complete: () => {
+      next:     () => this.dialog.showSuccess('Part created successfully.'),
+      error: (err) => this.dialog.showErrorMessage('Failed to create', err),
+      complete: () => {
         this.facade.reload();
         if (this.currentMetadata) {
           this.mainForm = this.formService.buildMainForm(this.currentMetadata);
@@ -225,7 +218,7 @@ export class SparePartComponent implements OnInit, OnDestroy {
     this.mainForm = this.formService.buildMainFormForEdit(this.currentMetadata, row);
     this.formBuilder.setControlsState(this.mainForm, this.immutableControllers, true);
 
-    this.dialogService.showFormPopup({
+    this.dialog.showFormPopup({
       heading: 'Edit Part',
       form:    this.mainForm,
       meta:    this.mainFormMeta,
@@ -241,16 +234,9 @@ export class SparePartComponent implements OnInit, OnDestroy {
 
   private update(formData: any): void {
     this.facade.update(formData).pipe(takeUntil(this.destroy$)).subscribe({
-      next:     () => this.dialogService.showSuccess('Part updated successfully.'),
-      error: (err) => {
-        const validationMessage = err.friendlyMessage
-          || err.error?.details?.join('\n')
-          || err.message;
-        this.dialogService.showMessage({
-          heading: 'Failed to create',
-          message: validationMessage
-        });
-      },      complete: () => {
+      next:     () => this.dialog.showSuccess('Part updated successfully.'),
+      error: (err) => this.dialog.showErrorMessage('Failed to update', err),
+      complete: () => {
         this.facade.reload();
         if (this.currentMetadata) {
           this.mainForm = this.formService.buildMainForm(this.currentMetadata);
@@ -264,11 +250,11 @@ export class SparePartComponent implements OnInit, OnDestroy {
 
   private deactivateSelected(): void {
     if (this.selectedRows.size === 0) {
-      this.dialogService.showWarning('Please select at least one record to deactivate.');
+      this.dialog.showWarning('Please select at least one record to deactivate.');
       return;
     }
 
-    this.dialogService.showConfirmation({
+    this.dialog.showConfirmation({
       heading: 'Deactivate Parts',
       message: 'Selected parts will be deactivated. Are you sure?',
     }).subscribe(confirmed => {
@@ -277,16 +263,9 @@ export class SparePartComponent implements OnInit, OnDestroy {
       this.facade.deactivate(Array.from(this.selectedRows))
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: () => this.dialogService.showSuccess('Selected parts deactivated successfully.'),
-          error: (err) => {
-            const validationMessage = err.friendlyMessage
-              || err.error?.details?.join('\n')
-              || err.message;
-            this.dialogService.showMessage({
-              heading: 'Failed to create',
-              message: validationMessage
-            });
-          },
+          next: () => this.dialog.showSuccess('Selected parts deactivated successfully.'),
+          error: (err) => this.dialog.showErrorMessage('Failed to deactivate', err),
+
           complete: () => {
             this.selectedRows.clear();
             this.selectedCount = 0;
@@ -300,10 +279,10 @@ export class SparePartComponent implements OnInit, OnDestroy {
 
   protected toPdf(): void {
     if (this.selectedRows.size === 0) {
-      this.dialogService.showWarning('Please select at least one record to print.');
+      this.dialog.showWarning('Please select at least one record to print.');
       return;
     }
-    this.dialogService.showPrintDialog({
+    this.dialog.showPrintDialog({
       width: '1500px', height: '650px',
       title: 'Part Details', mode: 'table',
       data: Array.from(this.selectedRows), columns: this.exportMeta,
@@ -314,7 +293,7 @@ export class SparePartComponent implements OnInit, OnDestroy {
 
   protected toExcel(): void {
     if (this.selectedRows.size === 0) {
-      this.dialogService.showWarning('Please select at least one record to export.');
+      this.dialog.showWarning('Please select at least one record to export.');
       return;
     }
     exportToExcel(Array.from(this.selectedRows), this.exportMeta, 'spare-parts.xlsx');
