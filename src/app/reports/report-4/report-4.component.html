@@ -1,0 +1,30 @@
+<mat-card class="report-card">
+  <mat-card-header class="report-header">
+    <div class="header-title-block">
+      <mat-card-title>Dynamic Fleet Utilization & Passenger Density</mat-card-title>
+      <mat-card-subtitle>Time-series evaluation of consumer transport demand relative to operational distance yield</mat-card-subtitle>
+    </div>
+
+    <div class="filter-action-row">
+      <mat-form-field appearance="outline" class="density-picker">
+        <mat-label>Target Operations Date</mat-label>
+        <input matInput [matDatepicker]="rawPicker" [(ngModel)]="selectedDate" (dateChange)="onDateChanged()">
+        <mat-datepicker-toggle matSuffix [for]="rawPicker"></mat-datepicker-toggle>
+        <mat-datepicker #rawPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content class="chart-content">
+    <div class="chart-container">
+      <canvas #dynamicPerformanceChart></canvas>
+    </div>
+  </mat-card-content>
+
+  <mat-divider></mat-divider>
+
+<!--  <mat-card-footer class="report-footer-summary">-->
+<!--    <mat-icon>date_range</mat-icon>-->
+<!--    <span><b>Dissertation Analysis:</b> This cross-dimensional query maps temporal load metrics against mechanical odometers to generate immediate fleet optimization assessments over custom reporting intervals.</span>-->
+<!--  </mat-card-footer>-->
+</mat-card>
