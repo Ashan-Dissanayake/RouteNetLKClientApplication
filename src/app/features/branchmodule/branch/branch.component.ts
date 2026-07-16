@@ -34,6 +34,7 @@ import {BranchFormService} from '../services/util/branchform.service';
 import {BranchMetadataService} from '../services/util/branch.metadata.service';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
+import {NgxPermissionsModule} from 'ngx-permissions';
 
 @Component({
   selector: 'app-branch',
@@ -58,6 +59,7 @@ import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
     MatCard,
     MatCardContent,
     MatCardTitle,
+    NgxPermissionsModule
   ],
   templateUrl: './branch.component.html',
   styleUrls: ['./branch.component.scss'],
@@ -74,7 +76,12 @@ export class BranchComponent implements OnInit, OnDestroy {
   protected readonly filterFormMeta  = BRANCH_FILTER_FORM_META;
   protected readonly mainFormMeta    = BRANCH_MAIN_FORM_META;
   protected readonly exportMeta      = BRANCH_DATA_EXPORT_META;
-  protected readonly actionPanelConfig = buildActionPanel();
+  protected readonly actionPanelConfig = buildActionPanel({
+    permissionMap: {
+      create: 'branch-add',
+      'bulk-deactivate': 'branch-delete'
+    }
+  });
 
   // ===== Streams (pass-through from facade) =====
   protected readonly branches$: Observable<Branch[]>;

@@ -21,8 +21,6 @@ export interface UserProfile {
   providedIn: 'root'
 })
 export class AuthService {
-  private http = inject(HttpClient);
-  private permissionsService = inject(NgxPermissionsService);
 
   private readonly TOKEN_KEY = 'auth_token';
   private readonly USER_KEY = 'auth_user';
@@ -31,7 +29,10 @@ export class AuthService {
   currentUser = signal<UserProfile | null>(this.getStoredUser());
   isAuthenticated = computed(() => !!this.currentUser());
 
-  constructor() {
+  constructor(
+    private http:HttpClient,
+    private permissionsService:NgxPermissionsService,
+  ) {
     // If a user was already logged in on page load, load their permissions
     const user = this.currentUser();
     if (user) {
@@ -57,12 +58,6 @@ export class AuthService {
 
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
-  }
-
-  hasRole(allowedRoles: string[]): boolean {
-    const user = this.currentUser();
-    if (!user) return false;
-    return user.roles.some(role => allowedRoles.includes(role));
   }
 
   isTokenExpired(): boolean {

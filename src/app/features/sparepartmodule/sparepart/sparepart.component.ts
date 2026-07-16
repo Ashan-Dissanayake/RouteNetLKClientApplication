@@ -56,12 +56,12 @@ import {PartMetadataService} from '../service/util/sparepart.metadata.service';
 export class SparePartComponent implements OnInit, OnDestroy {
 
   // ===== Static config =====
-  protected readonly tableColumns         = PART_TABLE_META;
-  protected readonly filterFormMeta       = PART_FILTER_FORM_META;
-  protected readonly mainFormMeta         = PART_MAIN_FORM_META;
+  protected readonly tableColumns = PART_TABLE_META;
+  protected readonly filterFormMeta= PART_FILTER_FORM_META;
+  protected readonly mainFormMeta= PART_MAIN_FORM_META;
   protected readonly immutableControllers = PART_IMMUTABLE_CONTROLLERS_META;
-  protected readonly exportMeta           = PART_DATA_EXPORT_META;
-  protected readonly actionPanelConfig    = buildActionPanel();
+  protected readonly exportMeta= PART_DATA_EXPORT_META;
+  protected readonly actionPanelConfig= buildActionPanel();
 
   // ===== Streams =====
   protected readonly parts$:    Observable<Part[]>;
@@ -160,7 +160,6 @@ export class SparePartComponent implements OnInit, OnDestroy {
   }
 
   // ===== Action panel =====
-
   protected onActionTriggered(event: ButtonClickEvent): void {
     const handlers: Record<string, () => void> = {
       'create':          () => this.openCreateForm(),

@@ -4,6 +4,9 @@ import {Branch} from '../../branchmodule/entity/branch';
 import {TripStatus} from './tripstatus';
 import {OriginTerminal} from './originterminal';
 
+/**
+ * Represents a Trip entity with various properties such as branch, trip type, permit, and status.
+ */
 export class Trip{
   id!: number;
   branch!:Branch;
@@ -17,3 +20,5 @@ export class Trip{
   tripstatus!:TripStatus;
   originterminal!:OriginTerminal;
 }
+
+

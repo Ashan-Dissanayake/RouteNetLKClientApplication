@@ -6,20 +6,39 @@ import {TripMetadata} from '../../model/trip.metadata.model';
 import {TRIP_FILTER_FORM_META, TRIP_MAIN_FORM_META} from '../../model/trip.meta';
 import {Trip} from '../../entity/trip';
 
+/**
+ * Service for building and managing forms related to trips.
+ * Provides methods to create filter forms, main forms (create mode),
+ * and main forms (edit mode) using metadata and trip data.
+ */
 @Injectable()
 export class TripFormService implements OnDestroy {
 
+  /**
+   * Subject used to manage the lifecycle of subscriptions and prevent memory leaks.
+   */
   private destroy$ = new Subject<void>();
 
+  /**
+   * Constructor for the TripFormService.
+   * @param formBuilder - Service used to build forms dynamically.
+   */
   constructor(private formBuilder: FormbuilderService) {}
 
+  /**
+   * Lifecycle hook that is called when the service is destroyed.
+   * Completes the `destroy$` subject to clean up subscriptions.
+   */
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  // ===== Filter form =====
-
+  /**
+   * Builds a filter form for trips using the provided metadata.
+   * @param metadata - Metadata containing trip types and statuses.
+   * @returns A `FormGroup` representing the filter form.
+   */
   buildFilterForm(metadata: TripMetadata): FormGroup {
     return this.formBuilder.build([...TRIP_FILTER_FORM_META], {
       sstriptype:   metadata.tripTypes,
@@ -27,8 +46,11 @@ export class TripFormService implements OnDestroy {
     });
   }
 
-  // ===== Main form — create mode =====
-
+  /**
+   * Builds the main form for creating a trip using the provided metadata.
+   * @param metadata - Metadata containing branches, trip types, statuses, calendars, permits, and terminals.
+   * @returns A `FormGroup` representing the main form in create mode.
+   */
   buildMainForm(metadata: TripMetadata): FormGroup {
     return this.formBuilder.build([...TRIP_MAIN_FORM_META], {
       branch:          metadata.branches,
@@ -40,11 +62,16 @@ export class TripFormService implements OnDestroy {
     });
   }
 
-  // ===== Main form — edit mode =====
-
+  /**
+   * Builds the main form for editing a trip using the provided metadata and trip data.
+   * @param metadata - Metadata containing branches, trip types, statuses, calendars, permits, and terminals.
+   * @param row - The trip data to populate the form with.
+   * @returns A `FormGroup` representing the main form in edit mode.
+   */
   buildMainFormForEdit(metadata: TripMetadata, row: Trip): FormGroup {
     const form = this.buildMainForm(metadata);
     form.patchValue(row);
     return form;
   }
 }
+

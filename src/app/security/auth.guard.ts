@@ -21,17 +21,3 @@ export const authGuard: CanActivateFn = (route, state) => {
   return false;
 };
 
-export const roleGuard = (allowedRoles: string[]): CanActivateFn => {
-  return () => {
-    const authService = inject(AuthService);
-    const router = inject(Router);
-
-    if (authService.isAuthenticated() && authService.hasRole(allowedRoles)) {
-      return true;
-    }
-
-    // Redirect to home page or unauthorized page
-    router.navigate(['/unauthorized']);
-    return false;
-  };
-};

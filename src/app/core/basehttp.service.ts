@@ -76,4 +76,16 @@ export abstract class BaseHttpService<T> {
       body ?? {}
     );
   }
+
+  putActionById(
+    url: string,
+    id: number,
+    action: string,
+    body?: any
+  ): Observable<T> {
+    return this.http.put<T>(
+      `${url}/${id}/${action}`,
+      body ?? {}
+    );
+  }
 }

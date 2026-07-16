@@ -1,4 +1,4 @@
-import {Component, ViewChild, inject} from '@angular/core';
+import {Component, ViewChild, inject, computed} from '@angular/core';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,8 +9,7 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import {NgIf, NgFor} from '@angular/common';
 import {MAT_DATE_FORMATS, MatDateFormats, provideNativeDateAdapter} from "@angular/material/core";
 import {AuthService} from './security/auth.service';
-import {NgxPermissionsModule} from 'ngx-permissions';
-
+import {NgxPermissionsModule, NgxPermissionsService} from 'ngx-permissions';
 
 
 interface MenuItem {
@@ -19,12 +18,11 @@ interface MenuItem {
   route?: string;
   children?: MenuItem[];
   expanded?: boolean;
+  permission?: string | string[];
 }
 
 const formats: MatDateFormats = {
-  parse: {
-    dateInput: 'yyyy-MM-dd',
-  },
+  parse: { dateInput: 'yyyy-MM-dd' },
   display: {
     dateInput: 'yyyy-MM-dd',
     monthYearLabel: 'MMM yyyy',
@@ -33,16 +31,11 @@ const formats: MatDateFormats = {
   },
 };
 
-// ---------------------------------------//
-
-
 @Component({
   selector: 'app-root',
   standalone: true,
   providers: [
-    // Provide the adapter first
     provideNativeDateAdapter(),
-    // Override the formats globaly
     { provide: MAT_DATE_FORMATS, useValue: formats }
   ],
   imports: [
@@ -60,58 +53,137 @@ const formats: MatDateFormats = {
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
+
   private authService = inject(AuthService);
   private router = inject(Router);
+
 
   @ViewChild('sidenav') sidenav!: MatSidenav;
   isMobile = false;
   isCollapsed = false;
   isAuthenticated = this.authService.isAuthenticated;
 
+  // Redesigned with cleaner, industry-standard enterprise icons
   menuItems: MenuItem[] = [
-    { icon: 'home', label: 'Home', route: '/' },
+    { icon: 'space_dashboard',
+      label: 'Dashboard',
+      route: '/admin/dashboard'
+    },
     {
-      icon: 'admin_panel_settings',
-      label: 'Admin',
+      icon: 'date_range',
+      label: 'Planning & Scheduling',
       children: [
-        { icon: 'badge', label: 'Employee', route: '/admin/employee' },
-        { icon: 'person', label: 'User', route: '/admin/user' },
-        { icon: 'account_tree', label: 'Branch', route: '/admin/branch' },
-        { icon: 'directions_bus', label: 'Vehicle', route: '/admin/vehicle' },
-        { icon: 'groups', label: 'Driver', route: '/admin/driver' },
-        { icon: 'groups', label: 'Conductor', route: '/admin/conductor' },
-        { icon: 'assignment', label: 'Permit', route: '/admin/permit' },
-        { icon: 'precision_manufacturing', label: 'Part', route: '/admin/part' },
-        { icon: 'shopping_cart_checkout', label: 'Part Request', route: '/admin/part-request' },
-        { icon: 'assignment_turned_in', label: 'GRN', route: '/admin/grn' },
-        { icon: 'navigation', label: 'Trip', route: '/admin/trip' },
-        { icon: 'calendar_month', label: 'Roster', route: '/admin/roster' },
-        { icon: 'route', label: 'Trp Execution', route: '/admin/trip-execution' },
-        { icon: 'report_problem', label: 'Incident Report', route: '/admin/incident-report' },
-        { icon: 'settings_backup_restore', label: 'Incident Vehicle Allocation', route: '/admin/incident-vehicle-allocation' },
-        { icon: 'money', label: 'Fare Collection', route: '/admin/fare-collection' },
-        { icon: 'money', label: 'Vehicle Service', route: '/admin/vehicle-service' },
+        { icon: 'badge', label: 'Employee Registry', route: '/employee', permission: 'employee-view' },
+        { icon: 'airline_seat_recline_normal', label: 'Drivers', route: '/driver', permission: 'driver-view' },
+        { icon: 'assignment_ind', label: 'Conductors', route: '/conductor', permission: 'conductor-view' },
+        { icon: 'subtitles', label: 'Route Permits', route: '/permit', permission: 'permit-view' },
+        { icon: 'alt_route', label: 'Trip Configurations', route: '/trip', permission: 'trip-view' },
+        { icon: 'table_chart', label: 'Roster Management', route: '/roster', permission: 'roster-view' },
       ],
       expanded: false
     },
-    { icon: 'dashboard', label: 'Dashboard', route: '/dashboard' }
+    {
+      icon: 'rv_hookup',
+      label: 'Depot Operations',
+      children: [
+        { icon: 'play_circle_filled', label: 'Trip Execution', route: '/trip-execution', permission: 'trip-execution-view' },
+        { icon: 'gpp_maybe', label: 'Incident Logs', route: '/incident-report', permission: 'incident-select' },
+        { icon: 'commute', label: 'Vehicle Allocation', route: '/incident-vehicle-allocation', permission: 'incident-vehicle-allocation-view' },
+        { icon: 'account_balance_wallet', label: 'Fare Collection', route: '/fare-collection', permission: 'fare-collection-view' },
+      ],
+      expanded: false
+    },
+    {
+      icon: 'handyman',
+      label: 'Maintenance & Garage',
+      children: [
+        { icon: 'directions_bus', label: 'Fleet Inventory', route: '/vehicle', permission: 'vehicle-view' },
+        { icon: 'build_circle', label: 'Vehicle Service Logs', route: '/vehicle-service', permission: 'vehicle-service-view' },
+        { icon: 'settings', label: 'Spare Parts Registry', route: '/part', permission: 'part-select' },
+        { icon: 'shopping_cart', label: 'Part Requests', route: '/part-request', permission: 'part-request-view' },
+        { icon: 'receipt_long', label: 'Good Receive Notes (GRN)', route: '/grn', permission: 'grn-view' },
+      ],
+      expanded: false
+    },
+    {
+      icon: 'assessment',
+      label: 'Reports',
+      children: [
+        { icon: 'space_dashboard', label: 'Report-1', route: '/report-1' },
+        { icon: 'receipt_long', label: 'Report-2', route: '/report-2' },
+        { icon: 'trending_up', label: 'Report-3', route: '/report-3' },
+        { icon: 'history', label: 'Report-4', route: '/report-4' },
+        { icon: 'pie_chart ', label: 'Report-5', route: '/report-5' },
+      ],
+    },
+    {
+      icon: 'admin_panel_settings',
+      label: 'System Administration',
+      children: [
+        { icon: 'manage_accounts', label: 'User Accounts', route: '/user', permission: 'user-view' },
+        { icon: 'corporate_fare', label: 'Depot Branches', route: '/branch', permission: 'branch-view' },
+      ],
+      expanded: false
+    }
+
   ];
 
-  constructor(private observer: BreakpointObserver) {
+
+
+  filteredMenuItems = computed(() => {
+    if (!this.isAuthenticated()) {
+      return [];
+    }
+    return this.filterMenuItemsByPermissions(this.menuItems);
+  });
+
+  constructor(
+    private observer: BreakpointObserver,
+    private permissionsService:NgxPermissionsService
+  ) {
     this.observer.observe(['(max-width: 800px)']).subscribe((result) => {
       this.isMobile = result.matches;
       this.isCollapsed = this.isMobile;
       if (this.isMobile) {
-        this.menuItems.forEach(item => item.expanded = false); // Collapse sub-menus on mobile
+        this.menuItems.forEach(item => item.expanded = false);
       }
     });
   }
 
+  private filterMenuItemsByPermissions(items: MenuItem[]): MenuItem[] {
+
+    return items
+      .map(item => {
+
+        const cloned = {...item};
+
+        if(item.children){
+          cloned.children =
+            this.filterMenuItemsByPermissions(item.children);
+        }
+
+        return cloned;
+      })
+      .filter(item => {
+
+        if(item.permission){
+
+          const permissions = Array.isArray(item.permission)
+            ? item.permission
+            : [item.permission];
+          return permissions.some(permission =>
+            this.permissionsService.getPermissions()
+              .hasOwnProperty(permission)
+          );
+        }
+        return !(item.children &&
+          item.children.length === 0);
+      });
+  }
+
   toggleSidenav() {
     if (this.isMobile) {
-      this.sidenav.toggle().then(r => {
-        console.log(r);
-      });
+      this.sidenav.toggle();
     } else {
       this.isCollapsed = !this.isCollapsed;
     }
@@ -120,8 +192,8 @@ export class AppComponent {
   toggleSubMenu(item: MenuItem) {
     item.expanded = !item.expanded;
     if (this.isMobile && item.expanded) {
-      this.menuItems.forEach(i => {
-        if (i !== item) i.expanded = false; // Collapse other sub-menus
+      this.filteredMenuItems().forEach(i => {
+        if (i !== item) i.expanded = false;
       });
     }
   }
@@ -131,5 +203,3 @@ export class AppComponent {
     this.router.navigate(['/login']);
   }
 }
-
-

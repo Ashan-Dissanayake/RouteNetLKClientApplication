@@ -1,61 +1,63 @@
-@if (isAuthenticated()) {
-  <mat-toolbar color="primary">
-    <button mat-icon-button aria-label="Toggle sidenav" (click)="toggleSidenav()">
+<ng-container *ngIf="isAuthenticated()">
+  <mat-toolbar class="depot-toolbar">
+    <button mat-icon-button aria-label="Toggle navigation" (click)="toggleSidenav()">
       <mat-icon>menu</mat-icon>
     </button>
-    <span>RouteNetLK</span>
+    <span class="brand-title">RouteNetLK</span>
     <span class="toolbar-spacer"></span>
-    <button mat-icon-button (click)="logout()" aria-label="Logout">
+    <button mat-icon-button (click)="logout()" aria-label="Sign out">
       <mat-icon>logout</mat-icon>
     </button>
   </mat-toolbar>
 
-  <mat-sidenav-container>
-    <mat-sidenav #sidenav [mode]="isMobile ? 'over' : 'side'" [opened]="!isCollapsed">
-      <mat-nav-list>
-        @for (item of menuItems; track item.label) {
-          <div>
+  <mat-sidenav-container class="depot-container">
+    <mat-sidenav #sidenav [mode]="isMobile ? 'over' : 'side'" [opened]="!isCollapsed" class="depot-sidenav">
+      <mat-nav-list class="sidenav-list">
+        <div *ngFor="let item of filteredMenuItems()" class="menu-group-wrapper">
+
+          <a
+            mat-list-item
+            class="nav-item-link"
+            [routerLink]="item.route || null"
+            (click)="item.children ? toggleSubMenu(item) : (isMobile && sidenav.close())"
+            [attr.aria-expanded]="item.children ? item.expanded : null"
+            [attr.aria-label]="item.label"
+            routerLinkActive="active"
+          >
+            <mat-icon class="nav-icon-left">{{item.icon}}</mat-icon>
+            <span class="nav-label-text" *ngIf="!isCollapsed || isMobile">{{item.label}}</span>
+            <mat-icon *ngIf="item.children && (!isCollapsed || isMobile)" class="expand-icon">
+              {{item.expanded ? 'expand_less' : 'expand_more'}}
+            </mat-icon>
+          </a>
+
+          <mat-nav-list class="sub-menu-list" *ngIf="item.children && item.expanded && (!isCollapsed || isMobile)">
             <a
               mat-list-item
-              [routerLink]="item.route || null"
-              (click)="item.children ? toggleSubMenu(item) : (isMobile && sidenav.close())"
-              [attr.aria-expanded]="item.children ? item.expanded : null"
-              [attr.aria-label]="item.label"
+              class="sub-nav-item-link"
+              *ngFor="let child of item.children"
+              routerLink="{{child.route}}"
+              (click)="isMobile && sidenav.close()"
+              [attr.aria-label]="child.label"
               routerLinkActive="active"
             >
-              <mat-icon matListItemIcon>{{item.icon}}</mat-icon>
-              <span *ngIf="!isCollapsed || isMobile">{{item.label}}</span>
-              <mat-icon *ngIf="item.children && (!isCollapsed || isMobile)" class="expand-icon">
-                {{item.expanded ? 'expand_less' : 'expand_more'}}
-              </mat-icon>
+              <mat-icon class="nav-icon-left sub-icon">{{child.icon}}</mat-icon>
+              <span class="nav-label-text" *ngIf="!isCollapsed || isMobile">{{child.label}}</span>
             </a>
-            @if (item.children && item.expanded) {
-              <mat-nav-list class="sub-menu">
-                @for (child of item.children; track child.route) {
-                  <a
-                    mat-list-item
-                    class="sub-item"
-                    routerLink="{{child.route}}"
-                    (click)="isMobile && sidenav.close()"
-                    [attr.aria-label]="child.label"
-                    routerLinkActive="active"
-                  >
-                    <mat-icon matListItemIcon>{{child.icon}}</mat-icon>
-                    <span *ngIf="!isCollapsed || isMobile">{{child.label}}</span>
-                  </a>
-                }
-              </mat-nav-list>
-            }
-          </div>
-        }
+          </mat-nav-list>
+
+        </div>
       </mat-nav-list>
     </mat-sidenav>
-    <mat-sidenav-content>
-      <div class="content">
+
+    <mat-sidenav-content class="depot-main-content">
+      <div class="content-wrapper">
         <router-outlet></router-outlet>
       </div>
     </mat-sidenav-content>
   </mat-sidenav-container>
-} @else {
+</ng-container>
+
+<ng-container *ngIf="!isAuthenticated()">
   <router-outlet></router-outlet>
-}
+</ng-container>

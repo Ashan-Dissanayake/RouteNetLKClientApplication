@@ -9,9 +9,22 @@ import {OpCalenderService} from '../api/opcalender.service';
 import {OriginTerminalService} from '../api/originterminal.service';
 import {TripMetadata} from '../../model/trip.metadata.model';
 
+/**
+ * Service to load lookup data for trips.
+ * This service aggregates data from multiple other services
+ * and provides it as a single observable.
+ */
 @Injectable()
-export class TripMetadataService {
-
+export class TripLookupDataService {
+  /**
+   * Constructor for `TripLookupDataService`.
+   * @param branchService Service to fetch branch-related data.
+   * @param tripTypeService Service to fetch trip type data.
+   * @param tripStatusService Service to fetch trip status data.
+   * @param permitService Service to fetch permit-related data.
+   * @param opCalenderService Service to fetch operational calendar data.
+   * @param originTerminalService Service to fetch origin terminal data.
+   */
   constructor(
     private branchService:         BranchService,
     private tripTypeService:        TripTypeService,
@@ -20,7 +33,11 @@ export class TripMetadataService {
     private opCalenderService:      OpCalenderService,
     private originTerminalService:  OriginTerminalService,
   ) {}
-
+  /**
+   * Loads all lookup data required for trips.
+   * @returns An observable of `TripMetadata` containing aggregated data
+   * from various services.
+   */
   loadAll(): Observable<TripMetadata> {
     return forkJoin({
       branches:        this.branchService.getSummary().pipe(map(r => r.data)),
@@ -32,3 +49,5 @@ export class TripMetadataService {
     });
   }
 }
+
+

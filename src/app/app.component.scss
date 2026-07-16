@@ -1,36 +1,47 @@
-/* --- Variables --- */
-$primary-gradient: linear-gradient(180deg, #006A71 0%, #004649 100%);
-$text-white: #fff;
-$bg-main: #F5F5F5;
-$transition-standard: 0.3s ease;
-$transition-fast: 0.2s ease;
-$sidenav-width: 250px;
-$sidenav-mini-width: 60px;
+/* --- SLTB Enterprise Transport Theme Color System --- */
+$sltb-primary-dark: #072F32;     /* Deep SLTB Corporate Teal (High Contrast Background) */
+$sltb-accent-teal: #146a70;      /* Core Operational Theme Teal */
+$sltb-active-blue: #0284C7;      /* Clean Transport System Active Indicator Blue */
+$sltb-bg-gray: #F8FAFC;          /* Clean Industrial Content Canvas Background */
 
-/* === Sidenav Container === */
-mat-sidenav-container {
-  font-family: "Inter", "Roboto", sans-serif;
+// Force clear white text states for dark navigation
+$text-high-contrast: #FFFFFF !important;
+$text-muted-gray: #E2E8F0 !important;
 
+$transition-smooth: 0.15s ease-in-out;
+$sidebar-expanded-width: 260px;
+$sidebar-collapsed-width: 64px;
+
+/* === Layout Container Wrapper === */
+mat-sidenav-container.depot-container {
+  height: calc(100vh - 50px);
+  background-color: $sltb-bg-gray;
 }
 
-/* === Toolbar === */
-mat-toolbar {
-  background: $primary-gradient;
-  color: $text-white;
+/* === Clean Top Header Bar === */
+mat-toolbar.depot-toolbar {
+  background: $sltb-primary-dark;
+  color: $text-high-contrast;
+  height: 50px;
+  font-size: 14px;
   font-weight: 600;
-  font-size: 15px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  letter-spacing: 0.5px;
   display: flex;
   align-items: center;
   padding: 0 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
 
-  button mat-icon {
-    color: $text-white;
-    transition: transform $transition-fast;
+  .brand-title {
+    margin-left: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: $text-high-contrast;
+  }
 
-    &:hover {
-      transform: scale(1.1);
-    }
+  button[mat-icon-button] mat-icon {
+    color: $text-high-contrast;
+    font-size: 22px;
   }
 }
 
@@ -38,101 +49,143 @@ mat-toolbar {
   flex: 1 1 auto;
 }
 
-/* === Sidenav === */
-mat-sidenav {
-  border-radius: unset;
-  width: $sidenav-width;
-  background: $primary-gradient;
-  color: $text-white;
-  font-size: 13px;
-  padding: 24px 12px;
-  box-sizing: border-box;
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
-  transition: width $transition-standard, background-color $transition-fast;
+/* === Re-Architected Sidenav Layout (Fixed Alignments & Sizing) === */
+mat-sidenav.depot-sidenav {
+  width: $sidebar-expanded-width;
+  background: $sltb-primary-dark !important; /* Forces dark background over Material defaults */
+  border: none;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.15);
+  transition: width $transition-smooth;
+  overflow-x: hidden;
 
-  &.mini {
-    width: $sidenav-mini-width;
+  // REMOVED ALL BORDER RADIUS ENTIRELY FOR AN INDUSTRIAL, PROFESSIONAL LOOK
+  border-radius: 0px !important;
+
+  .sidenav-list {
+    padding: 8px 0;
+    display: flex;
+    flex-direction: column;
   }
 
-  mat-nav-list {
-    list-style: none;
-    padding: 0;
+  .menu-group-wrapper {
+    display: block;
+    width: 100%;
+  }
 
-    a.mat-mdc-list-item {
-      display: flex;
-      align-items: center;
-      color: $text-white !important;
-      text-decoration: none;
-      padding: 10px 12px;
-      border-radius: 8px;
-      transition: background $transition-fast, padding-left $transition-fast;
+  /* --- Unified Primary & Sub Item Configurations --- */
+  ::ng-deep .mat-mdc-list-item-interactive {
+    border-radius: 0px !important; /* Removes inner Material item curves */
+  }
 
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.08);
+  .nav-item-link, .sub-nav-item-link {
+    display: flex !important;
+    align-items: center !important;
+    height: 44px !important;
+    padding: 0 16px !important;
+    text-decoration: none;
+    cursor: pointer;
+    background: transparent;
+    border-radius: 0px !important;
+    transition: background-color $transition-smooth;
+
+    /* FIXED BLACK TEXT ISSUE: Forces high-contrast visibility */
+    color: $text-muted-gray;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.08) !important;
+
+      .nav-label-text { color: $text-high-contrast; }
+      .nav-icon-left { color: $text-high-contrast; }
+    }
+
+    &.active {
+      background-color: $sltb-accent-teal !important;
+      border-left: 4px solid $sltb-active-blue;
+      padding-left: 12px !important; /* Accounts for border offset smoothly */
+
+      .nav-label-text {
+        color: $text-high-contrast;
+        font-weight: 600 !important;
+      }
+      .nav-icon-left {
+        color: $text-high-contrast;
+      }
+    }
+  }
+
+  /* --- Flawless Linear Structural Icon Alignment --- */
+  .nav-icon-left {
+    margin-right: 14px !important;
+    color: #94A3B8;
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    vertical-align: middle !important;
+  }
+
+  .nav-label-text {
+    font-size: 13px !important;
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-grow: 1;
+    color: whitesmoke;
+    //color: inherit; /* Direct inheritance bypassing native color rules */
+  }
+
+  .expand-icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    color: #64748B;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* --- Cascading Hierarchical Sub-menus --- */
+  .sub-menu-list {
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0.2); /* Creates a solid visual nesting block */
+
+    .sub-nav-item-link {
+      height: 38px !important;
+      padding-left: 32px !important; /* Indents cleanly beneath parental titles */
+
+      .sub-icon {
+        font-size: 16px !important;
+        width: 16px !important;
+        height: 16px !important;
+        margin-right: 12px !important;
+      }
+
+      .nav-label-text {
+        font-size: 12.5px !important;
       }
 
       &.active {
-        background-color: rgba(255, 255, 255, 0.15);
-        font-weight: 600;
+        background-color: rgba(2, 132, 199, 0.25) !important;
+        border-left: 4px solid $sltb-active-blue;
+        padding-left: 28px !important;
       }
-
-      mat-icon {
-        margin-right: 12px;
-        color: $text-white;
-        font-size: 20px;
-      }
-
-      span {
-        color: white;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-    }
-
-    .sub-menu {
-      padding-left: 20px;
-      transition: max-height $transition-standard;
-    }
-
-    .sub-item {
-      padding-left: 28px;
-
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.05);
-      }
-    }
-
-    .expand-icon {
-      margin-left: auto;
-      color: $text-white;
-      transition: transform $transition-standard;
     }
   }
 }
 
-/* === Main Content === */
-mat-sidenav-content {
-  padding: 0 20px;
-  background-color: $bg-main;
-  min-height: 100vh;
-}
+/* === Primary Application Workspace === */
+mat-sidenav-content.depot-main-content {
+  background-color: $sltb-bg-gray;
+  padding: 20px;
+  box-sizing: border-box;
 
-/* === Responsive === */
-@media (max-width: 800px) {
-  mat-sidenav {
-    width: 200px;
-
-    .sub-menu {
-      padding-left: 12px;
-    }
-
-    .sub-item {
-      padding-left: 20px;
-    }
-  }
-
-  mat-sidenav-content {
-    padding: 12px;
+  .content-wrapper {
+    max-width: 100%;
+    margin: 0 auto;
   }
 }

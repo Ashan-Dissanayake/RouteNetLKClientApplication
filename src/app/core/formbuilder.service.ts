@@ -199,9 +199,6 @@ export class FormbuilderService {
     });
   }
 
-
-
-
 }
 
 type NormalizationRule = {

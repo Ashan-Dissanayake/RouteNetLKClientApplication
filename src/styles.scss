@@ -1,70 +1,75 @@
-/* You can add global styles to this file, and also import other style files */
+/* Clean Global Enterprise Core Settings */
+html, body {
+  height: 100%;
+}
 
-html, body { height: 100%; }
-body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif;}
+body {
+  margin: 0;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: #F8FAFC;
+  color: #1E293B;
+  -webkit-font-smoothing: antialiased;
+}
 
+/* --- Optimized Enterprise Form Sizing (Original Perfect Alignment) --- */
 mat-form-field {
   width: 100%;
-  padding-bottom: 2px;
   padding-top: 5px;
-  //padding-inline-start: 10px;
-}
+  padding-bottom: 2px;
 
-.mat-mdc-form-field-infix {
-  min-height: 28px !important;
-  padding-top: 8px !important;
-  padding-bottom: 8px !important;
-}
+  // Compact infix structural sizing
+  .mat-mdc-form-field-infix {
+    min-height: 28px !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+  }
 
-.mat-mdc-form-field .mat-mdc-floating-label.mdc-floating-label {
-  padding-bottom: 15px;
-  font-size: 13px !important;
-}
+  // Your original label alignment trick, polished for the new theme
+  .mat-mdc-floating-label.mdc-floating-label {
+    font-size: 13px !important;
+    font-weight: 500;
+    padding-bottom: 15px; /* This is what kept it perfectly centered! */
 
-mat-form-field input {
-  font-size: 13px !important;
-}
-
-
-mat-card-title{ padding-bottom: 8px}
-
-.mainform {
-
-  ::ng-deep {
-
-    mat-form-field {
-      font-size: 0.85rem;
-      margin-bottom: 8px;
-
-      .mat-form-field-infix {
-        padding: 4px 8px;
-      }
-
-      .mat-form-field-label {
-        font-size: 0.75rem;
-      }
-
-      input.mat-input-element,
-      textarea.mat-input-element {
-        font-size: 0.85rem;
-        padding: 4px 0;
-        height: 24px;
-      }
-
-      mat-error {
-        font-size: 0.7rem;
-        margin-top: 2px;
-      }
-
-      mat-select {
-        .mat-select-trigger {
-          height: 24px;
-          line-height: 24px;
-          font-size: 0.85rem;
-          padding: 0 8px;
-        }
-      }
+    // Smooth transition when floating to the top
+    &.mdc-floating-label--float-above {
+      padding-bottom: 0;
     }
   }
+
+  // Input & Select elements baseline harmony
+  input.mat-mdc-input-element,
+  mat-select .mat-mdc-select-trigger {
+    font-size: 13px !important;
+    height: 20px !important;
+    line-height: 20px !important;
+  }
+
+  mat-error {
+    font-size: 11.5px !important;
+    margin-top: 2px;
+  }
 }
-::-webkit-scrollbar { display: none; }
+
+/* Uniform Enterprise Content Headers */
+mat-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0F172A;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #E2E8F0;
+  margin-bottom: 16px;
+}
+
+/* --- Production Clean Scrollbar Layouts --- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 3px;
+  &:hover { background: #94A3B8; }
+}

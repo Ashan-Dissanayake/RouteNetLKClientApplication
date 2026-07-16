@@ -20,6 +20,8 @@ import {
   MatTimepickerInput,
   MatTimepickerToggle
 } from '@angular/material/timepicker';
+import {MatIconButton} from '@angular/material/button';
+import {MatIcon} from '@angular/material/icon';
 
 @Component({
   selector: 'dynamic-field',
@@ -40,6 +42,32 @@ import {
             <ng-container *ngIf="formInstance.get(field.name)?.hasError('required')">This field is required.
             </ng-container>
             <ng-container *ngIf="formInstance.get(field.name)?.hasError('pattern')">Invalid format.</ng-container>
+          </mat-error>
+        </mat-form-field>
+
+
+        <mat-form-field *ngSwitchCase="'password'" appearance="outline">
+          <mat-label>{{ field.label || field.name }}</mat-label>
+          <input matInput
+                 [type]="hidePassword ? 'password' : 'text'"
+                 [formControlName]="field.name"/>
+
+          <button mat-icon-button
+                  matSuffix
+                  (click)="hidePassword = !hidePassword"
+                  [attr.aria-label]="'Hide password'"
+                  [attr.aria-pressed]="hidePassword"
+                  type="button"> <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+
+          <mat-error
+            *ngIf="formInstance.get(field.name)?.invalid && (formInstance.get(field.name)?.dirty || formInstance.get(field.name)?.touched)">
+            <ng-container *ngIf="formInstance.get(field.name)?.hasError('required')">
+              This field is required.
+            </ng-container>
+            <ng-container *ngIf="formInstance.get(field.name)?.hasError('pattern')">
+              Invalid format.
+            </ng-container>
           </mat-error>
         </mat-form-field>
 
@@ -207,7 +235,9 @@ import {
     InnerableComponent,
     MatTimepickerToggle,
     MatTimepicker,
-    MatTimepickerInput
+    MatTimepickerInput,
+    MatIcon,
+    MatIconButton
   ]
 })
 export class DynamicFieldComponent implements AfterViewInit{
@@ -217,6 +247,8 @@ export class DynamicFieldComponent implements AfterViewInit{
 
   endDate: Date | undefined;
   @ViewChild('picker') picker!: MatDatepicker<any>;
+
+  hidePassword = true; // <-- Add this line
 
   compareFn(o1: any | null, o2: any | null): boolean {
     if (!o1 || !o2) {

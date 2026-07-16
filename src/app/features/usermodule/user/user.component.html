@@ -1,0 +1,111 @@
+<div class="container">
+  <h2>User Details Management</h2>
+</div>
+<!-- Loading -->
+<mat-progress-bar *ngIf="loading$ | async" mode="indeterminate"></mat-progress-bar>
+
+<!-- Error -->
+<div *ngIf="error$ | async as error" id="error-window">
+  <mat-card>
+    <mat-card-title>Error loading Trips</mat-card-title>
+    <mat-card-content>{{ error?.message }}</mat-card-content>
+    <button mat-raised-button color="primary" (click)="reload()">Retry</button>
+  </mat-card>
+</div>
+
+<!-- ===== Action Panel ===== -->
+<app-button-panel
+  *ngIf="lookUpData$ | async as metadata"
+  [buttons]="actionPanelConfig"
+  (actionClicked)="onActionTriggered($event)"
+  (dropdownClicked)="onDropdownOnlyClick($event)"
+  [contextData]="{ selectedRows: selectedRows }"
+>
+</app-button-panel>
+
+<div *ngIf="lookUpData$ | async as metadata" id="serverSearch">
+  <form [formGroup]="filterForm">
+    <dynamic-field
+      *ngFor="let field of filterFormMeta; trackBy: trackByField"
+      [formInstance]="filterForm"
+      [field]="field"
+    ></dynamic-field>
+  </form>
+</div>
+
+<!-- ===== Main Table with Side View ===== -->
+<app-side-view
+  [opened]="activeRow !== null"
+  [data]="activeRow"
+  [title]="'User Details'"
+  [viewTemplate]="userDetailTemplate"
+  (closed)="onCloseDetailView()"
+>
+  <app-data-table
+    *ngIf="(users$ | async)?.length"
+    [data]="(users$ | async) || []"
+    [columns]="tableColumns"
+    [sortable]="true"
+    [paginatable]="true"
+    [pageSizeOptions]="[10, 20]"
+    (rowClick)="onRowClick($event)"
+    (actionClick)="onRowAction($event.action, $event.row)"
+    (checkBoxClick)="onRowCheckboxChanged($event)"
+    (selectAllClick)="onSelectAll($event)"
+  >
+    <!-- Row Actions -->
+    <ng-template tableCell="actions" let-row let-action="action">
+
+      <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item *ngxPermissionsOnly="['branch-update']" (click)="action('edit', row)">
+          <mat-icon>mode_edit</mat-icon>
+          <span>Edit</span>
+        </button>
+
+        <button
+          mat-menu-item *ngxPermissionsOnly="['user-change-password']" (click)="action('change-password', row)">
+          <mat-icon>lock_reset</mat-icon>
+          <span>Change Password</span>
+        </button>
+        <button
+          mat-menu-item *ngxPermissionsOnly="['user-reset-password']" (click)="action('reset-password',row)">
+          <mat-icon>restart_alt</mat-icon>
+          <span>Reset Password</span>
+        </button>
+      </mat-menu>
+    </ng-template>
+  </app-data-table>
+</app-side-view>
+
+<!--Template for detail view -->
+<ng-template #userDetailTemplate let-row>
+  <div  class="user-detail-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="title-section">
+        <mat-icon color="primary" class="user-icon">apartment</mat-icon>
+        <div>
+          <h6 class="user-title">{{ row.employee.callingname }}</h6>
+          <p class="user-subtitle">Address: {{ row.username }}</p>
+          <p class="user-subtitle">Address: {{ row.type.name }}</p>
+        </div>
+      </div>
+
+      <span
+        class="status-chip"
+        [ngClass]="{
+          'ACTIVE': row.userstatus.name === 'Active',
+          'LOCKED': row.userstatus.name === 'Locked',
+          'INACTIVE': row.userstatus.name === 'Inactive'
+          }">
+          {{ row.userstatus.name }}
+        </span>
+    </div>
+    <mat-divider></mat-divider>
+  </div>
+</ng-template>
+

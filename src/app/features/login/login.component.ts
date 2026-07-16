@@ -64,9 +64,9 @@ export class LoginComponent {
       next: () => {
         this.isLoading.set(false);
         this.dialog.showSuccess('Welcome back! You have successfully logged in.');
-        
+
         // Redirect to initial URL or admin branch as a default
-        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/admin/branch';
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/branch/branch';
         this.router.navigateByUrl(returnUrl);
       },
       error: (err) => {

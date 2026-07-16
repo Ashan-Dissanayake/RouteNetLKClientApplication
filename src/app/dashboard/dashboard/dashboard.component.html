@@ -1,1 +1,160 @@
-<p>dashboard works!</p>
+<div class="dashboard-container">
+
+  <mat-grid-list cols="4" rowHeight="100px" gutterSize="16px" class="metrics-grid">
+    <mat-grid-tile>
+      <mat-card class="kpi-card highlight-blue">
+        <mat-card-content>
+          <div class="kpi-icon-pane">
+            <mat-icon>directions_bus</mat-icon>
+          </div>
+          <div class="kpi-data-pane">
+            <div class="kpi-label">Active Trip Executions</div>
+            <div class="kpi-metric">142</div>
+            <div class="kpi-trend trend-up">▲ 12 vs scheduled</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+
+    <mat-grid-tile>
+      <mat-card class="kpi-card highlight-red">
+        <mat-card-content>
+          <div class="kpi-icon-pane">
+            <mat-icon>report_problem</mat-icon>
+          </div>
+          <div class="kpi-data-pane">
+            <div class="kpi-label">Pending Incidents</div>
+            <div class="kpi-metric">04</div>
+            <div class="kpi-trend trend-down">● 2 Awaiting backup</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+
+    <mat-grid-tile>
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <div class="kpi-icon-pane">
+            <mat-icon>groups</mat-icon>
+          </div>
+          <div class="kpi-data-pane">
+            <div class="kpi-label">Standby Crew</div>
+            <div class="kpi-metric">38 <span class="metric-total">/ 210</span></div>
+            <div class="kpi-trend">Drivers & Conductors</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+
+    <mat-grid-tile>
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <div class="kpi-icon-pane">
+            <mat-icon>payments</mat-icon>
+          </div>
+          <div class="kpi-data-pane">
+            <div class="kpi-label">Today's Collections</div>
+            <div class="kpi-metric">Rs. 1.48M</div>
+            <div class="kpi-trend trend-info">74% via Digital ETM</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+  </mat-grid-list>
+
+  <div class="operations-matrix">
+
+    <mat-card class="matrix-card">
+      <mat-card-header class="matrix-header">
+        <mat-card-title>Active Fleet Incidents</mat-card-title>
+        <mat-card-subtitle>Real-time break downs and emergency dispatches</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content class="matrix-scroll-content">
+        <mat-list class="dense-incident-list">
+
+          <mat-list-item class="incident-row state-critical">
+            <mat-icon matListItemIcon class="row-indicator-icon">error_outline</mat-icon>
+            <div matListItemTitle class="row-title-wrap">
+              <span class="route-tag">Route 122</span>
+              <span class="row-main-title">WP-NA-8842 Breakdown (Engine Overheating)</span>
+            </div>
+<!--            <div matListItemLine class="row-body-desc">-->
+<!--              Location: Homagama Junction | Impacting Trip sequence #421.-->
+<!--            </div>-->
+            <div matListItemMeta class="row-action-area">
+              <span class="status-lbl text-warn">Awaiting Backup</span>
+<!--              <button mat-flat-button color="accent" class="dense-flat-btn">Allocate</button>-->
+            </div>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+
+          <mat-list-item class="incident-row">
+            <mat-icon matListItemIcon class="row-indicator-icon">check_circle_outline</mat-icon>
+            <div matListItemTitle class="row-title-wrap">
+              <span class="route-tag tag-muted">Route 002</span>
+              <span class="row-main-title">WP-NB-9015 Minor Collision</span>
+            </div>
+            <div matListItemLine class="row-body-desc">
+              Backup Vehicle WP-ND-1102 dispatched from Colombo Central Depot successfully.
+            </div>
+            <div matListItemMeta class="row-action-area">
+              <span class="status-lbl text-success">Resolved</span>
+              <button mat-stroked-button class="dense-stroke-btn" disabled>Details</button>
+            </div>
+          </mat-list-item>
+          </mat-list>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="matrix-card">
+      <mat-card-header class="matrix-header">
+        <mat-card-title>Depot Revenue Summaries</mat-card-title>
+        <mat-card-subtitle>Daily collections, ticketing tallies, and closing statuses</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content class="matrix-table-content">
+        <table mat-table [dataSource]="[
+          { depot: 'Colombo Central', tickets: '4,850', cash: 'Rs. 320,000.00', digital: 'Rs. 640,000.00', status: 'Reconciled' },
+          { depot: 'Kandy Depot', tickets: '3,120', cash: 'Rs. 285,000.00', digital: 'Rs. 240,000.00', status: 'Reconciled' },
+          { depot: 'Galle Depot', tickets: '2,110', cash: 'Rs. 192,500.00', digital: 'Rs. 115,000.00', status: 'Pending' },
+          { depot: 'Anuradhapura Depot', tickets: '1,450', cash: 'Rs. 115,000.00', digital: 'Rs. 98,000.00', status: 'Reconciled' }
+        ]" class="mat-elevation-z0 clean-dashboard-table">
+
+          <ng-container matColumnDef="depot">
+            <th mat-header-cell *matHeaderCellDef> Depot / Branch </th>
+            <td mat-cell *matCellDef="let element"> <b>{{element.depot}}</b> </td>
+          </ng-container>
+
+          <ng-container matColumnDef="tickets">
+            <th mat-header-cell *matHeaderCellDef> Tickets </th>
+            <td mat-cell *matCellDef="let element"> {{element.tickets}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="cash">
+            <th mat-header-cell *matHeaderCellDef> Cash </th>
+            <td mat-cell *matCellDef="let element"> {{element.cash}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="digital">
+            <th mat-header-cell *matHeaderCellDef> Digital ETM </th>
+            <td mat-cell *matCellDef="let element"> {{element.digital}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef> Status </th>
+            <td mat-cell *matCellDef="let element">
+              <span class="badge-status" [ngClass]="element.status === 'Reconciled' ? 'st-done' : 'st-wait'">
+                {{element.status}}
+              </span>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['depot', 'tickets', 'cash', 'digital', 'status']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['depot', 'tickets', 'cash', 'digital', 'status'];"></tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+</div>

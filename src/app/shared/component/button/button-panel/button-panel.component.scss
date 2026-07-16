@@ -1,26 +1,31 @@
-$btn-primary: #048f98;
-$btn-primary-hover: #004649;
-$btn-disabled: rgba(125, 136, 141, 0.69);
-$btn-radius: 4px;
+/* --- SLTB Enterprise Button Color Architecture --- */
+$btn-primary: #115E63;            /* Core Operational SLTB Teal */
+$btn-primary-hover: #072F32;      /* Deep SLTB Dark Teal for structural depth */
+$btn-disabled: #94A3B8;           /* Neutral Slate Gray for disabled actions */
+$btn-radius: 5px;                 /* Removed border radius entirely for industrial tone */
 $btn-font-size: 13px;
 
 button {
   background-color: $btn-primary !important;
   color: white !important;
-  border-radius: $btn-radius;
+  border-radius: $btn-radius !important; /* Force explicit sharp edges */
   cursor: pointer;
   font-size: $btn-font-size;
   margin-right: 8px;
   margin-bottom: 10px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  transition: background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 
-  &:hover:not(.mat-disabled) {
+  &:hover:not(:disabled):not(.mat-mdc-button-disabled) {
     background-color: $btn-primary-hover !important;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
   }
 
-  &:disabled {
+  &:disabled, &.mat-mdc-button-disabled {
     background-color: $btn-disabled !important;
-    color: white !important;
+    color: #F1F5F9 !important;
     cursor: not-allowed;
+    box-shadow: none !important;
   }
 }

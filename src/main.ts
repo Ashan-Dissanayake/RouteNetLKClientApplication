@@ -16,8 +16,9 @@ import {routes} from './app/app.routes';
 import {ErrorInterceptor} from './app/core/errorInterceptor';
 import {authInterceptor} from './app/security/auth.interceptor';
 import {NgxPermissionsModule} from 'ngx-permissions';
+import {Chart, registerables} from 'chart.js';
 
-
+Chart.register(...registerables);
 
 bootstrapApplication(AppComponent, {
   providers: [

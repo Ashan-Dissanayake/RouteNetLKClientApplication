@@ -1,8 +1,9 @@
-import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, Output, inject} from '@angular/core';
 import {MatButton} from '@angular/material/button';
 import {NgForOf, NgIf} from '@angular/common';
 import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
 import {MatIcon} from '@angular/material/icon';
+import {NgxPermissionsService} from 'ngx-permissions';
 
 
 @Component({
@@ -27,12 +28,25 @@ export class ButtonPanelComponent implements OnChanges{
   @Output() actionClicked = new EventEmitter<ButtonClickEvent>();
   @Output() dropdownClicked = new EventEmitter<ButtonClickEvent>();
 
-  ngOnChanges() {
-    this.configureActions();
+  filteredButtons: ButtonAction[] = [];
+
+  constructor(
+    private permissionsService:NgxPermissionsService
+  ) {
   }
 
-  onClick(button: ButtonAction, fromDropdown = false) {
-    const event: ButtonClickEvent = { type: button.type, source: button };
+  ngOnChanges(): void {
+    this.configureActions();
+    this.filterButtonsByPermission();
+  }
+
+
+  onClick(button: ButtonAction, fromDropdown = false): void {
+    const event: ButtonClickEvent = {
+      type: button.type,
+      source: button
+    };
+
     if (!this.isDisabled(button)) {
       this.actionClicked.emit(event);
       if (fromDropdown) {
@@ -47,13 +61,55 @@ export class ButtonPanelComponent implements OnChanges{
       : !!button.disabled;
   }
 
-  configureActions(): void {
+
+  private configureActions(): void {
     this.buttons.forEach(btn => {
       if (btn.type === 'bulk-deactivate') {
-        btn.disabled = (ctx: any) => ctx.selectedRows?.size === 0;
+        btn.disabled = (ctx: any) =>
+          !ctx?.selectedRows ||
+          ctx.selectedRows.size === 0;
       }
     });
   }
+
+  private filterButtonsByPermission(): void {
+
+    this.filteredButtons = this.buttons
+      .map(button => {
+
+        const filteredDropdown = button.dropdown
+          ?.filter(item =>
+            !item.permission ||
+            this.hasPermission(item.permission)
+          );
+
+        return {
+          ...button,
+          dropdown: filteredDropdown
+        };
+
+      })
+      .filter(button => {
+
+        if (!button.permission) {
+          return true;
+        }
+
+        return this.hasPermission(button.permission);
+
+      });
+  }
+
+  private hasPermission(permission: string | string[]): boolean {
+    const permissions = Array.isArray(permission)
+      ? permission
+      : [permission];
+
+    return permissions.some(permission =>
+      !!this.permissionsService.getPermission(permission)
+    );
+  }
+
 
 }
 
@@ -66,6 +122,7 @@ export interface ButtonAction {
   disabled?: boolean | ((contextData: any) => boolean);         // Can be boolean or function
   dropdown?: ButtonAction[];                    // Nested actions
   group?: string;                               // Optional grouping
+  permission?: string | string[];               // Permissions required to view this action
 }
 
 export interface ButtonClickEvent {

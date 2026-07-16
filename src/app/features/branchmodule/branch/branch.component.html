@@ -55,7 +55,7 @@
   >
     <!-- Row Actions -->
     <ng-template tableCell="actions" let-row let-action="action">
-      <button mat-button (click)="action('edit', row); $event.stopPropagation()">
+      <button *ngxPermissionsOnly="['branch-update']" mat-button (click)="action('edit', row); $event.stopPropagation()">
         <mat-icon>mode_edit</mat-icon>
       </button>
     </ng-template>

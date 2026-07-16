@@ -1,43 +1,61 @@
 <div class="login-container">
-  <div class="glass-bg"></div>
-  <mat-card class="login-card">
-    <mat-progress-bar *ngIf="isLoading()" mode="indeterminate" class="login-progress"></mat-progress-bar>
-    
-    <mat-card-header class="login-header">
-      <div class="logo-container">
-        <mat-icon class="logo-icon">route</mat-icon>
-      </div>
-      <mat-card-title class="login-title">RouteNetLK</mat-card-title>
-      <mat-card-subtitle class="login-subtitle">System Authentication</mat-card-subtitle>
-    </mat-card-header>
 
-    <mat-card-content class="login-content">
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-        
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Username</mat-label>
-          <input matInput formControlName="username" type="text" placeholder="Enter your username" autocomplete="username">
-          <mat-icon matSuffix>person</mat-icon>
-          <mat-error *ngIf="loginForm.get('username')?.hasError('required')">Username is required</mat-error>
-          <mat-error *ngIf="loginForm.get('username')?.hasError('minlength')">Username must be at least 3 characters</mat-error>
-        </mat-form-field>
+  <!-- Left Side: Immersive Visual Identity Panel -->
+  <div class="login-visual-panel">
+    <div class="visual-overlay"></div>
+    <div class="visual-content">
+      <div class="brand-badge">Sri Lanka Transport Board</div>
+      <h1>RouteNetLK</h1>
+      <p>Automated Fleet Compliance & Operations Management System</p>
+    </div>
+  </div>
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Password</mat-label>
-          <input matInput formControlName="password" [type]="hidePassword() ? 'password' : 'text'" placeholder="Enter your password" autocomplete="current-password">
-          <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword()">
-            <mat-icon>{{hidePassword() ? 'visibility_off' : 'visibility'}}</mat-icon>
+  <!-- Right Side: Clean Administrative Workspace -->
+  <div class="login-form-panel">
+    <mat-card class="login-card">
+      <mat-progress-bar *ngIf="isLoading()" mode="indeterminate" class="login-progress"></mat-progress-bar>
+
+      <mat-card-header class="login-header">
+        <mat-card-title class="login-title">Sign In</mat-card-title>
+        <mat-card-subtitle class="login-subtitle">Access your depot control desk</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content class="login-content">
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+
+          <!-- Username Input -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Username</mat-label>
+            <input matInput formControlName="username" type="text" placeholder="Enter your username" autocomplete="username">
+            <mat-icon matSuffix>person</mat-icon>
+            <mat-error *ngIf="loginForm.get('username')?.hasError('required')">Username is required</mat-error>
+            <mat-error *ngIf="loginForm.get('username')?.hasError('minlength')">Username must be at least 3 characters</mat-error>
+          </mat-form-field>
+
+          <!-- Password Input -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Password</mat-label>
+            <input matInput formControlName="password" [type]="hidePassword() ? 'password' : 'text'" placeholder="Enter your password" autocomplete="current-password">
+            <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword()">
+              <mat-icon>{{hidePassword() ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+            <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Password is required</mat-error>
+            <mat-error *ngIf="loginForm.get('password')?.hasError('minlength')">Password must be at least 4 characters</mat-error>
+          </mat-form-field>
+
+          <!-- Action Button -->
+          <button mat-flat-button type="submit" class="login-button" [disabled]="isLoading() || loginForm.invalid">
+            <span *ngIf="!isLoading()">LOGIN</span>
+            <span *ngIf="isLoading()">Verifying Credentials...</span>
           </button>
-          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Password is required</mat-error>
-          <mat-error *ngIf="loginForm.get('password')?.hasError('minlength')">Password must be at least 4 characters</mat-error>
-        </mat-form-field>
 
-        <button mat-raised-button color="primary" type="submit" class="login-button" [disabled]="isLoading() || loginForm.invalid">
-          <span *ngIf="!isLoading()">Sign In</span>
-          <span *ngIf="isLoading()">Authenticating...</span>
-        </button>
+        </form>
+      </mat-card-content>
 
-      </form>
-    </mat-card-content>
-  </mat-card>
+      <mat-card-footer class="login-footer">
+        <p>© 2026 SLTB Depot Operations. All rights reserved.</p>
+      </mat-card-footer>
+    </mat-card>
+  </div>
+
 </div>

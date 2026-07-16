@@ -113,4 +113,10 @@ export const ApiEndpoints = {
     VEHICLE_SERVICE_STATUS:`${BASE_URL}/vehicle-service-statuses/summaries`,
     VEHICLE_SERVICE_PRIORITY:`${BASE_URL}/vehicle-service-priorities/summaries`,
 
+    // USER MANAGEMENT
+    USERS :`${BASE_URL}/users`,
+    USER_DEACTIVATE_OR_ACTIVATE :`${BASE_URL}/users/activate-or-deactivate-user`,
+    USER_STATUS:`${BASE_URL}/user-statuses/summaries`,
+    USER_TYPE:`${BASE_URL}/user-types/summaries`,
+
 } as const;
