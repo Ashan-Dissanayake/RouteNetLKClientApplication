@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {MatDialog} from '@angular/material/dialog';
+import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {MatSnackBar, MatSnackBarConfig} from '@angular/material/snack-bar';
 import {Observable} from 'rxjs';
 import {FormGroup} from '@angular/forms';
@@ -9,6 +9,7 @@ import {ConfirmComponent} from '../shared/component/confirm/confirm.component';
 import {FormpopupComponent} from '../shared/component/form/formpopup/formpopup.component';
 import {PrintTableComponent} from '../shared/component/export/print/print-table.component';
 import {getErrorMessage} from './error.util';
+import {ComponentType} from '@angular/cdk/portal';
 
 const DEFAULT_CONFIG = {
     DIALOG_WIDTH: '500px',
@@ -90,6 +91,15 @@ export class DialogService {
             ...config
         });
     }
+
+  showComponent<T>(
+    component: ComponentType<T>, data?: any, width = DEFAULT_CONFIG.FORM_DIALOG_WIDTH): MatDialogRef<T>
+  {
+    return this.dialog.open(component, {
+      width,
+      data
+    });
+  }
 }
 
 export interface DialogOptions {

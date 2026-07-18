@@ -1,11 +1,12 @@
 import {Injectable, OnDestroy} from '@angular/core';
-import {BehaviorSubject, finalize, Observable, Subject, takeUntil, tap, throwError} from 'rxjs';
+import {BehaviorSubject, finalize, forkJoin, Observable, Subject, takeUntil, tap, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {normalizeSearchCriteria} from '../../../../core/search-criteria-normalizer';
-import {User} from '../../entity/User';
+import {User} from '../../entity/user';
 import {UserService} from '../api/user.service';
 import {UserLookUpDataService} from './user.lookupdata.service';
 import {EMPTY_USER_LOOK_UP_DATA, UserLookUpData} from '../../model/user.lookupdata.model';
+import {UserRoleService} from '../api/userrole.service';
 
 @Injectable()
 export class UserFacadeService implements OnDestroy {
@@ -25,6 +26,7 @@ export class UserFacadeService implements OnDestroy {
 
   constructor(
     private userService:  UserService,
+    private userRoleService:UserRoleService,
     private lookUpDataService:  UserLookUpDataService,
   ) {}
 
@@ -95,6 +97,10 @@ export class UserFacadeService implements OnDestroy {
     return this.userService.resetPassword(userId, payload);
   }
 
+  replaceRoles(userId: number, data: any): Observable<any> {
+    return this.userRoleService.replaceRoles(userId, data);
+  }
+
   // ===== Internal helpers =====
   private fetchUsers(params?: any): void {
     this.setLoading(true);
@@ -114,4 +120,5 @@ export class UserFacadeService implements OnDestroy {
 
   private setLoading(value: boolean): void { this.loadingSubject.next(value); }
   private clearError(): void               { this.errorSubject.next(null); }
+
 }

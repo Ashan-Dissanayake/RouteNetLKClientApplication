@@ -119,4 +119,11 @@ export const ApiEndpoints = {
     USER_STATUS:`${BASE_URL}/user-statuses/summaries`,
     USER_TYPE:`${BASE_URL}/user-types/summaries`,
 
+    //USER ROLE MANAGEMENT
+    ROLES :`${BASE_URL}/roles/summaries`,
+    USER_ROLES :`${BASE_URL}/user-roles`,
+    USER_ROLE_ASSIGN: (userId: number) => `${BASE_URL}/user-roles/${userId}/roles`,
+    USER_ROLE_REVOKE: (userId: number, roleId: number) => `${BASE_URL}/user-roles/${userId}/roles/${roleId}`,
+    USER_ROLE_REPLACE: (userId: number) => `${BASE_URL}/user-roles/${userId}/roles`,
+
 } as const;

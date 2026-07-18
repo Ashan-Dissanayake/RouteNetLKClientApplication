@@ -6,7 +6,7 @@ import {ApiResponse} from '../../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../../core/api-endpoints';
 import {UserStatus} from '../../entity/userstatus';
 import {UserType} from '../../entity/usertype';
-import {User} from '../../entity/User';
+import {User} from '../../entity/user';
 import {Employee} from '../../../employeemodule/entity/employee';
 import {Incident} from '../../../incidentreportmodule/entity/incident';
 

@@ -65,7 +65,6 @@
           <mat-icon>mode_edit</mat-icon>
           <span>Edit</span>
         </button>
-
         <button
           mat-menu-item *ngxPermissionsOnly="['user-change-password']" (click)="action('change-password', row)">
           <mat-icon>lock_reset</mat-icon>
@@ -75,6 +74,11 @@
           mat-menu-item *ngxPermissionsOnly="['user-reset-password']" (click)="action('reset-password',row)">
           <mat-icon>restart_alt</mat-icon>
           <span>Reset Password</span>
+        </button>
+        <button
+          mat-menu-item *ngxPermissionsOnly="['user-role-replace']" (click)="action('manageRoles', row)">
+          <mat-icon>manage_accounts</mat-icon>
+          <span>Manage Roles</span>
         </button>
       </mat-menu>
     </ng-template>

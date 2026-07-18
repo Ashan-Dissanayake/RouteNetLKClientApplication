@@ -6,12 +6,16 @@ import {buildActionPanel} from '../../../shared/component/button/action-panel.fa
 import {
   USER_DATA_EXPORT_META,
   USER_FILTER_FORM_META,
-  USER_IMMUTABLE_CONTROLLERS_META, USER_MAIN_FORM_META, USER_PASSWORD_CHANGE_FORM_META, USER_RESET_PASSWORD_FORM_META,
+  USER_IMMUTABLE_CONTROLLERS_META,
+  USER_MAIN_FORM_META,
+  USER_PASSWORD_CHANGE_FORM_META,
+  USER_RESET_PASSWORD_FORM_META,
+  USER_ROLE_FORM_META,
   USER_TABLE_META
 } from '../model/user.meta';
 import {async, debounceTime, Observable, Subject, take, takeUntil} from 'rxjs';
 import {UserLookUpData} from '../model/user.lookupdata.model';
-import {User} from '../entity/User';
+import {User} from '../entity/user';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {FormbuilderService} from '../../../core/formbuilder.service';
 import {DialogService} from '../../../core/dialog.service';
@@ -25,7 +29,6 @@ import {AsyncPipe, DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
 import {MatProgressBar} from '@angular/material/progress-bar';
-import {BRANCH_FILTER_FORM_META} from '../../branchmodule/model/branch.meta';
 import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
 import {MatDivider} from '@angular/material/divider';
 import {NgxPermissionsModule} from 'ngx-permissions';
@@ -71,41 +74,43 @@ import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
   ]
 })
 export class UserComponent  implements OnInit, OnDestroy {
+
   // ===== Static config =====
   protected readonly tableColumns = USER_TABLE_META;
-  protected readonly filterFormMeta= USER_FILTER_FORM_META;
-  protected readonly mainFormMeta= USER_MAIN_FORM_META;
+  protected readonly filterFormMeta = USER_FILTER_FORM_META;
+  protected readonly mainFormMeta = USER_MAIN_FORM_META;
   protected readonly immutableControllers = USER_IMMUTABLE_CONTROLLERS_META;
-  protected readonly exportMeta= USER_DATA_EXPORT_META;
-  protected readonly actionPanelConfig= buildActionPanel();
+  protected readonly exportMeta = USER_DATA_EXPORT_META;
+  protected readonly actionPanelConfig = buildActionPanel();
 
   // ===== Streams =====
-  protected readonly users$:    Observable<User[]>;
+  protected readonly users$: Observable<User[]>;
   protected readonly lookUpData$: Observable<UserLookUpData>;
-  protected readonly loading$:  Observable<boolean>;
-  protected readonly error$:    Observable<any>;
-  private destroy$         = new Subject<void>();
+  protected readonly loading$: Observable<boolean>;
+  protected readonly error$: Observable<any>;
+  private destroy$ = new Subject<void>();
 
 // ===== UI state =====
-  protected activeRow:    User | null = null;
-  protected selectedRows  = new Set<User>();
+  protected activeRow: User | null = null;
+  protected selectedRows = new Set<User>();
   protected selectedCount = 0;
-  protected readonly async = async;
+  //protected async = async;
 
   // ===== Forms =====
   protected filterForm: FormGroup = new FormGroup({});
-  protected mainForm:   FormGroup = new FormGroup({});
+  protected mainForm: FormGroup = new FormGroup({});
+  protected userRoleForm: FormGroup = new FormGroup({});
 
   constructor(
-    private facade:      UserFacadeService,
+    private facade: UserFacadeService,
     private formService: UserFormService,
     private formBuilder: FormbuilderService,
-    private dialog:      DialogService,
+    private dialog: DialogService
   ) {
-    this.users$    = this.facade.users$;
-    this.lookUpData$  = this.facade.lookUpData$;
-    this.loading$   = this.facade.loading$;
-    this.error$     = this.facade.error$;
+    this.users$ = this.facade.users$;
+    this.lookUpData$ = this.facade.lookUpData$;
+    this.loading$ = this.facade.loading$;
+    this.error$ = this.facade.error$;
   }
 
   // ===== Lifecycle =====
@@ -121,7 +126,8 @@ export class UserComponent  implements OnInit, OnDestroy {
       takeUntil(this.destroy$),
     ).subscribe(meta => {
       this.filterForm = this.formService.buildFilterForm(meta);
-      this.mainForm   = this.formService.buildMainForm(meta);
+      this.mainForm = this.formService.buildMainForm(meta);
+      this.userRoleForm = this.formService.buildUserRoleManagementForm(meta);
       this.watchFilterForm();
     });
   }
@@ -140,13 +146,19 @@ export class UserComponent  implements OnInit, OnDestroy {
     ).subscribe(values => this.facade.filter(values));
   }
 
-  protected reload(): void { this.facade.reload(); }
+  protected reload(): void {
+    this.facade.reload();
+  }
 
   // ===== Row interaction =====
 
-  protected onRowClick(row: User): void  { this.activeRow = row; }
+  protected onRowClick(row: User): void {
+    this.activeRow = row;
+  }
 
-  protected onCloseDetailView(): void    { this.activeRow = null; }
+  protected onCloseDetailView(): void {
+    this.activeRow = null;
+  }
 
   protected onRowCheckboxChanged(event: CheckboxEvent): void {
     event.checked ? this.selectedRows.add(event.row) : this.selectedRows.delete(event.row);
@@ -167,8 +179,9 @@ export class UserComponent  implements OnInit, OnDestroy {
   protected onRowAction(action: string, row: User): void {
     const actions: Record<string, () => void> = {
       'edit': () => this.openEditForm(row),
-      'change-password':()=>this.openChangePassword(row),
-      'reset-password':()=>this.openResetPassword(row)
+      'change-password': () => this.openChangePassword(row),
+      'reset-password': () => this.openResetPassword(row),
+      'manageRoles': () => this.openRoleManagement(row)
     };
     if (actions[action]) actions[action]();
     else this.dialog.showWarning(`Unknown row action: ${action}`);
@@ -180,42 +193,65 @@ export class UserComponent  implements OnInit, OnDestroy {
     this.dialog.showFormPopup({
       heading: 'Change Password', form: passwordForm, meta: USER_PASSWORD_CHANGE_FORM_META, width: '500px'
     }).subscribe(formData => {
-        if (formData) {
-          this.facade.changePassword(user.id, formData)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-              next: () => this.dialog.showSuccess('Password changed successfully'),
-              error: (err) => this.dialog.showErrorMessage('Failed to change password', err)
-            });
-        }
-        else {
-          this.formBuilder.resetForm(passwordForm);
-        }
-      });
+      if (formData) {
+        this.facade.changePassword(user.id, formData)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: () => this.dialog.showSuccess('Password changed successfully'),
+            error: (err) => this.dialog.showErrorMessage('Failed to change password', err)
+          });
+      } else {
+        this.formBuilder.resetForm(passwordForm);
+      }
+    });
   }
 
-  private openResetPassword(user:User):void {
+  private openResetPassword(user: User): void {
     const form = this.formService.buildResetPasswordForm();
 
     this.dialog.showFormPopup({
-      heading:'Reset Password', form,
-      meta:USER_RESET_PASSWORD_FORM_META, width:'500px'
-    }).subscribe(data=>{
-        if(data){
-          this.facade.resetPassword(user.id, data).
-          pipe(takeUntil(this.destroy$)).subscribe({
-          next:()=>{this.dialog.showSuccess('Password reset successfully');},
-          error:(err)=>{this.dialog.showErrorMessage('Password reset failed', err);}
-          });
-        }
-      });
+      heading: 'Reset Password', form,
+      meta: USER_RESET_PASSWORD_FORM_META, width: '500px'
+    }).subscribe(data => {
+      if (data) {
+        this.facade.resetPassword(user.id, data).pipe(takeUntil(this.destroy$)).subscribe({
+          next: () => {
+            this.dialog.showSuccess('Password reset successfully');
+          },
+          error: (err) => {
+            this.dialog.showErrorMessage('Password reset failed', err);
+          }
+        });
+      }
+    });
+  }
+
+  private openRoleManagement(user: User): void {
+    this.dialog.showFormPopup({
+      heading: 'User Role',
+      form: this.userRoleForm,
+      meta: USER_ROLE_FORM_META,
+      width: '500px'
+    }).subscribe(data => {
+      if (!data) {
+        this.formBuilder.resetForm(this.userRoleForm);
+        return;
+      }
+      this.facade.replaceRoles(user.id, data)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {this.dialog.showSuccess('User roles updated successfully.');},
+          error: err => this.dialog.showErrorMessage('Failed to update user roles.', err),
+          complete: () => this.formBuilder.resetForm(this.userRoleForm)
+        });
+    });
   }
 
   // ===== Action panel =====
   protected onActionTriggered(event: ButtonClickEvent): void {
     const handlers: Record<string, () => void> = {
-      'create':          () => this.openCreateForm(),
-      'clear-search':    () => this.formBuilder.resetForm(this.filterForm),
+      'create': () => this.openCreateForm(),
+      'clear-search': () => this.formBuilder.resetForm(this.filterForm),
     };
     if (handlers[event.type]) handlers[event.type]();
     else this.dialog.showWarning(`No handler for: ${event.type}`);
@@ -223,7 +259,7 @@ export class UserComponent  implements OnInit, OnDestroy {
 
   protected onDropdownOnlyClick(event: ButtonClickEvent): void {
     const handlers: Record<string, () => void> = {
-      'export-pdf':   () => this.toPdf(),
+      'export-pdf': () => this.toPdf(),
       'export-excel': () => this.toExcel(),
     };
     if (handlers[event.type]) handlers[event.type]();
@@ -231,15 +267,14 @@ export class UserComponent  implements OnInit, OnDestroy {
   }
 
   // ===== Create =====
-
   private openCreateForm(): void {
     this.formBuilder.setControlsState(this.mainForm, this.immutableControllers, false);
 
     this.dialog.showFormPopup({
       heading: 'Create User',
-      form:    this.mainForm,
-      meta:    this.mainFormMeta,
-      width:   '900px',
+      form: this.mainForm,
+      meta: this.mainFormMeta,
+      width: '900px',
     }).subscribe(formData => {
       if (formData) this.save(formData);
       else this.formBuilder.resetForm(this.mainForm);
@@ -248,7 +283,7 @@ export class UserComponent  implements OnInit, OnDestroy {
 
   private save(formData: any): void {
     this.facade.create(formData).pipe(takeUntil(this.destroy$)).subscribe({
-      next:     () => this.dialog.showSuccess('User created successfully.'),
+      next: () => this.dialog.showSuccess('User created successfully.'),
       error: (err) => this.dialog.showErrorMessage('Failed to create', err),
       complete: () => {
         this.facade.reload();
@@ -274,9 +309,9 @@ export class UserComponent  implements OnInit, OnDestroy {
 
     this.dialog.showFormPopup({
       heading: 'Edit User',
-      form:    this.mainForm,
-      meta:    this.mainFormMeta,
-      width:   '900px',
+      form: this.mainForm,
+      meta: this.mainFormMeta,
+      width: '900px',
     }).subscribe(formData => {
       if (formData) this.update(formData);
       else this.formBuilder.resetForm(this.mainForm);
@@ -285,7 +320,7 @@ export class UserComponent  implements OnInit, OnDestroy {
 
   private update(formData: any): void {
     this.facade.update(formData).pipe(takeUntil(this.destroy$)).subscribe({
-      next:     () => this.dialog.showSuccess('User updated successfully.'),
+      next: () => this.dialog.showSuccess('User updated successfully.'),
       error: (err) => this.dialog.showErrorMessage('Failed to update', err),
       complete: () => {
         this.facade.reload();
@@ -302,11 +337,11 @@ export class UserComponent  implements OnInit, OnDestroy {
     }
 
     this.dialog.showPrintDialog({
-      width:   '1500px',
-      height:  '650px',
-      title:   'User Details',
-      mode:    'table',
-      data:    Array.from(this.selectedRows),
+      width: '1500px',
+      height: '650px',
+      title: 'User Details',
+      mode: 'table',
+      data: Array.from(this.selectedRows),
       columns: this.exportMeta,
     }).subscribe(result => {
       if (result) {

@@ -47,3 +47,9 @@ export const USER_RESET_PASSWORD_FORM_META: FormField[] = [
   {name: 'newPassword', type: 'password', label: 'New Password', required: true, mode: 'none'},
   {name: 'confirmPassword', type: 'password', label: 'Confirm Password', required: true, mode: 'none'}
 ];
+
+export const USER_ROLE_FORM_META: FormField[] = [
+  {name: 'roles', type: 'dualist', label: 'Assigned Roles', required: true, mode: 'options',
+    referencePath: ['roles'],optionLabelKey: 'name'
+  }
+];

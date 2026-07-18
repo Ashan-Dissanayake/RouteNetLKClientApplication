@@ -1,14 +1,15 @@
 import {Injectable, OnDestroy} from '@angular/core';
 import {Subject, takeUntil} from 'rxjs';
 import {FormbuilderService} from '../../../../core/formbuilder.service';
-import {FormGroup} from '@angular/forms';
+import {FormGroup, Validators} from '@angular/forms';
 import {UserFacadeService} from './userfacade.service';
 import {UserLookUpData} from '../../model/user.lookupdata.model';
 import {
   USER_FILTER_FORM_META,
   USER_MAIN_FORM_META,
   USER_PASSWORD_CHANGE_FORM_META,
-  USER_RESET_PASSWORD_FORM_META
+  USER_RESET_PASSWORD_FORM_META,
+  USER_ROLE_FORM_META
 } from '../../model/user.meta';
 import {UserValidators} from './user.validator';
 
@@ -66,6 +67,13 @@ export class UserFormService implements OnDestroy {
     form.addValidators(UserValidators.passwordMatch('newPassword', 'confirmPassword'));
     return form;
   }
+
+  buildUserRoleManagementForm(metadata: UserLookUpData): FormGroup {
+    const form = this.formBuilder.build([...USER_ROLE_FORM_META], metadata);
+    form.addValidators(Validators.required)
+    return form;
+  }
+
 }
 
 

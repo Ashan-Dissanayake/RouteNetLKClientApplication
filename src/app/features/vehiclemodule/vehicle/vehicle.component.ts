@@ -314,5 +314,4 @@ export class VehicleComponent implements OnInit, OnDestroy {
 
   protected trackByField(_: number, field: any): any { return field.key ?? _; }
 
-  protected readonly BRANCH_TABLE_META = BRANCH_TABLE_META;
 }
