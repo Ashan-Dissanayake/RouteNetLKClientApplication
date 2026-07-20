@@ -1,0 +1,50 @@
+<div class="matrix-container">
+
+  <!-- Spinner Masking Layer -->
+  <div class="loading-overlay" *ngIf="loading$ | async">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <mat-accordion multi="true">
+    <mat-expansion-panel *ngFor="let mCard of matrixModules" [expanded]="true" class="matrix-panel">
+
+      <mat-expansion-panel-header>
+        <mat-panel-title class="panel-title-text">
+          {{ mCard.module.name }}
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <div class="matrix-content-wrapper">
+        <!-- Structural Matrix Header -->
+        <div class="matrix-header-row" [style.grid-template-columns]="'2fr repeat(' + mCard.operations.length + ', 1fr)'">
+          <div class="header-cell title-cell">Role System</div>
+          <div class="header-cell action-label" *ngFor="let op of mCard.operations">
+            {{ op.displayname }}
+          </div>
+        </div>
+
+        <!-- Structural Data Body Grid Matrix Lines -->
+        <div class="matrix-body-rows">
+          <div
+            class="matrix-row"
+            *ngFor="let r of mCard.rows"
+            [style.grid-template-columns]="'2fr repeat(' + mCard.operations.length + ', 1fr)'">
+
+            <div class="body-cell role-cell">{{ r.role.name }}</div>
+
+            <div class="body-cell check-cell" *ngFor="let op of mCard.operations">
+              <mat-checkbox
+                [checked]="!!r.cellState[op.id]"
+                (change)="onToggleCell(r.role.id, mCard.module.id, op.id, r.cellState[op.id], $event.checked)"
+                color="primary">
+              </mat-checkbox>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </mat-expansion-panel>
+  </mat-accordion>
+
+</div>

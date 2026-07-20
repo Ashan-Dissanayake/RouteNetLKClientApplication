@@ -1,113 +1,130 @@
-$text-main: #333;
-$text-muted: #666;
-$text-label: #777;
-$font-family: Roboto, 'Segoe UI', sans-serif;
+$border-color: #e0e0e0;
+$text-dark: #1a1a1a;
+$text-muted: #5f6368;
+$custom-green: #0f764e;
 
-$status-colors: (
-  'ACTIVE': (color: #0b6b2f, bg: #d7f6df),
-  'LOCKED': (color: #000000, bg: #f5d253),
-  'INACTIVE': (color: #8b0000, bg: #f9d9d9)
-);
+.matrix-container {
+  position: relative;
+  padding: 24px;
+  background-color: #fafafa;
+  min-height: 200px;
 
-.container {
-  padding: 10px;
-}
-
-#serverSearch {
-  ::ng-deep .mat-mdc-form-field {
-    width: unset !important;
-    padding-inline-start: 20px;
-  }
-}
-
-.user-detail-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  padding: 1rem;
-  color: $text-main;
-  font-family: $font-family;
-
-  .header {
+  .loading-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 10;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+  }
 
-    .title-section {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
+  mat-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
 
-      .user-icon {
-        font-size: 25px;
-      }
-      .user-title {
-        font-size: 1.4rem;
-        font-weight: 600;
-        margin: 0;
-      }
+  .matrix-panel {
+    border-radius: 12px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid $border-color;
+    overflow: hidden;
 
-      .user-subtitle {
-        font-size: 0.9rem;
-        color: $text-muted;
-        margin: 0;
-      }
+    .panel-title-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: $text-dark;
+      text-transform: capitalize;
+    }
+
+    ::ng-deep .mat-expansion-panel-body {
+      padding: 0 !important;
     }
   }
 
-  .status-chip {
-    font-weight: 600;
-    font-size: 0.8rem;
-    padding: 4px 10px;
-    border-radius: 16px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-
-    @each $status, $colors in $status-colors {
-      &.#{$status} {
-        color: map-get($colors, color);
-        background: map-get($colors, bg);
-      }
-    }
+  .matrix-content-wrapper {
+    overflow-x: auto;
   }
 
-  .info-grid {
+  .matrix-header-row, .matrix-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px 24px;
+    align-items: center;
+    border-bottom: 1px solid $border-color;
+    padding: 16px 24px;
+  }
 
-    .info-item {
-      display: flex;
-      flex-direction: column;
+  .matrix-header-row {
+    background-color: #fcfcfc;
 
-      .label {
-        font-size: 0.8rem;
-        color: $text-label;
-        margin-bottom: 2px;
-        text-transform: uppercase;
+    .header-cell {
+      font-size: 14px;
+      font-weight: 500;
+      color: $text-muted;
+
+      &.title-cell {
+        font-weight: 600;
+        color: $text-dark;
       }
 
-      .value {
-        font-size: 1rem;
-        font-weight: 500;
-        color: #222;
-        word-break: break-word;
+      &.action-label {
+        text-align: center;
+        color: $text-dark;
+      }
+    }
+  }
+
+  .matrix-body-rows {
+    .matrix-row {
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .body-cell {
+        font-size: 14px;
+        color: $text-muted;
+
+        &.role-cell {
+          font-weight: 500;
+          color: $text-dark;
+        }
+
+        &.check-cell {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
       }
     }
   }
 }
 
-/* Responsive adjustments */
-.coverage-grid {
-  display: grid; // Assumed layout base
+// Angular Material View Customizations
+::ng-deep {
+  .matrix-panel {
+    .mat-mdc-checkbox {
+      --mdc-checkbox-selected-icon-color: #ffffff;
+      --mdc-checkbox-selected-focus-icon-color: #ffffff;
+      --mdc-checkbox-selected-hover-icon-color: #ffffff;
 
-  @media (max-width: 1200px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  @media (max-width: 800px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  @media (max-width: 500px) {
-    grid-template-columns: 1fr;
+      &.mat-mdc-checkbox-checked {
+        .mdc-checkbox__background {
+          background-color: #{$custom-green} !important;
+          border-color: #{$custom-green} !important;
+          border-radius: 4px;
+        }
+      }
+
+      .mdc-checkbox__background {
+        border-color: #d1d5db !important;
+        border-width: 1.5px !important;
+        border-radius: 6px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+    .mat-mdc-checkbox .mat-internal-form-field-action-target {
+      opacity: 0;
+    }
   }
 }

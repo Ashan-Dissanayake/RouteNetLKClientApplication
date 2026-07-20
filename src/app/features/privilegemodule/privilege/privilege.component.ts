@@ -2,24 +2,9 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {PrivilegeFacadeService} from '../service/util/privilegefacade.service';
 import {PrivilegeFormService} from '../service/util/privilegeform.service';
 import {PrivilegeLookUpDataService} from '../service/util/privilege.lookupdata.service';
-import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
-import {
-  PRIVILEGE_FILTER_FORM_META,
-  PRIVILEGE_IMMUTABLE_CONTROLLERS_META,
-  PRIVILEGE_MAIN_FORM_META,
-  PRIVILEGE_TABLE_META
-} from '../model/privilege.meta';
-import {debounceTime, Observable, Subject, take, takeUntil} from 'rxjs';
-import {Privilege} from '../entity/privilege';
-import {PrivilegeLookUpData} from '../model/privilege.lookupdata.model';
-import {FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {FormbuilderService} from '../../../core/formbuilder.service';
-import {DialogService} from '../../../core/dialog.service';
-import {CheckboxEvent, DataTableComponent} from '../../../shared/component/data-table/data-table.component';
-import {
-  ButtonClickEvent,
-  ButtonPanelComponent
-} from '../../../shared/component/button/button-panel/button-panel.component';
+import {ReactiveFormsModule} from '@angular/forms';
+import { DataTableComponent} from '../../../shared/component/data-table/data-table.component';
+import {ButtonPanelComponent} from '../../../shared/component/button/button-panel/button-panel.component';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
@@ -31,6 +16,19 @@ import {NgxPermissionsModule} from 'ngx-permissions';
 import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
 import {MatIcon} from '@angular/material/icon';
+import {MatCheckbox} from '@angular/material/checkbox';
+import {
+  MatAccordion,
+  MatExpansionPanel,
+  MatExpansionPanelHeader,
+  MatExpansionPanelTitle
+} from '@angular/material/expansion';
+import {combineLatest, Observable, Subject, takeUntil} from 'rxjs';
+import {Role} from '../../usermodule/entity/role';
+import {Module} from '../entity/module';
+import {Operation} from '../entity/operation';
+import {Privilege} from '../entity/privilege';
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-privilege',
@@ -55,7 +53,13 @@ import {MatIcon} from '@angular/material/icon';
     NgxPermissionsModule,
     SideViewComponent,
     TableCellDirective,
-    MatMenuTrigger
+    MatMenuTrigger,
+    MatCheckbox,
+    MatAccordion,
+    MatExpansionPanel,
+    MatExpansionPanelTitle,
+    MatExpansionPanelHeader,
+    MatProgressSpinner
   ],
   templateUrl: './privilege.component.html',
   styleUrl: './privilege.component.scss',
@@ -67,5 +71,98 @@ import {MatIcon} from '@angular/material/icon';
   ]
 })
 export class PrivilegeComponent{
+  private destroy$ = new Subject<void>();
 
+  // UI Render Array
+  matrixModules: UiMatrixModule[] = [];
+
+  // Expose status streams for template loading states
+  protected readonly loading$:               Observable<boolean>;
+
+  constructor(
+    private facade: PrivilegeFacadeService
+  ) {
+    this.loading$                = this.facade.loading$;
+  }
+
+  ngOnInit(): void {
+    // 1. Trigger lookup and master data load sequence
+    this.facade.initialize().pipe(takeUntil(this.destroy$)).subscribe();
+
+    // 2. Combine lookups and current active privileges to compute grid states reactively
+    combineLatest({
+      lookups: this.facade.lookUpData$,
+      activePrivileges: this.facade.privileges$
+    })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(({ lookups, activePrivileges }) => {
+        this.buildMatrix(lookups.roles, lookups.modules, lookups.operations, activePrivileges);
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * Transforms relational data into an organized Matrix grouped by Module -> Operations -> Roles
+   */
+  private buildMatrix(roles: Role[], modules: Module[], operations: Operation[], activePrivileges: Privilege[]): void {
+    this.matrixModules = modules.map(mod => {
+      // Find operations assigned to this module based on your schema foreign keys
+      const moduleOps = operations.filter(op => op.module.id === mod.id);
+
+      // Construct a structural configuration mapping for each system user role
+      const rows: MatrixRow[] = roles.map(role => {
+        const cellState: { [operationId: number]: Privilege | null } = {};
+
+        moduleOps.forEach(op => {
+          // Identify if a mapping entry exists in the privilege list
+          const activePriv = activePrivileges.find(p =>
+            p.role.id === role.id &&
+            p.module.id === mod.id &&
+            p.operation.id === op.id
+          );
+          cellState[op.id] = activePriv || null;
+        });
+
+        return { role, cellState };
+      });
+
+      return { module: mod, operations: moduleOps, rows };
+    });
+  }
+
+  /**
+   * Dispatches network calls on toggle interactions based on the presence of existing IDs
+   */
+  onToggleCell(roleId: number, moduleId: number, operationId: number, existingPrivilege: Privilege | null, checked: boolean): void {
+    if (checked && !existingPrivilege) {
+      // Checked & Unassigned -> Map payload structures to match PrivilegeRequestDto arrays
+      const dummyPrivilegePayload = { id: 0, role_id: roleId, module_id: moduleId, operation_id: operationId } as any;
+
+      this.facade.assignPrivileges(roleId, [dummyPrivilegePayload]).subscribe({
+        next: () => this.facade.reload()
+      });
+
+    } else if (!checked && existingPrivilege) {
+      // Unchecked & Exists -> Issue a structural removal sequence via delete path variables
+      this.facade.revokePrivileges(roleId, [existingPrivilege]).subscribe({
+        next: () => this.facade.reload()
+      });
+    }
+  }
+}
+
+interface MatrixRow {
+  role: Role;
+  // Maps operation_id -> active Privilege object if assigned, or null if unassigned
+  cellState: { [operationId: number]: Privilege | null };
+}
+
+interface UiMatrixModule {
+  module: Module;
+  operations: Operation[];
+  rows: MatrixRow[];
 }
