@@ -1,0 +1,33 @@
+<mat-card class="report-card">
+  <mat-card-header class="report-header">
+    <div class="header-title-block">
+      <mat-card-title>Fleet Maintenance Lifecycle Trends</mat-card-title>
+      <mat-card-subtitle>Monitoring periodic engineering mechanical services against active workshop backlogs</mat-card-subtitle>
+    </div>
+    <div class="report-actions">
+      <span class="metric-badge" [class.badge-loading]="isLoading">
+        {{ isLoading ? 'Loading Trends...' : 'Engineering Active' }}
+      </span>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content class="chart-content">
+    <!-- Center panel dynamic loader spinner -->
+    <div *ngIf="isLoading" class="loading-overlay">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- Layout element node container kept visible for ViewChild hook bindings -->
+    <div class="chart-container" [style.visibility]="isLoading ? 'hidden' : 'visible'">
+      <canvas #maintenanceChart></canvas>
+    </div>
+  </mat-card-content>
+
+  <mat-divider></mat-divider>
+
+  <!-- Dissertation summary block activated upon dynamic data load completion -->
+  <mat-card-footer class="report-footer-summary" *ngIf="!isLoading">
+    <mat-icon>engineering</mat-icon>
+    <span><b>Analysis:</b> The clear downward trend in the pending maintenance backlog across recent weeks indicates a positive optimization in automated component tracking and mechanical resource allocation pipelines.</span>
+  </mat-card-footer>
+</mat-card>

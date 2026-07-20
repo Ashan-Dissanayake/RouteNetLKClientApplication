@@ -7,9 +7,7 @@ export interface ActionPanelConfig {
   permissionMap?: Record<string, string | string[]>;
 }
 
-export function buildActionPanel(
-  config: ActionPanelConfig = {}
-): ButtonAction[] {
+export function buildActionPanel(config: ActionPanelConfig = {}): ButtonAction[] {
 
   // Deep clone to prevent mutating global metadata
   let actions = BASE_ACTION_PANEL_META.map(action => ({

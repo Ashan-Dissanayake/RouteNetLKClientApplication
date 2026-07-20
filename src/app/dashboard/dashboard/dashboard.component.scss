@@ -6,13 +6,60 @@ $border-light: #cbd5e1;
 
 $clr-success: #16a34a;
 $clr-danger: #dc2626;
-$clr-warning: #ea580c;
+$clr-warning: #ea580c;      // Primary Orange for dynamic attention alerts
+$clr-warning-light: #fff7ed; // Soft orange background highlight
 
 .dashboard-container {
   padding: 8px 0;
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+/* === STATE CONTROLS: LOADING & ERROR FRAMES === */
+.dashboard-loading-buffer {
+  width: 100%;
+  margin-bottom: 4px;
+
+  .clean-progress-bar {
+    height: 4px;
+  }
+}
+
+.dashboard-error-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background-color: rgba(220, 38, 38, 0.06);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  color: $clr-danger;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 4px;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  span {
+    flex-grow: 1;
+  }
+
+  button[mat-icon-button] {
+    color: $clr-danger;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
 }
 
 /* === KPI TILES SYSTEM === */
@@ -28,7 +75,7 @@ $clr-warning: #ea580c;
     height: 100%;
     background: #ffffff !important;
     border: 1px solid $border-light !important;
-    border-radius: 0px !important; // Strict sharp edge metric
+    border-radius: 0px !important;
     box-shadow: none !important;
     box-sizing: border-box;
 
@@ -57,9 +104,9 @@ $clr-warning: #ea580c;
       }
     }
 
-    /* Subtle operational left accent bands to avoid over-designing color layers */
     &.highlight-blue { border-left: 3px solid $sltb-active-blue !important; .kpi-icon-pane { color: $sltb-active-blue; }}
     &.highlight-red { border-left: 3px solid $clr-danger !important; .kpi-icon-pane { color: $clr-danger; }}
+    &.highlight-green { border-left: 3px solid $clr-success !important; .kpi-icon-pane { color: $clr-success; }}
 
     .kpi-data-pane {
       display: flex;
@@ -79,12 +126,6 @@ $clr-warning: #ea580c;
         font-weight: 700;
         color: #0f172a;
         margin: 1px 0;
-
-        .metric-total {
-          font-size: 14px;
-          color: #94a3b8;
-          font-weight: 400;
-        }
       }
 
       .kpi-trend {
@@ -94,6 +135,7 @@ $clr-warning: #ea580c;
 
         &.trend-up { color: $clr-success; }
         &.trend-down { color: $clr-warning; }
+        &.trend-stable { color: $clr-success; }
         &.trend-info { color: $sltb-active-blue; }
       }
     }
@@ -124,6 +166,13 @@ $clr-warning: #ea580c;
     border-bottom: 1px solid $border-light;
     margin: 0 !important;
 
+    &.branch-summary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-direction: row;
+    }
+
     mat-card-title {
       font-size: 14px !important;
       font-weight: 700 !important;
@@ -143,11 +192,113 @@ $clr-warning: #ea580c;
   }
 }
 
-/* === CONTROL ROW AND DATA STREAM STYLING === */
+/* === SINGLE DEPOT TARGETS & ROSTER OVERVIEW === */
+.branch-matrix-content {
+  padding: 0 !important;
+
+  .depot-revenue-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    border-bottom: 1px solid $border-light;
+    background: #fafafa;
+
+    .rev-block {
+      padding: 14px 20px;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #f1f5f9;
+
+      &:last-child {
+        border-right: none;
+      }
+
+      .rev-lbl {
+        font-size: 10.5px;
+        text-transform: uppercase;
+        color: #64748b;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+      }
+
+      .rev-val {
+        font-size: 16px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-top: 2px;
+
+        &.text-success { color: $clr-success; }
+        &.text-warn { color: $clr-warning; } // Uses structural orange layout channel
+      }
+    }
+  }
+
+  .matrix-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #475569;
+    letter-spacing: 0.5px;
+    padding: 16px 20px 8px 20px;
+    background: #ffffff;
+  }
+
+  .coverage-overview-progress-panel {
+    padding: 8px 20px 20px 20px;
+
+    .summary-text-desc {
+      font-size: 13px;
+      color: #334155;
+      line-height: 1.5;
+      margin: 0 0 12px 0;
+
+      b {
+        font-weight: 600;
+        color: #0f172a;
+      }
+    }
+
+    .clean-progress-bar {
+      height: 6px;
+      border-radius: 0px;
+
+      // Overriding Angular Material internal track shapes to keep it flat & minimal
+      ::ng-deep .mdc-linear-progress__bar-inner {
+        border-color: $sltb-accent-teal !important;
+      }
+    }
+  }
+}
+
+/* === INCIDENTS & EMPTY FALLBACK STATES === */
 .matrix-scroll-content {
   padding: 0 !important;
-  max-height: 320px;
+  max-height: 360px;
   overflow-y: auto;
+
+  .empty-state-notice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: #94a3b8;
+
+    mat-icon {
+      font-size: 42px;
+      width: 42px;
+      height: 42px;
+      color: rgba(22, 163, 74, 0.4);
+      margin-bottom: 8px;
+    }
+
+    p {
+      font-size: 13px;
+      font-weight: 500;
+      margin: 0;
+      color: #64748b;
+    }
+  }
 }
 
 .dense-incident-list {
@@ -159,6 +310,9 @@ $clr-warning: #ea580c;
 
     &.state-critical {
       background-color: rgba(220, 38, 38, 0.01);
+      border-left: 3px solid $clr-danger;
+      padding-left: 17px !important; // Accounts for border offset balance
+
       .row-indicator-icon { color: $clr-danger; }
     }
 
@@ -186,14 +340,6 @@ $clr-warning: #ea580c;
       }
     }
 
-    .row-body-desc {
-      font-size: 12px !important;
-      color: #64748b !important;
-      padding-top: 3px;
-      white-space: normal !important;
-      line-height: 1.4;
-    }
-
     .row-action-area {
       display: flex;
       align-items: center;
@@ -202,63 +348,26 @@ $clr-warning: #ea580c;
       .status-lbl {
         font-size: 11px;
         font-weight: 600;
-        &.text-warn { color: $clr-warning; }
+
+        &.text-warn {
+          color: $clr-warning; // Highlight warning status in orange layout variant
+        }
         &.text-success { color: $clr-success; }
       }
     }
   }
 }
 
-/* === CLEAN OVERRIDE RULES FOR NATIVE DATA TABLE === */
-.matrix-table-content {
-  padding: 0 !important;
-}
+/* === ALERTS & STATUS BADGES === */
+.badge-status {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 3px 8px;
+  white-space: nowrap;
 
-.clean-dashboard-table {
-  width: 100%;
-  background: transparent;
-
-  tr.mat-mdc-header-row {
-    height: 38px !important;
-    background: #ffffff;
-  }
-
-  tr.mat-mdc-row {
-    height: 40px !important;
-    background: #ffffff;
-    &:hover { background: #f8fafc; }
-  }
-
-  th.mat-mdc-header-cell {
-    font-size: 11px !important;
-    font-weight: 600 !important;
-    color: #475569 !important;
-    text-transform: uppercase;
-    border-bottom: 1px solid $border-light !important;
-    padding: 0 16px !important;
-  }
-
-  td.mat-mdc-cell {
-    font-size: 12.5px !important;
-    color: #1e293b !important;
-    border-bottom: 1px solid #f1f5f9 !important;
-    padding: 0 16px !important;
-  }
-
-  tr:last-child td.mat-mdc-cell {
-    border-bottom: none !important;
-  }
-}
-
-/* === SELECTION ACTION TRIGGERS === */
-.dense-flat-btn {
-  height: 26px !important;
-  line-height: 26px !important;
-  border-radius: 0px !important;
-  font-size: 11.5px !important;
-  padding: 0 10px !important;
-  background-color: $sltb-accent-teal !important;
-  color: #ffffff !important;
+  &.st-done { background: rgba(22, 163, 74, 0.08); color: $clr-success; }
+  &.st-wait { background: rgba(234, 88, 12, 0.08); color: $clr-warning; }
+  &.st-critical-badge { background: rgba(220, 38, 38, 0.08); color: $clr-danger; }
 }
 
 .dense-stroke-btn {
@@ -267,13 +376,4 @@ $clr-warning: #ea580c;
   border-radius: 0px !important;
   font-size: 11.5px !important;
   padding: 0 10px !important;
-}
-
-.badge-status {
-  font-size: 10.5px;
-  font-weight: 600;
-  padding: 2px 6px;
-
-  &.st-done { background: rgba(22, 163, 74, 0.08); color: $clr-success; }
-  &.st-wait { background: rgba(234, 88, 12, 0.08); color: $clr-warning; }
 }

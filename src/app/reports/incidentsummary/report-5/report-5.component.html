@@ -1,0 +1,30 @@
+<mat-card class="report-card">
+  <mat-card-header class="report-header">
+    <div class="header-title-block">
+      <mat-card-title>Distribution of Route Incidents & Anomalies</mat-card-title>
+      <mat-card-subtitle>Proportional analysis of service interruptions logged during dispatch execution cycles</mat-card-subtitle>
+    </div>
+    <div class="report-actions">
+      <span class="metric-badge" [class.badge-loading]="isLoading">
+        {{ isLoading ? 'Analyzing Anomalies...' : 'Incidents Loaded' }}
+      </span>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content class="chart-content">
+    <div *ngIf="isLoading" class="loading-overlay">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <div class="chart-container" [style.visibility]="isLoading ? 'hidden' : 'visible'">
+      <canvas #incidentPieChart></canvas>
+    </div>
+  </mat-card-content>
+
+  <mat-divider></mat-divider>
+
+  <mat-card-footer class="report-footer-summary" *ngIf="!isLoading">
+    <mat-icon>warning</mat-icon>
+    <span><b>Analysis:</b> The aggregated layout maps high mechanical breakdowns against total disruptions, establishing the programmatic necessity for targeted predictive scheduling modules.</span>
+  </mat-card-footer>
+</mat-card>

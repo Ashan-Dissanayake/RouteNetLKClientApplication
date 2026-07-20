@@ -67,7 +67,8 @@ export class AppComponent {
   menuItems: MenuItem[] = [
     { icon: 'space_dashboard',
       label: 'Dashboard',
-      route: '/admin/dashboard'
+      route: '/admin/dashboard',
+      permission:'dashboard-view'
     },
     {
       icon: 'date_range',
@@ -121,6 +122,7 @@ export class AppComponent {
       label: 'System Administration',
       children: [
         { icon: 'manage_accounts', label: 'User Accounts', route: '/user', permission: 'user-view' },
+        { icon: 'lock_open', label: 'User Privileges', route: '/privilege', permission: 'privilege-view' },
         { icon: 'corporate_fare', label: 'Depot Branches', route: '/branch', permission: 'branch-view' },
       ],
       expanded: false

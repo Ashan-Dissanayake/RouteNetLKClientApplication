@@ -90,11 +90,10 @@ export class UserComponent  implements OnInit, OnDestroy {
   protected readonly error$: Observable<any>;
   private destroy$ = new Subject<void>();
 
-// ===== UI state =====
+  // ===== UI state =====
   protected activeRow: User | null = null;
   protected selectedRows = new Set<User>();
   protected selectedCount = 0;
-  //protected async = async;
 
   // ===== Forms =====
   protected filterForm: FormGroup = new FormGroup({});
@@ -151,7 +150,6 @@ export class UserComponent  implements OnInit, OnDestroy {
   }
 
   // ===== Row interaction =====
-
   protected onRowClick(row: User): void {
     this.activeRow = row;
   }

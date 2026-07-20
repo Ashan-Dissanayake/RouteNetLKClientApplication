@@ -1,0 +1,42 @@
+<mat-card class="report-card">
+  <mat-card-header class="report-header">
+    <div class="header-title-block">
+      <mat-card-title>Dynamic Fleet Utilization & Passenger Density</mat-card-title>
+      <mat-card-subtitle>Time-series evaluation of consumer transport demand relative to operational distance yield</mat-card-subtitle>
+    </div>
+
+    <!-- Enhanced Range selection row layout -->
+    <div class="filter-action-row">
+      <mat-form-field class="report-range-field" appearance="outline">
+        <mat-label>Operations Range</mat-label>
+        <mat-date-range-input
+          [formGroup]="range"
+          [rangePicker]="rangePicker"
+          [min]="minDate"
+          [max]="maxDate">
+          <input matStartDate placeholder="Start date" formControlName="start">
+          <input matEndDate placeholder="End date" formControlName="end">
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="rangePicker"></mat-datepicker-toggle>
+        <mat-date-range-picker #rangePicker></mat-date-range-picker>
+      </mat-form-field>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content class="chart-content">
+    <div *ngIf="isLoading" class="loading-overlay">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <div class="chart-container" [style.visibility]="isLoading ? 'hidden' : 'visible'">
+      <canvas #dynamicPerformanceChart></canvas>
+    </div>
+  </mat-card-content>
+
+  <mat-divider></mat-divider>
+
+  <mat-card-footer class="report-footer-summary" *ngIf="!isLoading">
+    <mat-icon>date_range</mat-icon>
+    <span><b>Dissertation Analysis:</b> This cross-dimensional query maps temporal load metrics against mechanical odometers to generate immediate fleet optimization assessments over custom reporting intervals.</span>
+  </mat-card-footer>
+</mat-card>

@@ -155,35 +155,35 @@ export const routes: Routes = [
       {
         path: 'report-1',
         loadComponent: () =>
-          import('./reports/report-1/report-1.component')
+          import('./reports/dispatchsummary/report-1/report-1.component')
             .then(m => m.Report1Component)
       },
 
       {
         path: 'report-2',
         loadComponent: () =>
-          import('./reports/report-2/report-2.component')
+          import('./reports/revenuebypaymethods/report-2/report-2.component')
             .then(m => m.Report2Component)
       },
 
       {
         path: 'report-3',
         loadComponent: () =>
-          import('./reports/report-3/report-3.component')
+          import('./reports/maintenancetrends/report-3/report-3.component')
             .then(m => m.Report3Component)
       },
 
       {
         path: 'report-4',
         loadComponent: () =>
-          import('./reports/report-4/report-4.component')
+          import('./reports/fleetperformance/report-4/report-4.component')
             .then(m => m.Report4Component)
       },
 
       {
         path: 'report-5',
         loadComponent: () =>
-          import('./reports/report-5/report-5.component')
+          import('./reports/incidentsummary/report-5/report-5.component')
             .then(m => m.Report5Component)
       },
 
@@ -195,6 +195,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/usermodule/user/user.component')
             .then(m => m.UserComponent)
+      },
+      {
+        path: 'privilege',
+        canActivate: [permissionGuard('privilege-view')],
+        loadComponent: () =>
+          import('./features/privilegemodule/privilege/privilege.component')
+            .then(m => m.PrivilegeComponent)
       },
 
       {

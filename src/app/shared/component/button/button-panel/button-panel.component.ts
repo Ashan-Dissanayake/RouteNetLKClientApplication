@@ -56,9 +56,7 @@ export class ButtonPanelComponent implements OnChanges{
   }
 
   isDisabled(button: ButtonAction): boolean {
-    return typeof button.disabled === 'function'
-      ? button.disabled(this.contextData)
-      : !!button.disabled;
+    return typeof button.disabled === 'function' ? button.disabled(this.contextData) : !!button.disabled;
   }
 
 
@@ -82,29 +80,20 @@ export class ButtonPanelComponent implements OnChanges{
             !item.permission ||
             this.hasPermission(item.permission)
           );
-
         return {
           ...button,
           dropdown: filteredDropdown
         };
-
       })
       .filter(button => {
-
-        if (!button.permission) {
-          return true;
-        }
-
+        if (!button.permission) return true;
         return this.hasPermission(button.permission);
-
       });
   }
 
   private hasPermission(permission: string | string[]): boolean {
     const permissions = Array.isArray(permission)
-      ? permission
-      : [permission];
-
+      ? permission : [permission];
     return permissions.some(permission =>
       !!this.permissionsService.getPermission(permission)
     );

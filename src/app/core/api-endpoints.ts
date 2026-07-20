@@ -126,4 +126,12 @@ export const ApiEndpoints = {
     USER_ROLE_REVOKE: (userId: number, roleId: number) => `${BASE_URL}/user-roles/${userId}/roles/${roleId}`,
     USER_ROLE_REPLACE: (userId: number) => `${BASE_URL}/user-roles/${userId}/roles`,
 
+    //PRIVILEGE MANAGEMENT
+    PRIVILEGE :`${BASE_URL}/privileges`,
+    OPERATION: `${BASE_URL}/operations/summaries`,
+    MODULE: `${BASE_URL}/modules/summaries`,
+
+    //dashboard
+    DASHBOARD:`${BASE_URL}/dashboard/overview`,
+
 } as const;

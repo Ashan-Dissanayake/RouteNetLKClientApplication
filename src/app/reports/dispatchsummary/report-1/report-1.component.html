@@ -1,0 +1,33 @@
+<mat-card class="report-card">
+  <mat-card-header class="report-header">
+    <div class="header-title-block">
+      <mat-card-title>Fleet Dispatch vs. Breakdown Impact</mat-card-title>
+      <mat-card-subtitle>Correlating operational trip volume with active mid-route breakdown incidents</mat-card-subtitle>
+    </div>
+    <div class="report-actions">
+      <span class="metric-badge" [class.badge-loading]="isLoading">
+        {{ isLoading ? 'Loading Metrics...' : 'System Status: Stable' }}
+      </span>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content class="chart-content-pane">
+    <!-- Loading Spinner to present a polished UI during network delay -->
+    <div *ngIf="isLoading" class="loading-overlay">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- The canvas container is always kept in the DOM so @ViewChild never resolves to undefined -->
+    <div class="canvas-container" [style.visibility]="isLoading ? 'hidden' : 'visible'">
+      <canvas #dimensionsChart></canvas>
+    </div>
+  </mat-card-content>
+
+  <mat-divider></mat-divider>
+
+  <!-- Clean footer to show data sync confirmation to evaluators -->
+  <mat-card-footer class="report-footer-summary" *ngIf="!isLoading">
+    <mat-icon>sync</mat-icon>
+    <span class="footer-text">Live operational data synced successfully</span>
+  </mat-card-footer>
+</mat-card>

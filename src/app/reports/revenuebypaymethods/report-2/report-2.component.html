@@ -1,0 +1,33 @@
+<mat-card class="report-card">
+  <mat-card-header class="report-header">
+    <div class="header-title-block">
+      <mat-card-title>Depot Revenue Tally & Auditing Split</mat-card-title>
+      <mat-card-subtitle>Comparative audit of physical cash collections versus real-time Electronic Ticketing Machine (ETM) log records</mat-card-subtitle>
+    </div>
+    <div class="report-actions">
+      <span class="metric-badge" [class.badge-loading]="isLoading">
+        {{ isLoading ? 'Auditing Vault...' : 'Audit Synced' }}
+      </span>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content class="chart-content">
+    <!-- Center screen spinner for production analytics presentation look -->
+    <div *ngIf="isLoading" class="loading-overlay">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- Container stays in DOM, preventing undefined ViewChild crashes -->
+    <div class="chart-container" [style.visibility]="isLoading ? 'hidden' : 'visible'">
+      <canvas #revenueChart></canvas>
+    </div>
+  </mat-card-content>
+
+  <mat-divider></mat-divider>
+
+  <!-- Dynamic footer for dissertation discussion points -->
+  <mat-card-footer class="report-footer-summary" *ngIf="!isLoading">
+    <mat-icon>account_balance</mat-icon>
+    <span><b>Dissertation Analysis:</b> High cash-to-digital ratios at specific peripheral depots indicate regional variations in passenger adoption, presenting an empirical case for targeted digital ticketing rollouts.</span>
+  </mat-card-footer>
+</mat-card>

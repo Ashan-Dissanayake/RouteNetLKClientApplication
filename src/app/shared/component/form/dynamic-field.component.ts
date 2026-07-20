@@ -132,7 +132,6 @@ import {MatIcon} from '@angular/material/icon';
         <!--Date Range-->
         <mat-form-field *ngSwitchCase="'date-range'" appearance="outline">
           <mat-label>{{ field.label || field.name }}</mat-label>
-
           <mat-date-range-input
             [formGroup]="$any(formInstance.get(field.name))"
             [rangePicker]="picker">

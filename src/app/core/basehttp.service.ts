@@ -88,4 +88,16 @@ export abstract class BaseHttpService<T> {
       body ?? {}
     );
   }
+
+  deleteActionByIds(
+    url: string,
+    firstId: number,
+    secondId: number,
+    action: string
+  ): Observable<any> {
+
+    return this.http.delete<any>(
+      `${url}/${firstId}/${secondId}/${action}`
+    );
+  }
 }

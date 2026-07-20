@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle} from '@angular/material/card';
 import {MatIcon} from '@angular/material/icon';
 import {
@@ -10,10 +10,13 @@ import {
   MatHeaderRowDef, MatRow,
   MatRowDef, MatTable
 } from '@angular/material/table';
-import {NgClass} from '@angular/common';
+import {DecimalPipe, NgClass, NgIf,AsyncPipe} from '@angular/common';
 import {MatDivider, MatList, MatListItem, MatNavList} from '@angular/material/list';
-import {MatButton} from '@angular/material/button';
+import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatGridList, MatGridTile} from '@angular/material/grid-list';
+import {DashboardFacadeService} from '../dashboardfacade.service';
+import {Observable, Subject} from 'rxjs';
+import {MatProgressBar} from '@angular/material/progress-bar';
 
 @Component({
   selector: 'app-dashboard',
@@ -42,11 +45,43 @@ import {MatGridList, MatGridTile} from '@angular/material/grid-list';
     MatList,
     MatGridList,
     MatGridTile,
+    MatProgressBar,
+    MatIconButton,
+    DecimalPipe,
+    NgIf,
+    AsyncPipe,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   standalone:true
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit, OnDestroy{
+// 1. Declare properties with explicit types first
+  readonly metrics$: Observable<any>; // Replace 'any' with your explicit Metrics interface/model type
+  readonly loading$: Observable<boolean>;
+  readonly error$: Observable<any>;
+
+  private readonly destroy$ = new Subject<void>();
+
+  // 2. Inject and safely assign streams inside the constructor
+  constructor(private readonly dashboardFacade: DashboardFacadeService) {
+    this.metrics$ = this.dashboardFacade.metrics$;
+    this.loading$ = this.dashboardFacade.loading$;
+    this.error$ = this.dashboardFacade.error$;
+  }
+
+  ngOnInit(): void {
+    this.dashboardFacade.loadDashboardMetrics();
+  }
+
+  onRefreshMetrics(): void {
+    this.dashboardFacade.loadDashboardMetrics();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.dashboardFacade.clearState();
+  }
 
 }
