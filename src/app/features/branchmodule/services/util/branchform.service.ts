@@ -65,4 +65,11 @@ export class BranchFormService {
       this.lastGeneratedName = nameControl.value;
     });
   }
+
+  initCreateForm(metadata: BranchMetadata): FormGroup {
+    const form = this.buildMainForm(metadata);
+    form.get('docreated')?.setValue(new Date());
+    return form;
+  }
+
 }

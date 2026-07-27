@@ -62,23 +62,31 @@ export class PrivilegeFacadeService implements OnDestroy {
   }
 
 
-  assignPrivileges(roleId:number, privileges: Privilege[]): Observable<any> {
+  assignPrivileges(
+    roleId: number,
+    privileges: { module: { id: number }, operation: { id: number } }[]
+  ): Observable<any> {
+
     const payload = {
-      privileges: privileges.map(p => ({id:p.id}))
+      privileges
     };
 
     return this.privilegeService.assignPrivileges(roleId, payload)
-      .pipe(catchError(err => {
-        this.errorSubject.next(err);
-        return throwError(() => err);
-      }),
+      .pipe(
+        catchError(err => {
+          this.errorSubject.next(err);
+          return throwError(() => err);
+        }),
         takeUntil(this.destroy$)
       );
   }
 
-  revokePrivileges(roleId:number, privileges:Privilege[]): Observable<any[]> {
-    const requests = privileges.
-    map(privilege => this.privilegeService.revokePrivilege(roleId, privilege.id));
+  revokePrivileges(roleId: number, privileges: Privilege[]): Observable<any[]> {
+
+    const requests = privileges.map(privilege =>
+      this.privilegeService.revokePrivilege(roleId, privilege.id)
+    );
+
     return forkJoin(requests)
       .pipe(
         catchError(err => {

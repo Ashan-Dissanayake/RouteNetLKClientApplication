@@ -3,13 +3,13 @@ import {FormField} from '../../../shared/models/formfieldata.model';
 export const USER_TABLE_META = [
   { key: 'username', label: 'Username' },
   { key: 'employee.callingname', label: 'Employee' },
-  { key: 'roles', label: 'Roles' },
+  { key: 'employee.branch.name', label: 'Branch' },
   { key: 'userstatus.name', label: 'Status' },
   { key: 'actions', label: 'Actions' }
 ];
 
 export const USER_FILTER_FORM_META: FormField[] = [
-  {name: 'ssemployee', type: 'select', label: 'Employee Name', required: false, mode: "none"},
+  {name: 'ssemployee', type: 'select', label: 'Employee Name', required: false, mode: "options",optionLabelKey:'callingname'},
   {name: 'ssuseranme', type: 'text', label: 'User Name', required: false, mode: 'none'},
   {name: 'ssusertype', type: 'select', label: 'User Type', required: false, mode: 'options'},
 ] as FormField[];

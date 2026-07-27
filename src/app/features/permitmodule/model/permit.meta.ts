@@ -5,7 +5,7 @@ export const PERMIT_TABLE_META = [
   {key: 'route.name', label: 'Route'},
   {key: 'vehicle.number', label: 'Plate Number'},
   {key: 'doissued', label: 'Issue Date'},
-  {key: 'doexpired', label: 'Exp Date'},
+  // {key: 'doexpired', label: 'Exp Date'},
   {key: 'branch.name', label: 'Branch'},
   {key: 'servicetype.name', label: 'Service Type'},
   {key: 'permitestatus.name', label: 'Status'},
@@ -20,16 +20,17 @@ export const PERMIT_FILTER_FORM_META: FormField[] = [
 
 export const PERMIT_MAIN_FORM_META: FormField[] = [
   {name: 'id', type: 'hidden', label: 'permit id', required: false, mode: 'none'},
-  {name: 'branch', type: 'select', label: 'Branch', required: true, mode: 'options'},
+  // {name: 'branch', type: 'select', label: 'Branch', required: true, mode: 'options'},
   {name: 'vehicle', type: 'select', label: 'Vehicle', required: true, mode: 'options',optionLabelKey: 'number'},
   {name: 'route', type: 'select', label: 'Route', required: true, mode: 'options'},
+  {name: 'number', type: 'text', label: 'Permit Number', required: true, mode: 'regex'},
   {name: 'number', type: 'text', label: 'Permit Number', required: true, mode: 'regex'},
   {name: 'doissued', type: 'date', label: 'Issued Date', required: true, mode: 'date',
     dateConfig:{ maxDate:new Date() }
   },
-  {name: 'doexpired', type: 'date', label: 'Exp Date', required: true, mode: 'date',
-    dateConfig:{ minDate:new Date()}
-  },
+  // {name: 'doexpired', type: 'date', label: 'Exp Date', required: true, mode: 'date',
+  //   dateConfig:{ minDate:new Date().setDate(1)}
+  // },
   {name: 'servicetype', type: 'select', label: 'Service Type', required: true, mode: 'options'},
   {name: 'permitestatus', type: 'select', label: 'Permit Status', required: true, mode: 'options'}
 ] as FormField[];
@@ -39,7 +40,7 @@ export const PERMIT_EXPORT_META = [
   {key: 'route.name', header: 'Route'},
   {key: 'vehicle.number', header: 'Plate Number'},
   {key: 'doissued', header: 'Issue Date'},
-  {key: 'doexpired', header: 'Exp Date'},
+  // {key: 'doexpired', header: 'Exp Date'},
   {key: 'branch.name', header: 'Branch'},
   {key: 'servicetype.name', header: 'Service Type'},
   {key: 'permitestatus.name', header: 'Status'},

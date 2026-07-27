@@ -20,10 +20,10 @@ export class GrnMetadataService {
 
   loadAll(): Observable<GrnMetadata> {
     return forkJoin({
-      grnStatuses:  this.grnStatusService.get().pipe(map(r => r.data)),
-      partRequests: this.partRequestService.getSummary().pipe(map(r => r.data)),
-      branches:     this.branchService.getSummary().pipe(map(r => r.data)),
-      parts:        this.partService.get().pipe(map(r => r.data)),
+      grnStatuses:this.grnStatusService.get().pipe(map(r => r.data)),
+      partRequests:this.partRequestService.getSummary().pipe(map(r => r.data)),
+      branches:this.branchService.getSummary().pipe(map(r => r.data)),
+      parts:this.partService.getSummary().pipe(map(r => r.data)),
     });
   }
 }

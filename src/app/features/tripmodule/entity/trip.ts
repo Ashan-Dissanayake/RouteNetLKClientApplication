@@ -3,6 +3,7 @@ import {Permit} from '../../permitmodule/entity/permit';
 import {Branch} from '../../branchmodule/entity/branch';
 import {TripStatus} from './tripstatus';
 import {OriginTerminal} from './originterminal';
+import {Shift} from '../../rostermodule/entity/shift';
 
 /**
  * Represents a Trip entity with various properties such as branch, trip type, permit, and status.
@@ -19,6 +20,7 @@ export class Trip{
   notrip!:number;
   tripstatus!:TripStatus;
   originterminal!:OriginTerminal;
+  shift!:Shift;
 }
 
 

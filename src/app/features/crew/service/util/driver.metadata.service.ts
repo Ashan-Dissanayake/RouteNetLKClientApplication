@@ -22,7 +22,7 @@ export class DriverMetadataService{
 
   loadAll():Observable<DriverMetadata>{
     return forkJoin({
-      employees:this.employeeService.getSummary().pipe(map(r=>r.data)),
+      employees:this.employeeService.getByDesignationDriver().pipe(map(r=>r.data)),
       licenceCategories:this.licenceCategoryService.get().pipe(map(r=>r.data)),
       crewStatuses:this.crewStatusService.get().pipe(map(r=>r.data)),
       routeFamiliarityLevels:this.routeFamiliarityLevelService.get().pipe(map(r=>r.data)),

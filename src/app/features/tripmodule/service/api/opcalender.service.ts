@@ -8,15 +8,27 @@ import {TripType} from '../../entity/triptype';
 import {TripStatus} from '../../entity/tripstatus';
 import {OpCalender} from '../../entity/opcalender';
 
+/**
+ * Service for managing operations related to the OpCalender entity.
+ * Extends the BaseHttpService to provide HTTP operations.
+ */
 @Injectable({ providedIn: 'root' })
-export class OpCalenderService extends BaseHttpService <OpCalender>{
+export class OpCalenderService extends BaseHttpService<OpCalender> {
 
+  /**
+   * Constructor for OpCalenderService.
+   * @param http The HttpClient instance used for making HTTP requests.
+   */
   constructor(protected override http: HttpClient) {
     super(http);
   }
 
-  get():Observable<ApiResponse<OpCalender>>{
-    return  this.getAll(ApiEndpoints.OP_CALENDER);
+  /**
+   * Fetches all OpCalender records from the API.
+   * @returns An Observable containing the API response with a list of OpCalender entities.
+   */
+  get(): Observable<ApiResponse<OpCalender>> {
+    return this.getAll(ApiEndpoints.OP_CALENDER);
   }
 
 }

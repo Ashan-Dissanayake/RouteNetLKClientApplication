@@ -22,7 +22,7 @@ export class ConductorMetadataService{
 
   loadAll():Observable<ConductorMetadata>{
     return forkJoin({
-      employees:this.employeeService.getSummary().pipe(map(r=>r.data)),
+      employees:this.employeeService.getByDesignationConductor().pipe(map(r=>r.data)),
       crewStatuses:this.crewStatusService.get().pipe(map(r=>r.data)),
       routeFamiliarityLevels:this.routeFamiliarityLevelService.get().pipe(map(r=>r.data)),
       regexes:this.regexService.getStaticRegexes('drivers').pipe(map(r=>r.data))

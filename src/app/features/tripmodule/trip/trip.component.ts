@@ -9,7 +9,7 @@ import { debounceTime, take, takeUntil, } from 'rxjs/operators';
 import {TRIP_DATA_EXPORT_META, TRIP_FILTER_FORM_META, TRIP_MAIN_FORM_META, TRIP_TABLE_META} from '../model/trip.meta';
 import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
 import {Trip} from '../entity/trip';
-import {TripMetadata} from '../model/trip.metadata.model';
+import {TripLookUpDataModel} from '../model/trip.lookupdata.model';
 import {TripFacadeService} from '../service/util/tripfacade.service';
 import {TripFormService} from '../service/util/tripfrom.service';
 import {FormbuilderService} from '../../../core/formbuilder.service';
@@ -69,7 +69,7 @@ export class TripComponent implements OnInit, OnDestroy {
   // ===== Streams =====
   /** Observables stream of trips. */
   protected readonly trips$: Observable<Trip[]>;
-  protected readonly metadata$: Observable<TripMetadata>;
+  protected readonly metadata$: Observable<TripLookUpDataModel>;
   protected readonly loading$: Observable<boolean>;
   protected readonly error$: Observable<any>;
 
@@ -92,7 +92,7 @@ export class TripComponent implements OnInit, OnDestroy {
   /** Subject to manage component destruction. */
   private destroy$ = new Subject<void>();
   /** Current metadata for trips. */
-  private currentMetadata: TripMetadata | null = null;
+  private currentMetadata: TripLookUpDataModel | null = null;
 
   /**
    * Constructor for the TripComponent.
@@ -228,14 +228,10 @@ export class TripComponent implements OnInit, OnDestroy {
    * @param successMessage The success message to display.
    * @param row The row to apply the transition to.
    */
-  private executeTransition(
-    operation$: Observable<any>,
-    successMessage: string,
-    row: Trip,
-  ): void {
+  private executeTransition(operation$: Observable<any>, successMessage: string, row: Trip,): void {
     operation$.pipe(takeUntil(this.destroy$)).subscribe({
       next: () => this.dialog.showSuccess(successMessage),
-      error: err => this.dialog.showMessage({ heading: 'Failed to execute', message: err.errorMessage }),
+      error: (err) => this.dialog.showErrorMessage('Failed to create', err),
       complete: () => {
         this.facade.reload();
         if (this.activeRow?.id === row.id) this.activeRow = null;
@@ -267,7 +263,7 @@ export class TripComponent implements OnInit, OnDestroy {
   private save(formData: any): void {
     this.facade.create(formData).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => this.dialog.showSuccess('Trip created successfully.'),
-      error: err => this.dialog.showMessage({ heading: 'Failed to create trip', message: err.errorMessage }),
+      error: (err) => this.dialog.showErrorMessage('Failed to create', err),
       complete: () => {
         this.facade.reload();
         if (this.currentMetadata) {

@@ -25,8 +25,21 @@ export const TRIP_EXECUTION_TABLE_META = [
 export const TRIP_EXECUTION_MAIN_FORM_META: FormField[] = [
   // {name: 'id', type: 'hidden', label: 'Part id', required: false, mode: 'none'},
   {name: 'branch', type: 'select', label: 'Branch', required: true, mode: 'options'},
-  {name: 'doservice', type: 'date', label: 'Service Date', required: true, mode: 'date'},
+  {name: 'doservice', type: 'date', label: 'Service Date', required: true, mode: 'date',
+    dateConfig:{
+      minDate:getTomorrow()
+
+    }
+  },
 ] as FormField[];
+
+
+function getTomorrow(): Date {
+  const date = new Date();
+  date.setDate(date.getDate() + 1);
+  return date;
+}
+
 
 // export const TRIP_EXECUTION_UPDATE_FORM_META:FormField[] = [
 //   {name: 'startodometer', type: 'text', label: 'Start Odometer', required: false, mode: 'none'},

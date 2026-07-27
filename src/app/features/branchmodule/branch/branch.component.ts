@@ -25,7 +25,7 @@ import {exportToExcel} from '../../../shared/component/export/excel-export.util'
 import {buildActionPanel} from '../../../shared/component/button/action-panel.factory';
 import {
   BRANCH_DATA_EXPORT_META,
-  BRANCH_FILTER_FORM_META,
+  BRANCH_FILTER_FORM_META, BRANCH_IMMUTABLE_CONTROLLERS_META,
   BRANCH_MAIN_FORM_META,
   BRANCH_TABLE_META
 } from '../model/branch.meta';
@@ -75,6 +75,7 @@ export class BranchComponent implements OnInit, OnDestroy {
   protected readonly tableColumns    = BRANCH_TABLE_META;
   protected readonly filterFormMeta  = BRANCH_FILTER_FORM_META;
   protected readonly mainFormMeta    = BRANCH_MAIN_FORM_META;
+  protected readonly immutableControllers = BRANCH_IMMUTABLE_CONTROLLERS_META
   protected readonly exportMeta      = BRANCH_DATA_EXPORT_META;
   protected readonly actionPanelConfig = buildActionPanel({
     permissionMap: {
@@ -208,6 +209,8 @@ export class BranchComponent implements OnInit, OnDestroy {
   // ===== Create =====
 
   private openCreateForm(): void {
+    this.formBuilder.setControlsState(this.mainForm, this.immutableControllers, false);
+
     this.dialog.showFormPopup({
       heading: 'Create Branch',
       form:    this.mainForm,
@@ -223,7 +226,6 @@ export class BranchComponent implements OnInit, OnDestroy {
     this.facade.create(formData).pipe(takeUntil(this.destroy$)).subscribe({
       next:     () => this.dialog.showSuccess('Branch created successfully.'),
       error: (err) => this.dialog.showErrorMessage('Failed to create', err),
-
       complete: () => {
         this.facade.reload();
         this.formBuilder.resetForm(this.mainForm);
@@ -233,7 +235,7 @@ export class BranchComponent implements OnInit, OnDestroy {
 
   // ===== Edit =====
   private openEditForm(row: Branch): void {
-    // Patch the existing form with the row's values then open the same popup
+    this.formBuilder.setControlsState(this.mainForm, this.immutableControllers, true);
     this.mainForm.patchValue(row);
 
     this.dialog.showFormPopup({

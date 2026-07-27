@@ -1,9 +1,9 @@
 import {Injectable, OnDestroy} from '@angular/core';
-import {filter, Subject, switchMap, takeUntil} from 'rxjs';
+import {Subject} from 'rxjs';
 import {FormbuilderService} from '../../../../core/formbuilder.service';
 import {DriverFacadeService} from './driverfacade.service';
 import {DriverMetadata} from '../../model/driver.metadata.model';
-import {FormGroup, Validators} from '@angular/forms';
+import {FormGroup} from '@angular/forms';
 import {DRIVER_FILTER_FORM_META, DRIVER_MAIN_FORM_META} from '../../model/driver.meta';
 import {Driver} from '../../entity/driver';
 import {Employee} from '../../../employeemodule/entity/employee';
@@ -34,16 +34,15 @@ export class DriverFormService implements OnDestroy {
 
   // ===== Main form — create mode =====
   buildMainForm(metadata: DriverMetadata): FormGroup {
-    const form = this.formBuilder.build([...DRIVER_MAIN_FORM_META], {
-      employee:              metadata.employees,
-      licensecategory:       metadata.licenceCategories,
-      crewstatus:            metadata.crewStatuses,
+    console.log(metadata.employees.length);
+    // this.wireLicenseCategoryToRegex(form);
+    return this.formBuilder.build([...DRIVER_MAIN_FORM_META], {
+      employee: metadata.employees,
+      licensecategory: metadata.licenceCategories,
+      crewstatus: metadata.crewStatuses,
       routefamiliaritylevel: metadata.routeFamiliarityLevels,
-      regexes:               metadata.regexes,
+      regexes: metadata.regexes,
     });
-
-    this.wireLicenseCategoryToRegex(form);
-    return form;
   }
 
   // ===== Main form — edit mode =====
@@ -71,7 +70,7 @@ export class DriverFormService implements OnDestroy {
     // Map the row to form shape and patch
     form.patchValue(DriverMapper.toForm(row));
 
-    this.wireLicenseCategoryToRegex(form);
+    //this.wireLicenseCategoryToRegex(form);
     return form;
   }
 
@@ -83,21 +82,21 @@ export class DriverFormService implements OnDestroy {
   // Lives here not in the component — the component has zero awareness
   // that license category selection triggers an API call.
 
-  private wireLicenseCategoryToRegex(form: FormGroup): void {
-    form.get('licensecategory')?.valueChanges.pipe(
-      filter(category => !!category?.name),
-      switchMap(category => this.facade.loadDynamicRegexes(category.name)),
-      takeUntil(this.destroy$),
-    ).subscribe(regexData => {
-      const licenseNumberControl = form.get('licensenumber');
-      if (!licenseNumberControl) return;
-
-      licenseNumberControl.setValidators([
-        Validators.pattern(regexData['licensenumber'].regex),
-      ]);
-      // emitEvent: false prevents unnecessary valueChanges emissions
-      // when validators are updated
-      licenseNumberControl.updateValueAndValidity({ emitEvent: false });
-    });
-  }
+  // private wireLicenseCategoryToRegex(form: FormGroup): void {
+  //   form.get('licensecategory')?.valueChanges.pipe(
+  //     filter(category => !!category?.name),
+  //     switchMap(category => this.facade.loadDynamicRegexes(category.name)),
+  //     takeUntil(this.destroy$),
+  //   ).subscribe(regexData => {
+  //     const licenseNumberControl = form.get('licensenumber');
+  //     if (!licenseNumberControl) return;
+  //
+  //     licenseNumberControl.setValidators([
+  //       Validators.pattern(regexData['licensenumber'].regex),
+  //     ]);
+  //     // emitEvent: false prevents unnecessary valueChanges emissions
+  //     // when validators are updated
+  //     licenseNumberControl.updateValueAndValidity({ emitEvent: false });
+  //   });
+  // }
 }

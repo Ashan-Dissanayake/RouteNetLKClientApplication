@@ -22,7 +22,7 @@ export class VehicleFormService implements OnDestroy {
   buildFilterForm(metadata: VehicleMetadata): FormGroup {
     return this.formBuilder.build([...VEHICLE_FILTER_FORM_META], {
       ssconditionrate: metadata.conditionRates,
-      ssbustype:       metadata.busTypes,
+      ssbustype:metadata.busTypes,
     });
   }
 

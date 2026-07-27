@@ -137,22 +137,39 @@ export class PrivilegeComponent{
   /**
    * Dispatches network calls on toggle interactions based on the presence of existing IDs
    */
-  onToggleCell(roleId: number, moduleId: number, operationId: number, existingPrivilege: Privilege | null, checked: boolean): void {
-    if (checked && !existingPrivilege) {
-      // Checked & Unassigned -> Map payload structures to match PrivilegeRequestDto arrays
-      const dummyPrivilegePayload = { id: 0, role_id: roleId, module_id: moduleId, operation_id: operationId } as any;
+  onToggleCell(
+    roleId: number,
+    moduleId: number,
+    operationId: number,
+    existingPrivilege: Privilege | null,
+    checked: boolean
+  ): void {
 
-      this.facade.assignPrivileges(roleId, [dummyPrivilegePayload]).subscribe({
-        next: () => this.facade.reload()
-      });
+    if (checked && !existingPrivilege) {
+
+      const privilegePayload = {
+        module: {
+          id: moduleId
+        },
+        operation: {
+          id: operationId
+        }
+      };
+
+      this.facade.assignPrivileges(roleId, [privilegePayload])
+        .subscribe({
+          next: () => this.facade.reload()
+        });
 
     } else if (!checked && existingPrivilege) {
-      // Unchecked & Exists -> Issue a structural removal sequence via delete path variables
-      this.facade.revokePrivileges(roleId, [existingPrivilege]).subscribe({
-        next: () => this.facade.reload()
-      });
+
+      this.facade.revokePrivileges(roleId, [existingPrivilege])
+        .subscribe({
+          next: () => this.facade.reload()
+        });
     }
   }
+
 }
 
 interface MatrixRow {

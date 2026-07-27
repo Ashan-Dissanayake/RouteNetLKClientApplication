@@ -85,6 +85,7 @@ export const ApiEndpoints = {
     TRIP_STATUS:`${BASE_URL}/trip-statuses/summaries`,
     OP_CALENDER:`${BASE_URL}/op-calenders/summaries`,
     ORIGIN_TERMINAL:`${BASE_URL}/origin-terminals/summaries`,
+    SHIFTS:`${BASE_URL}/shifts/summaries`,
 
     //TRIP EXECUTION
     TRIP_EXECUTION:`${BASE_URL}/trip-execution`,

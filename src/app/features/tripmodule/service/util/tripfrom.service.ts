@@ -2,7 +2,7 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
 import {FormbuilderService} from '../../../../core/formbuilder.service';
-import {TripMetadata} from '../../model/trip.metadata.model';
+import {TripLookUpDataModel} from '../../model/trip.lookupdata.model';
 import {TRIP_FILTER_FORM_META, TRIP_MAIN_FORM_META} from '../../model/trip.meta';
 import {Trip} from '../../entity/trip';
 
@@ -36,40 +36,41 @@ export class TripFormService implements OnDestroy {
 
   /**
    * Builds a filter form for trips using the provided metadata.
-   * @param metadata - Metadata containing trip types and statuses.
+   * @param lookUpData - Metadata containing trip types and statuses.
    * @returns A `FormGroup` representing the filter form.
    */
-  buildFilterForm(metadata: TripMetadata): FormGroup {
+  buildFilterForm(lookUpData: TripLookUpDataModel): FormGroup {
     return this.formBuilder.build([...TRIP_FILTER_FORM_META], {
-      sstriptype:   metadata.tripTypes,
-      sstripstatus: metadata.tripStatuses,
+      sstriptype:   lookUpData.tripTypes,
+      sstripstatus: lookUpData.tripStatuses,
     });
   }
 
   /**
    * Builds the main form for creating a trip using the provided metadata.
-   * @param metadata - Metadata containing branches, trip types, statuses, calendars, permits, and terminals.
+   * @param lookUpData - Metadata containing branches, trip types, statuses, calendars, permits, and terminals.
    * @returns A `FormGroup` representing the main form in create mode.
    */
-  buildMainForm(metadata: TripMetadata): FormGroup {
+  buildMainForm(lookUpData: TripLookUpDataModel): FormGroup {
     return this.formBuilder.build([...TRIP_MAIN_FORM_META], {
-      branch:          metadata.branches,
-      triptype:        metadata.tripTypes,
-      tripstatus:      metadata.tripStatuses,
-      opcalender:      metadata.opCalenders,
-      permite:         metadata.permits,
-      originterminal:  metadata.originTerminals,
+      branch:          lookUpData.branches,
+      triptype:        lookUpData.tripTypes,
+      tripstatus:      lookUpData.tripStatuses,
+      opcalender:      lookUpData.opCalenders,
+      permite:         lookUpData.permits,
+      originterminal:  lookUpData.originTerminals,
+      shift:  lookUpData.shifts,
     });
   }
 
   /**
    * Builds the main form for editing a trip using the provided metadata and trip data.
-   * @param metadata - Metadata containing branches, trip types, statuses, calendars, permits, and terminals.
+   * @param lookUpData - Metadata containing branches, trip types, statuses, calendars, permits, and terminals.
    * @param row - The trip data to populate the form with.
    * @returns A `FormGroup` representing the main form in edit mode.
    */
-  buildMainFormForEdit(metadata: TripMetadata, row: Trip): FormGroup {
-    const form = this.buildMainForm(metadata);
+  buildMainFormForEdit(lookUpData: TripLookUpDataModel, row: Trip): FormGroup {
+    const form = this.buildMainForm(lookUpData);
     form.patchValue(row);
     return form;
   }

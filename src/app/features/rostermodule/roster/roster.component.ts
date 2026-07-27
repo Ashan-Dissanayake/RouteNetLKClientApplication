@@ -162,7 +162,7 @@ export class RosterComponent implements OnInit, OnDestroy {
             this.formBuilder.resetForm(this.mainForm);
             this.facade.reload();
           },
-          error: err => this.dialog.showWarning(err.errorMessage),
+          error: err => this.dialog.showErrorMessage('Deactivation failed', err),
         });
     });
   }
@@ -208,10 +208,7 @@ export class RosterComponent implements OnInit, OnDestroy {
           this.dialog.showSuccess('Assignment approved successfully.');
           this.reloadAssignments();
         },
-        error: err => this.dialog.showMessage({
-          heading: 'Failed to approve',
-          message: err.errorMessage,
-        }),
+        error: err => this.dialog.showError('Assignment failed.', err),
       });
   }
 
@@ -223,10 +220,7 @@ export class RosterComponent implements OnInit, OnDestroy {
           this.dialog.showSuccess('Assignment rejected successfully.');
           this.reloadAssignments();
         },
-        error: err => this.dialog.showMessage({
-          heading: 'Failed to reject',
-          message: err.errorMessage,
-        }),
+        error: err => this.dialog.showError('Assignment failed.', err),
       });
   }
 

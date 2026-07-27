@@ -3,7 +3,8 @@ import { Observable } from 'rxjs';
 import { ApiResponse } from '../shared/models/apiresponse.model';
 
 export abstract class BaseHttpService<T> {
-  constructor(protected http: HttpClient) { }
+
+  protected constructor(protected http: HttpClient) { }
 
   // For endpoints that return arrays
   getAll<T>(url: string, params?: any): Observable<ApiResponse<T>> {

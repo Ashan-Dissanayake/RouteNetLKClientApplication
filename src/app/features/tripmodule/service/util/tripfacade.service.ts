@@ -2,7 +2,7 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subject, throwError } from 'rxjs';
 import { catchError, finalize, map, takeUntil, tap } from 'rxjs/operators';
 import {Trip} from '../../entity/trip';
-import {EMPTY_TRIP_METADATA, TripMetadata} from '../../model/trip.metadata.model';
+import {EMPTY_TRIP_METADATA, TripLookUpDataModel} from '../../model/trip.lookupdata.model';
 import {TripService} from '../api/trip.service';
 import {TripLookupDataService} from './trip.lookupdata.service';
 import {normalizeSearchCriteria} from '../../../../core/search-criteria-normalizer';
@@ -19,7 +19,7 @@ export class TripFacadeService implements OnDestroy {
   private tripSubject = new BehaviorSubject<Trip[]>([]);
 
   /** Subject to manage trip metadata. */
-  private metadataSubject = new BehaviorSubject<TripMetadata>(EMPTY_TRIP_METADATA);
+  private metadataSubject = new BehaviorSubject<TripLookUpDataModel>(EMPTY_TRIP_METADATA);
 
   /** Subject to manage the loading state. */
   private loadingSubject = new BehaviorSubject<boolean>(false);
@@ -70,7 +70,7 @@ export class TripFacadeService implements OnDestroy {
    * Initializes the service by loading trip metadata and fetching trips.
    * @returns Observable of the loaded trip metadata.
    */
-  initialize(): Observable<TripMetadata> {
+  initialize(): Observable<TripLookUpDataModel> {
     this.setLoading(true);
     this.clearError();
 

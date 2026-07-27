@@ -13,7 +13,7 @@ export const DRIVER_TABLE_META = [
 ];
 
 export const DRIVER_FILTER_FORM_META: FormField[] = [
-  {name: 'ssnumber', type: 'text', label: 'Driver Number', required: false, mode: "none"},
+  {name: 'sslicensenumber', type: 'text', label: 'License Number', required: false, mode: "none"},
   {name: 'sscrewstatus', type: 'select', label: 'Crew Status', required: false, mode: 'options'},
   {name: 'ssroutefamilitylevel', type: 'select', label: 'Route Familiarity Level', required: false, mode: 'options'},
 ] as FormField[];
@@ -21,7 +21,6 @@ export const DRIVER_FILTER_FORM_META: FormField[] = [
 export const DRIVER_MAIN_FORM_META: FormField[] = [
   {name: 'id', type: 'hidden', label: 'Vehicle id', required: false, mode: 'none'},
   {name: 'employee', type: 'select', label: 'Name', required: true, mode: 'options',optionLabelKey: 'callingname',},
-  // {name: 'number', type: 'text', label: 'Driver Number', required: true, mode: 'regex'},
   {name: 'licensecategory', type: 'select', label: 'License Category', required: true, mode: 'options'},
   {name: 'licensenumber', type: 'text', label: 'License Number', required: true, mode: 'regex'},
   {
@@ -32,8 +31,10 @@ export const DRIVER_MAIN_FORM_META: FormField[] = [
     dateConfig:{
       range:{
         years:4,months: 0,days:0
-      }
-    }
+      },
+      // minDate:new Date()
+    },
+    mode:"date"
   },
   {
     name: 'medicalDateRange',
@@ -41,8 +42,10 @@ export const DRIVER_MAIN_FORM_META: FormField[] = [
     label: 'Medical Valid Period',
     required: true,
     dateConfig:{
-      range: {years:0,months:6,days: 0}
-    }
+      range: {years:0,months:6,days: 0},
+      // minDate:new Date(),
+    },
+    mode:"date"
   },
   {name: 'crewstatus', type: 'select', label: 'Status', required: true, mode: 'options'},
   {name: 'routefamiliaritylevel', type: 'select', label: 'Route Familiarity Level', required: true, mode: 'options'},

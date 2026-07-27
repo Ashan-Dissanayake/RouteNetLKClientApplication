@@ -18,11 +18,11 @@ export const VEHICLE_FILTER_FORM_META: FormField[] = [
 
 export const VEHICLE_MAIN_FORM_META: FormField[] = [
   {name: 'id', type: 'hidden', label: 'Vehicle id', required: false, mode: 'none'},
-  {name: 'branch', type: 'select', label: 'Branch', required: true, mode: 'options'},
+  // {name: 'branch', type: 'select', label: 'Branch', required: true, mode: 'options'},
   {name: 'number', type: 'text', label: 'Number Plate', required: true, mode: 'regex'},
   {name: 'model', type: 'select', label: 'Model', required: true, mode: 'options'},
   {name: 'bustype', type: 'select', label: 'Bus Type', required: true, mode: 'options'},
-  {name: 'mileage', type: 'text', label: 'Mileage', required: true, mode: 'none'},
+  {name: 'mileage', type: 'text', label: 'Mileage', required: false, mode: 'none'},
   {name: 'fueltype', type: 'select', label: 'Fuel Type', required: true, mode: 'options'},
   {name: 'conditionrate', type: 'select', label: 'Condition Rate', required: true, mode: 'options'},
   {name: 'vehiclestatus', type: 'select', label: 'Status', required: true, mode: 'options'},

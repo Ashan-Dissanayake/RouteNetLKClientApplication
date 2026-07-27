@@ -79,8 +79,8 @@ export class DriverFacadeService implements OnDestroy {
   }
 
   // ===== Dynamic regex loading =====
-  loadDynamicRegexes(licenseCategory: string): Observable<Regex> {
-    return this.regexService.getDynamicRegexes('drivers', licenseCategory).pipe(
+  loadStaticRegexes(): Observable<Regex> {
+    return this.regexService.getStaticRegexes('drivers').pipe(
       map(res => res.data),
     );
   }

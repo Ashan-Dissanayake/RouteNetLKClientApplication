@@ -175,7 +175,7 @@ export class FareCollectionComponent implements OnInit,OnDestroy{
   ): void {
     operation$.pipe(takeUntil(this.destroy$)).subscribe({
       next:     () => this.dialog.showSuccess(successMessage),
-      error:    err => this.dialog.showErrorMessage('Failed to execute', err),
+      error: err => this.dialog.showErrorMessage('Deactivation failed', err),
       complete: () => {
         this.facade.reload();
         if (this.activeRow?.id === row.id) this.activeRow = null;

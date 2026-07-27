@@ -14,6 +14,7 @@ import {ReportService} from '../../service/reportservice';
 import {Report1Response} from '../entity/report1response';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
 import {NgIf} from '@angular/common';
+import {DialogService} from '../../../core/dialog.service';
 
 @Component({
   selector: 'app-report-1',
@@ -40,7 +41,10 @@ export class Report1Component implements OnInit, OnDestroy {
   public reportData!: Report1Response;
   public isLoading = true;
 
-  constructor(private reportService: ReportService) {}
+  constructor(
+    private reportService: ReportService,
+    private dialogService:DialogService
+  ) {}
 
   ngOnInit(): void {
     this.fetchReportData();
@@ -54,7 +58,7 @@ export class Report1Component implements OnInit, OnDestroy {
         this.renderChart();
       },
       error: (err) => {
-        console.error('Error fetching operational report data:', err);
+        this.dialogService.showError('Error fetching operational report data:', err);
         this.isLoading = false;
       }
     });

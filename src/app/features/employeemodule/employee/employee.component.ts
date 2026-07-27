@@ -202,7 +202,6 @@ export class EmployeeComponent implements OnInit, OnDestroy {
     this.facade.create(formData).pipe(takeUntil(this.destroy$)).subscribe({
       next:     () => this.dialog.showSuccess('Employee created successfully.'),
       error: (err) => this.dialog.showErrorMessage('Failed to create', err),
-
       complete: () => {
         this.facade.reload();
         this.formBuilder.resetForm(this.mainForm);
@@ -261,7 +260,6 @@ export class EmployeeComponent implements OnInit, OnDestroy {
         .subscribe({
           next: () => this.dialog.showSuccess('Selected employees deactivated successfully.'),
           error: err => this.dialog.showErrorMessage('Deactivation failed', err),
-
           complete: () => {
             this.selectedRows.clear();
             this.selectedCount = 0;

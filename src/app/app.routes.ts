@@ -86,7 +86,7 @@ export const routes: Routes = [
 
       {
         path: 'incident-report',
-        canActivate: [permissionGuard('incident-select')],
+        canActivate: [permissionGuard('incident-view')],
         loadComponent: () =>
           import('./features/incidentreportmodule/incidentreport/incidentreport.component')
             .then(m => m.IncidentReportComponent)
@@ -128,7 +128,7 @@ export const routes: Routes = [
 
       {
         path: 'part',
-        canActivate: [permissionGuard('part-select')],
+        canActivate: [permissionGuard('part-view')],
         loadComponent: () =>
           import('./features/sparepartmodule/sparepart/sparepart.component')
             .then(m => m.SparePartComponent)
@@ -224,7 +224,7 @@ export const routes: Routes = [
 
   {
     path: '**',
-    redirectTo: 'dashboard'
+    redirectTo: '/branch'
   }
 
 ];

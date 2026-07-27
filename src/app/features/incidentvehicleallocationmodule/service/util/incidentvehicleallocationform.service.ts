@@ -27,21 +27,21 @@ export class IncidentVehicleAllocationFormService implements OnDestroy {
   }
 
   buildFilterForm(metadata: IncidentVehicleAllocationMetadata): FormGroup {
-    return this.formBuilder.build([...INCIDENT_VEHICLE_ALLOCATION_FILTER_FORM_META], {
+   const form =  this.formBuilder.build([...INCIDENT_VEHICLE_ALLOCATION_FILTER_FORM_META], {
       ssvehicle:  metadata.vehicles,
     });
+    console.log(form.controls);
+    return  form;
   }
 
   buildMainForm(metadata: IncidentVehicleAllocationMetadata): FormGroup {
-    const form = this.formBuilder.build([...INCIDENT_VEHICLE_ALLOCATION_MAIN_FORM_META], {
-      incident:metadata.incidents,
-      vehicle:[],
-      providedbranch:[],
+    // this.wireCascades(form);
+    return this.formBuilder.build([...INCIDENT_VEHICLE_ALLOCATION_MAIN_FORM_META], {
+      incident: metadata.incidents,
+      vehicle: metadata.vehicles,
+      providedbranch: metadata.branches,
       incidentvehicleallocationstatus: metadata.incidentVehicleAllocationStatuses,
     });
-
-    this.wireCascades(form);
-    return form;
   }
 
   private wireCascades(form: FormGroup): void {

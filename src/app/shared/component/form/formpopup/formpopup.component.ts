@@ -87,8 +87,8 @@ export class FormpopupComponent {
 
   private handleCreate(form: FormGroup): void {
     this.dialogService.showConfirmation({
-      heading:'Creating Branch',
-      message: 'Do you want to create this branch?'
+      heading:'Creating',
+      message: 'Do you want to create this?'
     }).subscribe(confirmed => {
       if (confirmed) {
         this.dialogRef.close(form.getRawValue());
@@ -97,7 +97,7 @@ export class FormpopupComponent {
   }
 
   private handleUpdate(form: FormGroup): void {
-    const heading = 'Updating Branch';
+    const heading = 'Updating';
     const dirtyValues = this.formBuilderService.getUpdatedValues(form);
     const changedKeys = Object.keys(dirtyValues).filter(k => k !== 'id');
 

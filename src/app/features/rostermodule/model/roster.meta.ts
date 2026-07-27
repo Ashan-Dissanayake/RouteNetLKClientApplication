@@ -23,7 +23,14 @@ export const ROSTER_MAIN_FORM_META: FormField[] = [
     dateConfig:{
       range:{
         years:0,months: 0,days:6
-      }
+      },
+      minDate:getTomorrow()
     }
   },
 ] as FormField[];
+
+function getTomorrow(): Date {
+  const date = new Date();
+  date.setDate(date.getDate() + 1);
+  return date;
+}

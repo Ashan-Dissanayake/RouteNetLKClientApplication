@@ -84,7 +84,7 @@ export class IncidentVehicleAllocationComponent implements OnInit, OnDestroy {
   protected mainForm:   FormGroup = new FormGroup({});
 
   private destroy$         = new Subject<void>();
-  private currentMetadata: IncidentVehicleAllocationMetadata | null = null;
+  // private currentMetadata: IncidentVehicleAllocationMetadata | null = null;
 
   constructor(
     private facade:      IncidentVehicleAllocationFacadeService,
@@ -107,12 +107,9 @@ export class IncidentVehicleAllocationComponent implements OnInit, OnDestroy {
         error: err => this.dialog.showError('Failed to initialize module.', err),
       });
 
-    // Skip EMPTY_INCIDENT_VEHICLE_ALLOCATION_METADATA initial emission
     this.facade.metadata$.pipe(
-      filter(meta => meta.incidents.length > 0),
       takeUntil(this.destroy$),
     ).subscribe(meta => {
-      this.currentMetadata = meta;
       this.filterForm = this.formService.buildFilterForm(meta);
       this.mainForm   = this.formService.buildMainForm(meta);
       this.watchFilterForm();
@@ -190,6 +187,7 @@ export class IncidentVehicleAllocationComponent implements OnInit, OnDestroy {
   // ===== Create =====
 
   private openCreateForm(): void {
+
     this.dialog.showFormPopup({
       heading: 'Create Incident Allocation',
       form:    this.mainForm,
@@ -204,12 +202,10 @@ export class IncidentVehicleAllocationComponent implements OnInit, OnDestroy {
   private save(formData: any): void {
     this.facade.create(formData).pipe(takeUntil(this.destroy$)).subscribe({
       next:     () => this.dialog.showSuccess('Incident Vehicle Allocation created successfully.'),
-      error:    err => this.dialog.showMessage({ heading: 'Failed to create', message: err.errorMessage }),
+      error: err => this.dialog.showErrorMessage('Deactivation failed', err),
       complete: () => {
         this.facade.reload();
-        if (this.currentMetadata) {
-          this.mainForm = this.formService.buildMainForm(this.currentMetadata);
-        }
+        this.formBuilder.resetForm(this.mainForm);
       },
     });
   }

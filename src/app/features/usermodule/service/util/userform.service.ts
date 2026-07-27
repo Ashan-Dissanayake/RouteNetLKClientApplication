@@ -69,6 +69,7 @@ export class UserFormService implements OnDestroy {
   }
 
   buildUserRoleManagementForm(metadata: UserLookUpData): FormGroup {
+    console.log(metadata)
     const form = this.formBuilder.build([...USER_ROLE_FORM_META], metadata);
     form.addValidators(Validators.required)
     return form;

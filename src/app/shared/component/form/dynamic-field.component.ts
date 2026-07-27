@@ -134,17 +134,15 @@ import {MatIcon} from '@angular/material/icon';
           <mat-label>{{ field.label || field.name }}</mat-label>
           <mat-date-range-input
             [formGroup]="$any(formInstance.get(field.name))"
-            [rangePicker]="picker">
-
+            [rangePicker]="picker"
+            [max]="field.dateConfig?.maxDate"
+            [min]="field.dateConfig?.minDate">
             <input matStartDate formControlName="start" placeholder="Start date"
                    (dateChange)="onStartDateChange($event, $any(field.dateConfig?.range), field.name)">
             <input matEndDate formControlName="end" placeholder="End date">
-
           </mat-date-range-input>
-
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-date-range-picker #picker></mat-date-range-picker>
-
           <mat-error *ngIf="formInstance.get(field.name)?.invalid">
             This field is required
           </mat-error>
@@ -159,6 +157,7 @@ import {MatIcon} from '@angular/material/icon';
             *ngIf="timePicker"
             matSuffix
             [for]="timePicker">
+
           </mat-timepicker-toggle>
 
           <input
@@ -244,10 +243,9 @@ export class DynamicFieldComponent implements AfterViewInit{
   @Input() formInstance!: FormGroup;
   @Input() field!: FormField;
 
-  endDate: Date | undefined;
   @ViewChild('picker') picker!: MatDatepicker<any>;
 
-  hidePassword = true; // <-- Add this line
+  hidePassword = true;
 
   compareFn(o1: any | null, o2: any | null): boolean {
     if (!o1 || !o2) {
@@ -283,7 +281,7 @@ export class DynamicFieldComponent implements AfterViewInit{
     this.picker?.close();
   }
 
-  currentYear = new Date().getFullYear();
+  // currentYear = new Date().getFullYear();
 
   private bindTimeControl(fieldName: string): void {
     const control = this.formInstance.get(fieldName);

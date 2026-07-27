@@ -1,4 +1,4 @@
-import {Component, ViewChild, inject, computed} from '@angular/core';
+import {Component, ViewChild, inject, computed, OnInit} from '@angular/core';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -63,6 +63,10 @@ export class AppComponent {
   isCollapsed = false;
   isAuthenticated = this.authService.isAuthenticated;
 
+  username = computed(() => {
+    return this.authService.currentUser()?.username ?? '';
+  });
+
   // Redesigned with cleaner, industry-standard enterprise icons
   menuItems: MenuItem[] = [
     { icon: 'space_dashboard',
@@ -88,7 +92,7 @@ export class AppComponent {
       label: 'Depot Operations',
       children: [
         { icon: 'play_circle_filled', label: 'Trip Execution', route: '/trip-execution', permission: 'trip-execution-view' },
-        { icon: 'gpp_maybe', label: 'Incident Logs', route: '/incident-report', permission: 'incident-select' },
+        { icon: 'gpp_maybe', label: 'Incident Logs', route: '/incident-report', permission: 'incident-view' },
         { icon: 'commute', label: 'Vehicle Allocation', route: '/incident-vehicle-allocation', permission: 'incident-vehicle-allocation-view' },
         { icon: 'account_balance_wallet', label: 'Fare Collection', route: '/fare-collection', permission: 'fare-collection-view' },
       ],
@@ -100,7 +104,7 @@ export class AppComponent {
       children: [
         { icon: 'directions_bus', label: 'Fleet Inventory', route: '/vehicle', permission: 'vehicle-view' },
         { icon: 'build_circle', label: 'Vehicle Service Logs', route: '/vehicle-service', permission: 'vehicle-service-view' },
-        { icon: 'settings', label: 'Spare Parts Registry', route: '/part', permission: 'part-select' },
+        { icon: 'settings', label: 'Spare Parts Registry', route: '/part', permission: 'part-view' },
         { icon: 'shopping_cart', label: 'Part Requests', route: '/part-request', permission: 'part-request-view' },
         { icon: 'receipt_long', label: 'Good Receive Notes (GRN)', route: '/grn', permission: 'grn-view' },
       ],
@@ -110,12 +114,13 @@ export class AppComponent {
       icon: 'assessment',
       label: 'Reports',
       children: [
-        { icon: 'space_dashboard', label: 'Report-1', route: '/report-1' },
-        { icon: 'receipt_long', label: 'Report-2', route: '/report-2' },
-        { icon: 'trending_up', label: 'Report-3', route: '/report-3' },
-        { icon: 'history', label: 'Report-4', route: '/report-4' },
-        { icon: 'pie_chart ', label: 'Report-5', route: '/report-5' },
+        { icon: 'space_dashboard', label: 'Fleet Dispatch vs. Breakdown Impact', route: '/report-1',permission: 'report-view'},
+        { icon: 'receipt_long', label: 'Depot Revenue Tally & Auditing Split', route: '/report-2',permission: 'report-view' },
+        { icon: 'trending_up', label: 'Fleet Maintenance Lifecycle Trends', route: '/report-3',permission: 'report-view' },
+        { icon: 'history', label: 'Dynamic Fleet Utilization & Passenger Density', route: '/report-4',permission: 'report-view' },
+        { icon: 'pie_chart ', label: 'Distribution of Route Incidents & Anomalies', route: '/report-5',permission: 'report-view' },
       ],
+      expanded: false
     },
     {
       icon: 'admin_panel_settings',
@@ -204,4 +209,5 @@ export class AppComponent {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
+
 }

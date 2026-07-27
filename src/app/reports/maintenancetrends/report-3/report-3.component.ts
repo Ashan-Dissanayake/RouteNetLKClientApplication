@@ -60,32 +60,83 @@ export class Report3Component implements OnInit, OnDestroy {
     });
   }
 
+  // renderChart(): void {
+  //   if (this.chart) {
+  //     this.chart.destroy();
+  //   }
+  //
+  //   this.chart = new Chart(this.chartCanvas.nativeElement, {
+  //     type: 'line',
+  //     data: {
+  //       labels: this.reportData.weeks, // Dynamic weeks mapped from API
+  //       datasets: [
+  //         {
+  //           label: 'Completed Vehicle Services',
+  //           data: this.reportData.completedServices,
+  //           borderColor: '#115E63', // Operational Teal
+  //           backgroundColor: 'rgba(17, 94, 99, 0.04)',
+  //           pointBackgroundColor: '#115E63',
+  //           tension: 0.2, // Clean curved interpolation lines
+  //           fill: true
+  //         },
+  //         {
+  //           label: 'Pending Maintenance Backlog',
+  //           data: this.reportData.pendingBacklog,
+  //           borderColor: '#DC2626', // Critical Warning Red
+  //           backgroundColor: 'transparent',
+  //           pointBackgroundColor: '#DC2626',
+  //           tension: 0.2
+  //         }
+  //       ]
+  //     },
+  //     options: {
+  //       responsive: true,
+  //       maintainAspectRatio: false,
+  //       plugins: {
+  //         legend: {
+  //           position: 'bottom',
+  //           labels: { boxWidth: 12, font: { size: 12, weight: 500 }, color: '#475569' }
+  //         }
+  //       },
+  //       scales: {
+  //         x: {
+  //           type: 'category',
+  //           grid: { display: false },
+  //           ticks: { color: '#64748B' }
+  //         },
+  //         y: {
+  //           type: 'linear',
+  //           beginAtZero: true,
+  //           title: { display: true, text: 'Vehicle Inspections Count', color: '#475569', font: { weight: 600 } },
+  //           grid: { color: '#E2E8F0' },
+  //           ticks: { color: '#64748B' }
+  //         }
+  //       }
+  //     }
+  //   });
+  // }
+
   renderChart(): void {
     if (this.chart) {
       this.chart.destroy();
     }
 
     this.chart = new Chart(this.chartCanvas.nativeElement, {
-      type: 'line',
+      type: 'bar', // Changed from 'line' to 'bar'
       data: {
         labels: this.reportData.weeks, // Dynamic weeks mapped from API
         datasets: [
           {
             label: 'Completed Vehicle Services',
             data: this.reportData.completedServices,
-            borderColor: '#115E63', // Operational Teal
-            backgroundColor: 'rgba(17, 94, 99, 0.04)',
-            pointBackgroundColor: '#115E63',
-            tension: 0.2, // Clean curved interpolation lines
-            fill: true
+            backgroundColor: '#115E63', // Operational Teal
+            borderRadius: 4, // Rounded bar edges
           },
           {
             label: 'Pending Maintenance Backlog',
             data: this.reportData.pendingBacklog,
-            borderColor: '#DC2626', // Critical Warning Red
-            backgroundColor: 'transparent',
-            pointBackgroundColor: '#DC2626',
-            tension: 0.2
+            backgroundColor: '#DC2626', // Critical Warning Red
+            borderRadius: 4,
           }
         ]
       },
@@ -102,7 +153,8 @@ export class Report3Component implements OnInit, OnDestroy {
           x: {
             type: 'category',
             grid: { display: false },
-            ticks: { color: '#64748B' }
+            ticks: { color: '#64748B' },
+            stacked: false // set true if you want stacked bars
           },
           y: {
             type: 'linear',
