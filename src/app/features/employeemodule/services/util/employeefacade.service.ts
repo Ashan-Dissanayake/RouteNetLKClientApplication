@@ -1,97 +1,44 @@
-import {Injectable, OnDestroy} from '@angular/core';
-import {BehaviorSubject, finalize, Observable, Subject, takeUntil, tap, throwError} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
+import {Injectable} from '@angular/core';
 import {EmployeeService} from '../api/employee.service';
 import {Employee} from '../../entity/employee';
-import {normalizeSearchCriteria} from '../../../../core/search-criteria-normalizer';
 import {EmployeeMetadata, EMPTY_EMPLOYEE_METADATA} from '../../model/employee.metadata.model';
 import {EmployeeMetadataService} from './employee.metadata.service';
+import {BaseFacade} from '../../../../shared/base/base.facade';
 
 @Injectable()
-export class EmployeeFacadeService implements OnDestroy {
+export class EmployeeFacadeService extends BaseFacade<Employee, EmployeeMetadata> {
 
-  // ===== State =====
-  private employeeSubject = new BehaviorSubject<Employee[]>([]);
-  private metadataSubject = new BehaviorSubject<EmployeeMetadata>(EMPTY_EMPLOYEE_METADATA);
-  private loadingSubject  = new BehaviorSubject<boolean>(false);
-  private errorSubject    = new BehaviorSubject<any>(null);
-  private destroy$        = new Subject<void>();
-
-  // ===== Public streams =====
-  readonly employees$ = this.employeeSubject.asObservable();
-  readonly metadata$  = this.metadataSubject.asObservable();
-  readonly loading$   = this.loadingSubject.asObservable();
-  readonly error$     = this.errorSubject.asObservable();
+  // ===== Streams =====
+  readonly employees$ = this.items$;
 
   constructor(
     private employeeService:  EmployeeService,
-    private metadataService:  EmployeeMetadataService,
-  ) {}
-
-  // ===== Lifecycle =====
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    private employeeMetadataService:  EmployeeMetadataService,
+  ) {
+    super(employeeService, employeeMetadataService, EMPTY_EMPLOYEE_METADATA);
   }
 
-  // ===== Initialization =====
-  initialize(): Observable<EmployeeMetadata> {
-    this.setLoading(true);
-    this.clearError();
-
-    return this.metadataService.loadAll().pipe(
-      tap(metadata => this.metadataSubject.next(metadata)),
-      tap(() => this.fetchEmployees()),
-      catchError(err => {
-        this.errorSubject.next(err);
-        return throwError(() => err);
-      }),
-      finalize(() => this.setLoading(false)),
-      takeUntil(this.destroy$),
-    );
-  }
-
-  // ===== Data loading =====
-  reload(): void {
-    this.fetchEmployees();
-  }
-
-  filter(criteria: Record<string, any>): void {
-    const params = normalizeSearchCriteria(criteria);
-    this.fetchEmployees(params);
-  }
-
-  // ===== CRUD =====
-  create(data: Employee): Observable<Employee> {
+  // ===== Domain CRUD validation and custom logic =====
+  protected override validateCreate(data: Employee): string | null {
     const status = (data as any).employeestatus?.name?.toLowerCase();
     if (status !== 'active') {
-      return throwError(() => new Error('Employee must have an active status to be created.'));
+      return 'Employee must have an active status to be created.';
     }
-    return this.employeeService.save(data);
+    return null;
   }
 
-  update(data: Employee): Observable<Employee> {
-    return this.employeeService.update(data);
-  }
-
-  deactivate(employees: Employee[]): Observable<number[]> {
-    if (!employees || employees.length === 0) {
-      return throwError(() => new Error('No employees selected.'));
-    }
-
-    const resignedIds = employees
+  protected override getDeactivationIds(employees: Employee[]): number[] {
+    return employees
       .filter(e => (e.employeestatus?.name ?? '').toLowerCase() === 'resigned')
       .map(e => e.id)
       .filter((id): id is number => id != null);
-
-    if (resignedIds.length === 0) {
-      return throwError(() => new Error('Selected employees cannot be deactivated because none are resigned.'));
-    }
-
-    return this.employeeService.deactivate(resignedIds);
   }
 
-  // ===== Pure computation helpers =====
+  protected override getNoQualifyingDeactivateErrorMessage(): string {
+    return 'Selected employees cannot be deactivated because none are resigned.';
+  }
+
+  // ===== Domain Specific Pure computation helpers =====
   extractGenderFromNIC(nic: string): 'Male' | 'Female' | null {
     if (!nic) return null;
 
@@ -111,24 +58,4 @@ export class EmployeeFacadeService implements OnDestroy {
 
     return null;
   }
-
-  // ===== Internal helpers =====
-  private fetchEmployees(params?: any): void {
-    this.setLoading(true);
-    this.clearError();
-
-    this.employeeService.get(params).pipe(
-      map(res => res.data as Employee[]),
-      tap(data => this.employeeSubject.next(data)),
-      catchError(err => {
-        this.errorSubject.next(err);
-        return throwError(() => err);
-      }),
-      finalize(() => this.setLoading(false)),
-      takeUntil(this.destroy$),
-    ).subscribe();
-  }
-
-  private setLoading(value: boolean): void { this.loadingSubject.next(value); }
-  private clearError(): void               { this.errorSubject.next(null); }
 }

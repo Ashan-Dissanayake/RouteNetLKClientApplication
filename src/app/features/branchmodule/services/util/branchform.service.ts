@@ -58,8 +58,6 @@ export class BranchFormService {
     ).subscribe(code => {
       const email = this.facade.generateEmail(code);
 
-      // emitEvent: false prevents these setValue calls from
-      // triggering valueChanges and causing a second API call
       form.patchValue({ code, email }, { emitEvent: false });
 
       this.lastGeneratedName = nameControl.value;

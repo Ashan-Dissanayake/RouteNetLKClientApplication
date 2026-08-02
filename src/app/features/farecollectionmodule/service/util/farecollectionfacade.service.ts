@@ -1,94 +1,29 @@
-import {Injectable, OnDestroy} from '@angular/core';
-import {BehaviorSubject, finalize, forkJoin, Observable, Subject, takeUntil, tap, throwError} from 'rxjs';
+import {Injectable} from '@angular/core';
 import {FareCollection} from '../../entity/farecollection';
 import {FareCollectionService} from '../api/farecollection.service';
-import {catchError, map} from 'rxjs/operators';
-import {normalizeSearchCriteria} from '../../../../core/search-criteria-normalizer';
 import {EMPTY_FARE_COLLECTION_METADATA, FareCollectionMetadata} from '../../model/farecollection.metadata.model';
 import {FareCollectionMetadataService} from './farecollection.metadata.service';
+import {BaseFacade} from '../../../../shared/base/base.facade';
+import {Observable} from 'rxjs';
 
 @Injectable()
-export class FareCollectionFacadeService implements OnDestroy{
-
-  // ===== State =====
-  private fareCollectionSubject = new BehaviorSubject<FareCollection[]>([]);
-  private metadataSubject = new BehaviorSubject<FareCollectionMetadata>(EMPTY_FARE_COLLECTION_METADATA);
-  private loadingSubject = new BehaviorSubject<boolean>(false);
-  private errorSubject = new BehaviorSubject<any>(null);
-  private destroy$            = new Subject<void>();
-
-  // ===== Public streams =====
-  fareCollections$ = this.fareCollectionSubject.asObservable();
-  metadata$ = this.metadataSubject.asObservable();
-  loading$ = this.loadingSubject.asObservable();
-  error$ = this.errorSubject.asObservable();
+export class FareCollectionFacadeService extends BaseFacade<FareCollection, FareCollectionMetadata> {
 
   constructor(
-    private fareCollectionService:FareCollectionService,
-    private fareCollectionMetaDataService:FareCollectionMetadataService
-  ) {}
-
-  // ===== Life Cycle =====
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  // ===== Initialization =====
-  initialize(): Observable<FareCollectionMetadata> {
-    this.setLoading(true);
-    this.clearError();
-
-    return this.fareCollectionMetaDataService.loadAll().pipe(
-      tap(metadata => this.metadataSubject.next(metadata)),
-      tap(() => this.fetchFareCollections()),
-      catchError(err => {
-        this.errorSubject.next(err);
-        return throwError(() => err);
-      }),
-      finalize(() => this.setLoading(false)),
-      takeUntil(this.destroy$),
+    private fareCollectionService: FareCollectionService,
+    private fareCollectionMetadataService: FareCollectionMetadataService
+  ) {
+    super(
+      fareCollectionService,
+      fareCollectionMetadataService,
+      EMPTY_FARE_COLLECTION_METADATA
     );
   }
 
-  // ===== Data loading =====
-  reload(): void {
-    this.fetchFareCollections();
-  }
+  readonly fareCollections$ = this.items$;
 
-  filter(criteria: Record<string, any>): void {
-    const params = normalizeSearchCriteria(criteria);
-    this.fetchFareCollections(params);
-  }
-
-  // ===== CRUD =====
-  create(data: FareCollection): Observable<FareCollection> {
-    return this.fareCollectionService.save(data);
-  }
-
-  // ===== Status transitions =====
   reconciled(row: FareCollection): Observable<FareCollection> {
     return this.fareCollectionService.reconciled(row.id);
   }
-
-  // ===== Internal helpers =====
-  private fetchFareCollections(params?: any): void {
-    this.setLoading(true);
-    this.clearError();
-
-    this.fareCollectionService.get(params).pipe(
-      map(res => res.data as FareCollection[]),
-      tap(data => this.fareCollectionSubject.next(data)),
-      catchError(err => {
-        this.errorSubject.next(err);
-        return throwError(() => err);
-      }),
-      finalize(() => this.setLoading(false)),
-      takeUntil(this.destroy$),
-    ).subscribe();
-  }
-
-  private setLoading(value: boolean): void { this.loadingSubject.next(value); }
-  private clearError(): void               { this.errorSubject.next(null); }
 
 }

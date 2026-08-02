@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {FormbuilderService} from '../../../core/formbuilder.service';
 import {BranchFacadeService} from '../services/util/branchfacade.service';
@@ -35,6 +35,11 @@ import {BranchMetadataService} from '../services/util/branch.metadata.service';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
 import {NgxPermissionsModule} from 'ngx-permissions';
+import {BaseComponent} from '../../../shared/base/base.component';
+import {Employee} from '../../employeemodule/entity/employee';
+import {EmployeeMetadata} from '../../employeemodule/model/employee.metadata.model';
+import {EmployeeFacadeService} from '../../employeemodule/services/util/employeefacade.service';
+import {EmployeeFormService} from '../../employeemodule/services/util/employeefrom.service';
 
 @Component({
   selector: 'app-branch',
@@ -69,266 +74,37 @@ import {NgxPermissionsModule} from 'ngx-permissions';
     BranchMetadataService,
   ],
 })
-export class BranchComponent implements OnInit, OnDestroy {
+export class BranchComponent extends BaseComponent<Branch, BranchMetadata>  {
 
   // ===== Static config =====
-  protected readonly tableColumns    = BRANCH_TABLE_META;
-  protected readonly filterFormMeta  = BRANCH_FILTER_FORM_META;
-  protected readonly mainFormMeta    = BRANCH_MAIN_FORM_META;
-  protected readonly immutableControllers = BRANCH_IMMUTABLE_CONTROLLERS_META
-  protected readonly exportMeta      = BRANCH_DATA_EXPORT_META;
-  protected readonly actionPanelConfig = buildActionPanel({
+  protected override readonly tableColumns    = BRANCH_TABLE_META;
+  protected override readonly filterFormMeta  = BRANCH_FILTER_FORM_META;
+  protected override readonly mainFormMeta    = BRANCH_MAIN_FORM_META;
+  protected override readonly immutableControllers = BRANCH_IMMUTABLE_CONTROLLERS_META
+  protected override readonly exportMeta      = BRANCH_DATA_EXPORT_META;
+  protected override readonly actionPanelConfig = buildActionPanel({
     permissionMap: {
       create: 'branch-add',
       'bulk-deactivate': 'branch-delete'
     }
   });
 
-  // ===== Streams (pass-through from facade) =====
-  protected readonly branches$: Observable<Branch[]>;
-  protected readonly metadata$:  Observable<BranchMetadata>;
-  protected readonly loading$:   Observable<boolean>;
-  protected readonly error$:     Observable<any>;
+  protected override readonly moduleName = 'Branch';
+  protected override readonly excelFileName = 'branch.xlsx';
 
-  // ===== UI state =====
-  protected activeRow:     Branch | null = null;
-  protected selectedRows   = new Set<Branch>();
-  protected selectedCount  = 0;
-  protected readonly async = async;
+  // ===== Subclass services resolution =====
+  protected override facade = inject(BranchFacadeService);
+  protected override formService = inject(BranchFormService);
 
-  // ===== Forms =====
-  protected filterForm: FormGroup = new FormGroup({});
-  protected mainForm:   FormGroup = new FormGroup({});
+  // ===== Template-accessible streams mapping =====
+  protected readonly branches$ = this.facade.branches$;
+  protected readonly metadata$  = this.facade.metadata$;
+  protected readonly loading$   = this.facade.loading$;
+  protected readonly error$     = this.facade.error$;
 
-  private destroy$ = new Subject<void>();
-
-  constructor(
-    private facade:      BranchFacadeService,
-    private formService: BranchFormService,
-    private formBuilder: FormbuilderService,
-    private dialog:      DialogService,
-  ) {
-    this.branches$ = this.facade.branches$;
-    this.metadata$  = this.facade.metadata$;
-    this.loading$   = this.facade.loading$;
-    this.error$     = this.facade.error$;
-  }
-
-  // ===== Lifecycle =====
-
-  ngOnInit(): void {
-    this.facade.initialize()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        error: err => this.dialog.showErrorMessage('Failed to initialize module.', err),
-      });
-
-    this.facade.metadata$.pipe(
-      takeUntil(this.destroy$),
-    ).subscribe(meta => {
-      this.filterForm = this.formService.buildFilterForm(meta);
-      this.mainForm   = this.formService.buildMainForm(meta);
-      this.watchFilterForm();
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  // ===== Filter =====
-
-  private watchFilterForm(): void {
-    this.filterForm.valueChanges.pipe(
-      debounceTime(300),
-      takeUntil(this.destroy$),
-    ).subscribe(values => this.facade.filter(values));
-  }
-
-  // ===== Row interaction =====
-
-  protected onRowClick(row: Branch): void {
-    this.activeRow = row;
-  }
-
-  protected onCloseDetailView(): void {
-    this.activeRow = null;
-  }
-
-  protected onRowCheckboxChanged(event: CheckboxEvent): void {
-    event.checked ? this.selectedRows.add(event.row) : this.selectedRows.delete(event.row);
-    this.selectedCount = this.selectedRows.size;
-  }
-
-  protected onSelectAll(checked: boolean): void {
-    this.selectedRows.clear();
-    if (checked) {
-      this.branches$.pipe(take(1)).subscribe(
-        rows => rows.forEach(r => this.selectedRows.add(r)),
-      );
-    }
-    this.selectedCount = this.selectedRows.size;
-  }
-
-  // ===== Row actions =====
-
-  protected onRowAction(action: string, row: Branch): void {
-    const actions: Record<string, () => void> = {
-      'edit': () => this.openEditForm(row),
-    };
-    if (actions[action]) actions[action]();
-    else this.dialog.showWarning(`Unknown row action: ${action}`);
-  }
-
-  // ===== Action panel =====
-
-  protected onActionTriggered(event: ButtonClickEvent): void {
-    const handlers: Record<string, () => void> = {
-      'create':          () => this.openCreateForm(),
-      'bulk-deactivate': () => this.deactivateSelected(),
-      'clear-search':    () => this.formBuilder.resetForm(this.filterForm),
-    };
-    if (handlers[event.type]) handlers[event.type]();
-    else this.dialog.showWarning(`No handler for: ${event.type}`);
-  }
-
-  protected onDropdownOnlyClick(event: ButtonClickEvent): void {
-    const handlers: Record<string, () => void> = {
-      'export-pdf':   () => this.toPdf(),
-      'export-excel': () => this.toExcel(),
-    };
-    if (handlers[event.type]) handlers[event.type]();
-    else this.dialog.showWarning(`Unhandled dropdown: ${event.type}`);
-  }
-
-  protected reload(): void {
-    this.facade.reload();
-  }
-
-  // ===== Create =====
-
-  private openCreateForm(): void {
-    this.formBuilder.setControlsState(this.mainForm, this.immutableControllers, false);
-
-    this.dialog.showFormPopup({
-      heading: 'Create Branch',
-      form:    this.mainForm,
-      meta:    this.mainFormMeta,
-      width:   '900px',
-    }).subscribe(formData => {
-      if (formData) this.save(formData);
-      else this.formBuilder.resetForm(this.mainForm);
-    });
-  }
-
-  private save(formData: any): void {
-    this.facade.create(formData).pipe(takeUntil(this.destroy$)).subscribe({
-      next:     () => this.dialog.showSuccess('Branch created successfully.'),
-      error: (err) => this.dialog.showErrorMessage('Failed to create', err),
-      complete: () => {
-        this.facade.reload();
-        this.formBuilder.resetForm(this.mainForm);
-      },
-    });
-  }
-
-  // ===== Edit =====
-  private openEditForm(row: Branch): void {
-    this.formBuilder.setControlsState(this.mainForm, this.immutableControllers, true);
-    this.mainForm.patchValue(row);
-
-    this.dialog.showFormPopup({
-      heading: 'Edit Branch',
-      form:    this.mainForm,
-      meta:    this.mainFormMeta,
-      width:   '900px',
-    }).subscribe(formData => {
-      if (formData) this.update(formData);
-      else this.formBuilder.resetForm(this.mainForm);
-    });
-  }
-
-  private update(formData: any): void {
-    this.facade.update(formData).pipe(takeUntil(this.destroy$)).subscribe({
-      next:     () => this.dialog.showSuccess('Branch updated successfully.'),
-      error: (err) => this.dialog.showErrorMessage('Failed to update', err),
-      complete: () => {
-        this.facade.reload();
-        this.formBuilder.resetForm(this.mainForm);
-      },
-    });
-  }
-
-  // ===== Bulk deactivate =====
-  private deactivateSelected(): void {
-    if (this.selectedRows.size === 0) {
-      this.dialog.showWarning(
-        'Please select at least one branch.'
-      );
-      return;
-    }
-
-    this.dialog.showConfirmation({
-      heading: 'Deactivate Branches',
-      message: 'Are you sure you want to deactivate selected branches?',
-    }).subscribe(confirmed => {
-      if (!confirmed) return;
-
-      const ids = Array.from(this.selectedRows);
-
-      this.facade.deactivate(ids)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: res => {
-            this.dialog.showSuccess(
-              "Branches deactivated successfully."
-            );
-
-            this.selectedRows.clear();
-            this.selectedCount = 0;
-
-            this.facade.reload();
-          },
-          error: err => this.dialog.showErrorMessage('Deactivation failed', err)
-
-        });
-    });
-  }
-
-  // ===== Export =====
-  protected toPdf(): void {
-    if (this.selectedRows.size === 0) {
-      this.dialog.showWarning('Please select at least one record to print.');
-      return;
-    }
-
-    this.dialog.showPrintDialog({
-      width:   '1500px',
-      height:  '650px',
-      title:   'Branch Details',
-      mode:    'table',
-      data:    Array.from(this.selectedRows),
-      columns: this.exportMeta,
-    }).subscribe(result => {
-      if (result) {
-        this.selectedRows.clear();
-        this.selectedCount = 0;
-      }
-    });
-  }
-
-  protected toExcel(): void {
-    if (this.selectedRows.size === 0) {
-      this.dialog.showWarning('Please select at least one record to export.');
-      return;
-    }
-    exportToExcel(Array.from(this.selectedRows), this.exportMeta, 'branch.xlsx');
-  }
-
-  // ===== Template helper =====
-  protected trackByField(_: number, field: any): any {
-    return field.key ?? _;
+  // ===== Overridden hooks =====
+  protected override getDeactivateConfirmationMessage(): string {
+    return 'Only resigned employees will be deactivated. Are you sure?';
   }
 
 }

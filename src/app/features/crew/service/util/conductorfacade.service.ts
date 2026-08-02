@@ -1,87 +1,49 @@
-import {Injectable, OnDestroy} from '@angular/core';
-import {BehaviorSubject, finalize, Observable, Subject, takeUntil, tap, throwError} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
+import {Injectable} from '@angular/core';
 import {ConductorService} from '../api/conductor.service';
 import {Conductor} from '../../entity/conductor';
-import {normalizeSearchCriteria} from '../../../../core/search-criteria-normalizer';
 import {ConductorMapper} from '../../../../shared/mappers/ConductorMapper';
 import {ConductorMetadata, EMPTY_CONDUCTOR_METADATA} from '../../model/conductor.metadata.model';
 import {ConductorMetadataService} from './conductor.metadata.service';
+import {BaseFacade} from '../../../../shared/base/base.facade';
 
 @Injectable()
-export class ConductorFacadeService implements OnDestroy {
+export class ConductorFacadeService extends BaseFacade<Conductor, ConductorMetadata> {
 
-  // ===== State =====
-  private conductorSubject = new BehaviorSubject<Conductor[]>([]);
-  private metadataSubject  = new BehaviorSubject<ConductorMetadata>(EMPTY_CONDUCTOR_METADATA);
-  private loadingSubject   = new BehaviorSubject<boolean>(false);
-  private errorSubject     = new BehaviorSubject<any>(null);
-  private destroy$         = new Subject<void>();
-
-  // ===== Public streams =====
-  readonly conductors$ = this.conductorSubject.asObservable();
-  readonly metadata$   = this.metadataSubject.asObservable();
-  readonly loading$    = this.loadingSubject.asObservable();
-  readonly error$      = this.errorSubject.asObservable();
+  // ===== Streams =====
+  readonly conductors$ = this.items$;
 
   constructor(
     private conductorService: ConductorService,
-    private metadataService:  ConductorMetadataService,
-  ) {}
-
-  // ===== Lifecycle =====
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  // ===== Initialization =====
-
-  initialize(): Observable<ConductorMetadata> {
-    this.setLoading(true);
-    this.clearError();
-
-    return this.metadataService.loadAll().pipe(
-      tap(metadata => this.metadataSubject.next(metadata)),
-      tap(() => this.fetchConductors()),
-      catchError(err => {
-        this.errorSubject.next(err);
-        return throwError(() => err);
-      }),
-      finalize(() => this.setLoading(false)),
-      takeUntil(this.destroy$),
+    private conductorMetadataService: ConductorMetadataService,
+  ) {
+    super(
+      conductorService,
+      conductorMetadataService,
+      EMPTY_CONDUCTOR_METADATA,
     );
   }
 
-  // ===== Data loading =====
 
-  reload(): void {
-    this.fetchConductors();
-  }
-
-  filter(criteria: Record<string, any>): void {
-    const params = normalizeSearchCriteria(criteria);
-    this.fetchConductors(params);
-  }
-
-  // ===== CRUD =====
-
-  /**
-   * Only allows creation when conductor crew status is 'eligible'.
-   * Applies ConductorMapper before sending to the API.
-   */
-  create(data: Conductor): Observable<Conductor> {
+  // ===== Domain CRUD validation =====
+  protected override validateCreate(data: Conductor): string | null {
     const status = data.crewstatus?.name?.toLowerCase();
     if (status !== 'eligible') {
-      return throwError(() => new Error('Conductor must have an eligible status to be created.'));
+      return 'Conductor must have an eligible status to be created.';
     }
-    return this.conductorService.save(ConductorMapper.fromForm(data));
+    return null;
   }
 
-  update(data: Conductor): Observable<Conductor> {
-    return this.conductorService.update(ConductorMapper.fromForm(data));
+
+  // ===== Entity transformation =====
+  protected override beforeCreate(data: Conductor): Conductor {
+    return ConductorMapper.fromForm(data);
   }
+
+
+  protected override beforeUpdate(data: Conductor): Conductor {
+    return ConductorMapper.fromForm(data);
+  }
+
 
   // ===== Snapshot helper =====
 
@@ -90,27 +52,6 @@ export class ConductorFacadeService implements OnDestroy {
    * Used by FormService to derive the employee list for edit mode.
    */
   getConductorsSnapshot(): Conductor[] {
-    return this.conductorSubject.getValue();
+    return this.itemsSubject.getValue();
   }
-
-  // ===== Internal helpers =====
-
-  private fetchConductors(params?: any): void {
-    this.setLoading(true);
-    this.clearError();
-
-    this.conductorService.get(params).pipe(
-      map(res => res.data as Conductor[]),
-      tap(data => this.conductorSubject.next(data)),
-      catchError(err => {
-        this.errorSubject.next(err);
-        return throwError(() => err);
-      }),
-      finalize(() => this.setLoading(false)),
-      takeUntil(this.destroy$),
-    ).subscribe();
-  }
-
-  private setLoading(value: boolean): void { this.loadingSubject.next(value); }
-  private clearError(): void               { this.errorSubject.next(null); }
 }

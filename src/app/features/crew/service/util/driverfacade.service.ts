@@ -9,104 +9,49 @@ import {RegexService} from '../../../../core/regex.service';
 import {DriverMapper} from '../../../../shared/mappers/DriverMapper';
 import {DriverMetadata, EMPTY_DRIVER_METADATA} from '../../model/driver.metadata.model';
 import {DriverMetadataService} from './driver.metadata.service';
+import {BaseFacade} from '../../../../shared/base/base.facade';
 
 @Injectable()
-export class DriverFacadeService implements OnDestroy {
+export class DriverFacadeService
+  extends BaseFacade<Driver, DriverMetadata> {
 
-  // ===== State =====
-  private driverSubject   = new BehaviorSubject<Driver[]>([]);
-  private metadataSubject = new BehaviorSubject<DriverMetadata>(EMPTY_DRIVER_METADATA);
-  private loadingSubject  = new BehaviorSubject<boolean>(false);
-  private errorSubject    = new BehaviorSubject<any>(null);
-  private destroy$        = new Subject<void>();
-
-  // ===== Public streams =====
-  readonly drivers$  = this.driverSubject.asObservable();
-  readonly metadata$ = this.metadataSubject.asObservable();
-  readonly loading$  = this.loadingSubject.asObservable();
-  readonly error$    = this.errorSubject.asObservable();
+  readonly drivers$ = this.items$;
 
   constructor(
-    private driverService:   DriverService,
-    private metadataService: DriverMetadataService,
-    private regexService:    RegexService,
-  ) {}
-
-  // ===== Lifecycle =====
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  // ===== Initialization =====
-  initialize(): Observable<DriverMetadata> {
-    this.setLoading(true);
-    this.clearError();
-
-    return this.metadataService.loadAll().pipe(
-      tap(metadata => this.metadataSubject.next(metadata)),
-      tap(() => this.fetchDrivers()),
-      catchError(err => {
-        this.errorSubject.next(err);
-        return throwError(() => err);
-      }),
-      finalize(() => this.setLoading(false)),
-      takeUntil(this.destroy$),
+    private driverService: DriverService,
+    private driverMetadataService: DriverMetadataService,
+    private regexService: RegexService,
+  ) {
+    super(
+      driverService,
+      driverMetadataService,
+      EMPTY_DRIVER_METADATA,
     );
   }
 
-  // ===== Data loading =====
-  reload(): void {
-    this.fetchDrivers();
-  }
-
-  filter(criteria: Record<string, any>): void {
-    const params = normalizeSearchCriteria(criteria);
-    this.fetchDrivers(params);
-  }
-
-  // ===== CRUD =====
-  create(data: Driver): Observable<Driver> {
+  protected override validateCreate(data: Driver): string | null {
     const status = data.crewstatus?.name?.toLowerCase();
-    if (status !== 'eligible') {
-      return throwError(() => new Error('Driver must have an eligible status to be created.'));
-    }
-    return this.driverService.save(DriverMapper.fromForm(data));
+
+    return status !== 'eligible'
+      ? 'Driver must have an eligible status to be created.'
+      : null;
   }
 
-  update(data: Driver): Observable<Driver> {
-    return this.driverService.update(DriverMapper.fromForm(data));
+  protected override beforeCreate(data: Driver): Driver {
+    return DriverMapper.fromForm(data);
   }
 
-  // ===== Dynamic regex loading =====
+  protected override beforeUpdate(data: Driver): Driver {
+    return DriverMapper.fromForm(data);
+  }
+
   loadStaticRegexes(): Observable<Regex> {
     return this.regexService.getStaticRegexes('drivers').pipe(
       map(res => res.data),
     );
   }
 
-  // ===== Snapshot helper =====
   getDriversSnapshot(): Driver[] {
-    return this.driverSubject.getValue();
+    return this.itemsSubject.getValue();
   }
-
-  // ===== Internal helpers =====
-  private fetchDrivers(params?: any): void {
-    this.setLoading(true);
-    this.clearError();
-
-    this.driverService.get(params).pipe(
-      map(res => res.data as Driver[]),
-      tap(data => this.driverSubject.next(data)),
-      catchError(err => {
-        this.errorSubject.next(err);
-        return throwError(() => err);
-      }),
-      finalize(() => this.setLoading(false)),
-      takeUntil(this.destroy$),
-    ).subscribe();
-  }
-
-  private setLoading(value: boolean): void { this.loadingSubject.next(value); }
-  private clearError(): void               { this.errorSubject.next(null); }
 }
