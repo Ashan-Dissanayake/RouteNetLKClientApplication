@@ -127,19 +127,6 @@ ng version
    ```
    Build artifacts will be stored in the `dist/` directory.
 
-## 🧪 Testing
-
-The client application includes unit and end-to-end testing suites:
-
-- **Unit Testing:** Executed with Karma and Jasmine test runners.
-  ```bash
-  ng test
-  ```
-- **End-to-End (E2E) Testing:** Configured for Cypress testing framework.
-  ```bash
-  npm run cypress:open   # Interactive runner
-  npm run cypress:run    # Headless execution
-  ```
 
 ## 📊 Development Methodology
 
