@@ -56,7 +56,7 @@ The client application is architected using **Angular 19 Standalone Components**
 * **State & Authorization:** `@ngrx/signals`, `ngx-permissions`, `jwt-decode`
 * **Data Visualization:** Chart.js 4.5, ng2-charts 8.0
 * **Export Utilities:** jsPDF 3.0, jsPDF-AutoTable 5.0, SheetJS (xlsx) 0.18, file-saver 2.0
-* **Language & Tooling:** TypeScript 5.7, Angular CLI 19.2.15, Cypress, Karma/Jasmine
+* **Language & Tooling:** TypeScript 5.7, Angular CLI 19.2.15
 
 ### System Requirements
 
