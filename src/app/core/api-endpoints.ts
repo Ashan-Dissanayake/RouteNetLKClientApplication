@@ -135,4 +135,9 @@ export const ApiEndpoints = {
     //dashboard
     DASHBOARD:`${BASE_URL}/dashboard/overview`,
 
+    //NOTIFICATIONS
+    NOTIFICATIONS_STREAM: (userId: number) => `${BASE_URL}/notifications/stream?userId=${userId}`,
+    NOTIFICATIONS_USER: (userId: number) => `${BASE_URL}/notifications/user/${userId}`,
+    NOTIFICATION_MARK_READ: (notificationId: number) => `${BASE_URL}/notifications/${notificationId}/read`,
+
 } as const;

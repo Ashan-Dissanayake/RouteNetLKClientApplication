@@ -1,4 +1,4 @@
-import {Component, ViewChild, inject, computed, OnInit} from '@angular/core';
+import {Component, ViewChild, inject, computed, effect} from '@angular/core';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,6 +10,8 @@ import {NgIf, NgFor} from '@angular/common';
 import {MAT_DATE_FORMATS, MatDateFormats, provideNativeDateAdapter} from "@angular/material/core";
 import {AuthService} from './security/auth.service';
 import {NgxPermissionsModule, NgxPermissionsService} from 'ngx-permissions';
+import {NotificationBellComponent} from './shared/component/notification-bell/notification-bell.component';
+import {NotificationService} from './core/notification.service';
 
 
 interface MenuItem {
@@ -47,7 +49,8 @@ const formats: MatDateFormats = {
     RouterModule,
     NgIf,
     NgFor,
-    NgxPermissionsModule
+    NgxPermissionsModule,
+    NotificationBellComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
@@ -55,6 +58,7 @@ const formats: MatDateFormats = {
 export class AppComponent {
 
   private authService = inject(AuthService);
+  private notificationService = inject(NotificationService);
   private router = inject(Router);
 
 
@@ -155,6 +159,18 @@ export class AppComponent {
         this.menuItems.forEach(item => item.expanded = false);
       }
     });
+
+    effect(() => {
+      if (this.isAuthenticated()) {
+        const userId = this.authService.getUserId();
+        if (userId) {
+          this.notificationService.loadUserNotifications(userId);
+          this.notificationService.connect(userId);
+        }
+      } else {
+        this.notificationService.disconnect();
+      }
+    });
   }
 
   private filterMenuItemsByPermissions(items: MenuItem[]): MenuItem[] {
@@ -206,6 +222,7 @@ export class AppComponent {
   }
 
   logout(): void {
+    this.notificationService.disconnect();
     this.authService.logout();
     this.router.navigate(['/login']);
   }

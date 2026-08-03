@@ -60,6 +60,17 @@ export class AuthService {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
+  getUserId(): number | null {
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      const decoded: any = jwtDecode(token);
+      return decoded.userId ?? decoded.id ?? (decoded.userId ? Number(decoded.userId) : null);
+    } catch {
+      return null;
+    }
+  }
+
   isTokenExpired(): boolean {
     const token = this.getToken();
     if (!token) return true;

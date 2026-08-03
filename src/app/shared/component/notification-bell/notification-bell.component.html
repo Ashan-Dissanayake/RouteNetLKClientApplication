@@ -1,0 +1,54 @@
+<button
+  mat-icon-button
+  [matMenuTriggerFor]="notifMenu"
+  aria-label="Notifications"
+  class="notification-bell-btn"
+>
+  <mat-icon
+    [matBadge]="unreadCount()"
+    [matBadgeHidden]="unreadCount() === 0"
+    matBadgeColor="warn"
+    matBadgeSize="small"
+  >
+    notifications
+  </mat-icon>
+</button>
+
+<mat-menu #notifMenu="matMenu" class="notification-dropdown-menu" xPosition="before">
+  <div class="notif-header" (click)="$event.stopPropagation()">
+    <span class="notif-title">Notifications</span>
+    <span class="notif-badge" *ngIf="unreadCount() > 0">{{ unreadCount() }} New</span>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="notif-body" (click)="$event.stopPropagation()">
+    <div *ngIf="notifications().length === 0" class="no-notifications">
+      <mat-icon class="empty-icon">notifications_off</mat-icon>
+      <p>No notifications available</p>
+    </div>
+
+    <div
+      *ngFor="let notif of notifications()"
+      class="notif-item"
+      [class.unread]="!notif.isread"
+      (click)="onNotificationClick(notif)"
+    >
+      <div class="notif-icon-wrapper">
+        <mat-icon [class.unread-icon]="!notif.isread">
+          {{ notif.isread ? 'drafts' : 'mark_email_unread' }}
+        </mat-icon>
+      </div>
+
+      <div class="notif-content">
+        <div class="notif-item-header">
+          <span class="item-title">{{ notif.title }}</span>
+          <span class="item-time">{{ notif.tocreated | date: 'shortTime' }}</span>
+        </div>
+        <p class="item-message">{{ notif.message }}</p>
+      </div>
+
+      <div class="unread-dot" *ngIf="!notif.isread"></div>
+    </div>
+  </div>
+</mat-menu>
