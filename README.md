@@ -1,508 +1,597 @@
-# RouteNetLK Server Application
+# RouteNetLK Client Application
 
-**Backend application for RouteNetLK — a fleet, operations, and service delivery management system designed around depot-level public transport workflows.**
+**Frontend application for RouteNetLK — a Fleet, Operations, and Service Delivery Management System designed for depot-level public transport operations.**
 
-Built with **Java 17 and Spring Boot 3**, the backend provides RESTful APIs for vehicle and employee management, permit and route operations, trip scheduling and execution, crew rostering, incident handling, maintenance, inventory, fare collection, reporting, and system administration.
+Built with **Angular 19 and TypeScript**, the RouteNetLK Client Application provides a modular web interface for managing fleet operations, employees, crew, permits, trips, incidents, maintenance, inventory, fare collection, reporting, and system administration.
 
-The project focuses on implementing **complex business workflows, domain-specific validation, lifecycle state management, role-based security, relational data integrity, automated testing, and constraint-based operational optimization**.
-
----
-
-## 🎯 Project Objectives
-
-* Model and automate depot-level fleet and operational workflows.
-* Implement domain-specific business rules and validation across operational modules.
-* Provide secure REST APIs with authentication and role/privilege-based authorization.
-* Maintain relational data integrity using MySQL, JPA, and Hibernate.
-* Automate crew rostering and resource allocation using constraint-based optimization.
-* Support reliable application behavior through unit and integration testing.
-* Maintain a modular backend structure that separates shared infrastructure from domain-specific functionality.
+The application follows a **feature-oriented frontend architecture** with reusable shared components, centralized application infrastructure, reactive state management, role and privilege-based access control, REST API integration, operational dashboards, and reporting capabilities.
 
 ---
 
-## 🚀 Key Features
+# 🎯 Project Objectives
 
-### Planning & Scheduling
-
-* Employee and crew management
-* Driver and conductor profile management
-* License and validity validation
-* Permit registration and route assignment
-* Trip scheduling and operational planning
-* Automated crew rostering using Timefold Solver
-
-### Depot Operations
-
-* Trip execution and dispatch management
-* Trip lifecycle and state transition handling
-* Incident and breakdown management
-* Alternative vehicle allocation
-* Operational workflow validation
-
-### Fleet & Maintenance
-
-* Vehicle registration and lifecycle management
-* Vehicle availability and status tracking
-* Fitness and compliance information
-* Preventive maintenance records
-* Vehicle service and repair history
-
-### Inventory & Spare Parts
-
-* Spare part catalogue management
-* Inventory adjustments
-* Internal spare part requests
-* Goods Received Note (GRN) workflows
-* Inventory transaction management
-
-### Fare Collection & Reporting
-
-* Daily fare collection management
-* Multi-source revenue aggregation
-* Dispatch summaries
-* Revenue analysis
-* Fleet utilization reporting
-* Maintenance and incident reporting
-
-### Security & Administration
-
-* Stateless JWT-based authentication
-* Role and privilege-based authorization
-* User and privilege management
-* Branch/depot configuration
-* Automated email notifications
-* Centralized exception handling
+- Provide a modular and responsive web interface for depot-level operations.
+- Organize frontend functionality around business features.
+- Integrate with the RouteNetLK Spring Boot REST API.
+- Implement authentication and privilege-based authorization.
+- Provide reusable UI components and form-building mechanisms.
+- Manage reactive application state across operational workflows.
+- Provide operational dashboards and analytical reports.
+- Support PDF and Excel document generation.
+- Maintain a scalable and maintainable Angular application structure.
 
 ---
 
-# 🏗️ Architecture
+# 🚀 Key Features
 
-The backend follows a **modular layered architecture**. Domain modules are organized independently while shared infrastructure provides common functionality used across the application.
+## Planning & Scheduling
 
-At the application level, the architecture can be represented as:
+- Employee and crew management
+- Driver and conductor management
+- Permit management
+- Trip scheduling
+- Crew roster management
+- Operational planning interfaces
+
+## Depot Operations
+
+- Trip execution and dispatch monitoring
+- Trip lifecycle management
+- Incident and breakdown management
+- Alternative vehicle allocation
+- Operational workflow management
+
+## Fleet & Maintenance
+
+- Vehicle registration
+- Vehicle lifecycle management
+- Vehicle availability and status tracking
+- Vehicle service records
+- Preventive maintenance management
+
+## Inventory & Spare Parts
+
+- Spare part catalogue management
+- Inventory management
+- Spare part request workflows
+- Goods Received Note (GRN) processing
+- Inventory transaction management
+
+## Fare Collection & Reporting
+
+- Fare collection management
+- Revenue tracking
+- Operational dashboards
+- Dispatch summaries
+- Fleet performance reports
+- Maintenance trend reports
+- Incident summary reports
+- Revenue by payment method reports
+
+## System Administration
+
+- User management
+- Role and privilege management
+- Branch/depot configuration
+- Authentication and authorization
+
+---
+
+# 🏗️ Frontend Architecture
+
+The application follows a **feature-oriented Angular architecture**.
+
+Business functionality is separated into individual feature areas under `features/`, while application-wide infrastructure is separated into `core/`, `security/`, `dashboard/`, `reports/`, and `shared/`.
+
+The architecture is designed to keep business-specific functionality close to the feature it belongs to while allowing commonly used UI components, models, mappers, and utilities to be reused across the application.
+
+---
+
+# 📦 Project Structure
+
+The high-level application structure is:
 
 ```text
-┌──────────────────────────────────────────────────────────────┐
-│                         REST API Layer                       │
-│                         Controllers                          │
-└──────────────────────────────┬───────────────────────────────┘
-                               │
-                               ▼
-┌──────────────────────────────────────────────────────────────┐
-│                       Application Layer                      │
-│                           Services                           │
-└──────────────────────────────┬───────────────────────────────┘
-                               │
-                ┌──────────────┴──────────────┐
-                ▼                             ▼
-┌───────────────────────────┐   ┌──────────────────────────────┐
-│     Domain Modules        │   │     Cross-Cutting Services   │
-│                           │   │                              │
-│ Branch                    │   │ Security                     │
-│ Employee                  │   │ Auditing                     │
-│ Vehicle                   │   │ Notifications                │
-│ Permit                    │   │ Email                        │
-│ Route                     │   │ Exception Handling            │
-│ Trip                      │   │ Transactions                  │
-│ Crew                      │   │ Number Generation             │
-│ Maintenance               │   │ Configuration                 │
-│ Inventory                 │   │ Shared API Components          │
-│ Fare Collection           │   │ Base Domain Components         │
-│ Incident                  │   │                              │
-│ ...                       │   │                              │
-└──────────────┬────────────┘   └──────────────┬───────────────┘
-               │                               │
-               └──────────────┬────────────────┘
-                              ▼
-                 ┌────────────────────────┐
-                 │     Repository Layer   │
-                 │   Spring Data JPA      │
-                 └────────────┬───────────┘
-                              │
-                              ▼
-                       ┌─────────────┐
-                       │    MySQL    │
-                       └─────────────┘
-```
+src/
+└── app/
+    │
+    ├── core/
+    │
+    ├── dashboard/
+    │   └── dashboard/
+    │
+    ├── features/
+    │   ├── branchmodule/
+    │   ├── crew/
+    │   ├── employeemodule/
+    │   ├── farecollectionmodule/
+    │   ├── grnmodule/
+    │   ├── incidentreportmodule/
+    │   ├── incidentvehicleallocationmodule/
+    │   ├── login/
+    │   ├── partrequestmodule/
+    │   ├── permitmodule/
+    │   ├── privilegemodule/
+    │   ├── rostermodule/
+    │   ├── sparepartmodule/
+    │   ├── tripexecution/
+    │   ├── tripmodule/
+    │   ├── usermodule/
+    │   ├── vehiclemodule/
+    │   └── vehicleservicemodule/
+    │
+    ├── reports/
+    │   ├── dispatchsummary/
+    │   ├── fleetperformance/
+    │   ├── incidentsummary/
+    │   ├── maintenancetrends/
+    │   ├── revenuebypaymethods/
+    │   └── service/
+    │
+    ├── security/
+    │
+    └── shared/
+        ├── base/
+        ├── component/
+        ├── mappers/
+        └── models/
+````
 
 ---
 
-## 📦 Project Structure
+# 🧩 Feature-Oriented Organization
 
-The source code is organized around business modules rather than placing all classes into a single global package structure.
+Each major business area is maintained as an independent feature under `features/`.
+
+For example:
 
 ```text
-src/main/java/
-│
-├── module/
-│   │
-│   ├── branch/
-│   │   ├── controller/
-│   │   ├── service/
-│   │   ├── repository/
-│   │   ├── model/
-│   │   │   ├── entity/
-│   │   │   └── dto/
-│   │   └── ...
-│   │
-│   ├── employee/
-│   │   ├── controller/
-│   │   ├── service/
-│   │   ├── repository/
-│   │   ├── model/
-│   │   │   ├── entity/
-│   │   │   └── dto/
-│   │   └── ...
-│   │
-│   ├── vehicle/
-│   │   ├── controller/
-│   │   ├── service/
-│   │   ├── repository/
-│   │   ├── model/
-│   │   │   ├── entity/
-│   │   │   └── dto/
-│   │   ├── validation/
-│   │   └── state/
-│   │
-│   ├── permit/
-│   ├── route/
-│   │
-│   ├── trip/
-│   │   ├── controller/
-│   │   ├── service/
-│   │   ├── repository/
-│   │   ├── model/
-│   │   │   ├── entity/
-│   │   │   └── dto/
-│   │   ├── validation/
-│   │   ├── state/
-│   │   └── event/
-│   │
-│   ├── crew/
-│   │   ├── controller/
-│   │   ├── service/
-│   │   ├── repository/
-│   │   ├── model/
-│   │   │   ├── entity/
-│   │   │   └── dto/
-│   │   └── ...
-│   │
-│   ├── maintenance/
-│   ├── inventory/
-│   ├── incident/
-│   └── ...
-│
-├── dashboard/
-│
-├── report/
-│
-├── security/
-│
-└── shared/
-    ├── api/
-    ├── auditing/
-    ├── config/
-    ├── email/
-    ├── exception/
-    ├── notification/
+features/
+└── vehiclemodule/
+    │
+    ├── entity/
     ├── model/
-    ├── numbergeneration/
-    └── transaction/
+    ├── service/
+    │   ├── api/
+    │   └── util/
+    │
+    └── vehicle/
 ```
 
-The exact module set evolves with the application, while the overall structure separates **domain-specific functionality from shared application infrastructure**.
-Not every module contains every component. Validation, state, planning, and event components are introduced only where the corresponding domain requires them.
+A feature generally contains its own:
+
+* UI components
+* Entity representations
+* DTO/model definitions
+* API services
+* Feature-specific utilities
+
+This structure keeps feature-specific implementation separated from other business areas.
+
+The same architectural approach is used across modules such as:
+
+* Branch
+* Employee
+* Crew
+* Vehicle
+* Permit
+* Trip
+* Trip Execution
+* Roster
+* Incident Management
+* Fare Collection
+* Vehicle Service
+* Spare Parts
+* Part Requests
+* GRN
+* User Management
+* Privilege Management
 
 ---
 
-# 🧠 Engineering Highlights
+# 🔄 Facade-Based Application Flow
 
-## 1. Modular Domain Organization
+Feature components communicate with application state and API services through facade-style service abstractions.
 
-Business functionality is grouped into domain modules such as Branch, Employee, Vehicle, Permit, Route, Trip, Crew, Maintenance, Inventory, and Incident.
-
-Each major module maintains its own application components such as:
+A simplified flow is:
 
 ```text
-Module
-├── Controller
-├── Service
-├── Repository
-└── Model
-    ├── Entity
-    └── DTO
+Component
+    │
+    ▼
+Facade / Feature Service
+    │
+    ├───────────────┐
+    ▼               ▼
+Application State   API Service
+                        │
+                        ▼
+                 Spring Boot REST API
 ```
 
-This reduces coupling between unrelated business domains and makes individual modules easier to maintain and evolve.Additional components are introduced according to domain requirements.
+This approach reduces the amount of API communication and state-management logic placed directly inside UI components.
+
+It also provides a consistent abstraction for operations such as:
+
+* Loading data
+* Creating records
+* Updating records
+* Deleting records
+* Managing loading states
+* Managing errors
+* Updating feature state
 
 ---
 
-## 2. Layered Application Architecture
+# 🔄 Reactive State Management
 
-The backend separates responsibilities across application layers:
+The application uses **Angular Signals** and **@ngrx/signals** for reactive state management in selected application workflows.
 
-```text
-Controller
-    ↓
-Service
-    ↓
-Repository
-    ↓
-Database
-```
+State can represent:
 
-### Controller
+* Current feature data
+* Loading status
+* Error status
+* Selected entities
+* Metadata
+* Workflow state
+* UI-related state
 
-Responsible for:
-
-* HTTP request handling
-* Request validation
-* API response handling
-* Mapping requests into application operations
-
-### Service
-
-Responsible for:
-
-* Business logic
-* Workflow orchestration
-* Transaction boundaries
-* Coordination between domain components
-
-### Repository
-
-Responsible for:
-
-* Persistence operations
-* Database queries
-* Entity retrieval and storage
-
-### Model
-
-Contains persistence entities and DTOs used to represent domain data and API contracts.
+Signals allow UI components to react automatically when the underlying application state changes.
 
 ---
 
-## 3. Strategy Pattern for Business Validation
+# 📝 Metadata-Driven Forms
 
-Business validation rules are separated into dedicated strategy implementations under the validation layer.
-
-Instead of concentrating multiple business rules inside large service methods, individual strategies can encapsulate specific validation responsibilities.
+The application includes reusable form-building mechanisms that use structured field metadata to dynamically construct form controls and their associated configurations.
 
 Conceptually:
 
 ```text
-                 ┌──────────────────────┐
-                 │ Validation Context   │
-                 └──────────┬───────────┘
-                            │
-             ┌──────────────┼──────────────┐
-             ▼              ▼              ▼
-       Strategy A      Strategy B      Strategy C
-       Uniqueness      Create Rule     Domain Rule
+Field Metadata
+      │
+      ▼
+Form Builder
+      │
+      ▼
+Reactive Form
+      │
+      ▼
+Reusable Form Components
 ```
 
-This approach supports:
+This approach reduces repetitive form configuration across modules and allows common form behavior to be implemented through reusable infrastructure.
 
-* Single-responsibility validation components
-* Easier testing of individual rules
-* Reduced conditional complexity
-* Extensibility when new business rules are introduced
+The form system supports concerns such as:
 
----
-
-## 4. State Pattern for Lifecycle Management
-
-State-based business behavior is isolated through the State pattern for workflows where operations depend on the current lifecycle state.
-
-This allows state-specific behavior and transition rules to remain separated from general service orchestration.
-
-The approach helps prevent invalid state transitions and keeps lifecycle rules explicit within the domain model.
+* Dynamic form control creation
+* Field metadata
+* Validation configuration
+* Select/options data
+* Reusable form components
+* Form popup workflows
 
 ---
 
-## 5. Constraint-Based Planning with Timefold
+# 🔐 Authentication & Authorization
 
-The system uses **Timefold Solver** for selected operational planning problems, particularly crew rostering and resource allocation.
+The client integrates with the Spring Boot backend security layer using **JWT-based authentication**.
 
-The planning model separates:
+The frontend security flow can be represented as:
 
-* Planning variables
-* Hard constraints
-* Soft constraints
-* Constraint scoring
-* Optimization
+```text
+Login
+  │
+  ▼
+JWT Token
+  │
+  ▼
+Authentication State
+  │
+  ├──────────────────┐
+  ▼                  ▼
+HTTP Interceptor    Route Guards
+  │                  │
+  ▼                  ▼
+Bearer Token       Permission Check
+  │                  │
+  └────────┬─────────┘
+           ▼
+      Protected API / Route
+```
 
-This allows complex scheduling requirements to be expressed as a constraint optimization problem rather than relying entirely on manually coded scheduling logic.
+## HTTP Interceptor
 
----
+The authentication interceptor attaches the JWT Bearer token to authenticated HTTP requests.
 
-## 6. Event-Driven Components
+## Route Guards
 
-Selected workflows use application events to decouple actions that should occur as a consequence of another business operation.
+Route guards protect application routes based on authentication and authorization requirements.
 
-For example, an operation can publish an application event while a dedicated listener handles the resulting workflow without tightly coupling the original service to every downstream action.
+## Privilege Management
 
-This approach is applied selectively rather than as a system-wide event-driven architecture.
+The application uses user role and privilege information to control access to modules and operations.
 
----
-
-## 7. Security Architecture
-
-The backend uses **Spring Security** with stateless JWT-based authentication.
-
-The security layer provides:
-
-* JWT authentication
-* Bearer token processing
-* Role-based authorization
-* Privilege-based access control
-* Protected REST endpoints
-* Stateless session management
-
-Authorization is designed around application roles and granular privileges so that access to operational modules can be controlled according to the responsibilities of different users.
-
----
-
-## 8. DTO-Based API Contracts
-
-API requests and responses are represented using DTOs rather than exposing persistence entities directly.
-
-**MapStruct** is used for object mapping between DTOs and entities.
-
-This provides:
-
-* Separation between persistence and API models
-* Explicit API contracts
-* Reduced coupling between database entities and clients
-* Compile-time generated mapping code
+This allows different operational users to access only the functionality relevant to their responsibilities.
 
 ---
 
-## 9. Relational Persistence
+# 📊 Dashboard
 
-The application uses **MySQL** with **Spring Data JPA / Hibernate**.
+The `dashboard/` area provides the main operational dashboard functionality.
 
-The database design focuses on:
+The dashboard is designed to provide an overview of important operational information and system metrics.
 
-* Normalized relational structures
-* Entity relationships
-* Referential integrity
-* Domain-specific constraints
-* Transactional consistency
-* Indexed queries where appropriate
+It acts as the primary entry point for users after authentication.
 
 ---
 
-## 10. Shared Application Infrastructure
+# 📈 Reporting Architecture
 
-Common functionality is isolated under the shared layer to avoid duplicating cross-cutting concerns across individual modules.
+Reporting functionality is maintained separately under the `reports/` area rather than coupling reports directly to individual business modules.
 
-Shared components include:
+Current report areas include:
+
+```text
+reports/
+│
+├── dispatchsummary/
+├── fleetperformance/
+├── incidentsummary/
+├── maintenancetrends/
+├── revenuebypaymethods/
+└── service/
+```
+
+The reporting functionality supports operational analytics such as:
+
+* Dispatch summaries
+* Fleet performance
+* Incident summaries
+* Maintenance trends
+* Revenue by payment method
+
+---
+
+# 🧱 Shared Component Library
+
+The `shared/` area contains reusable UI components and common frontend abstractions used across multiple feature areas.
 
 ```text
 shared/
-├── api/
-├── auditing/
-├── config/
-├── email/
-├── exception/
-├── notification/
-├── model/
-├── numbergeneration/
-└── transaction/
+│
+├── base/
+│
+├── component/
+│   ├── button/
+│   │   └── button-panel/
+│   │
+│   ├── confirm/
+│   ├── data-table/
+│   ├── dual-list-box/
+│   │
+│   ├── export/
+│   │   └── print/
+│   │
+│   ├── file-picker/
+│   │
+│   ├── form/
+│   │   └── formpopup/
+│   │
+│   ├── innertable/
+│   ├── message/
+│   ├── notification-bell/
+│   ├── side-view/
+│   └── stats-grid/
+│
+├── mappers/
+│
+└── models/
 ```
 
-Examples include:
+The shared component layer provides reusable functionality for:
 
-* Centralized exception handling
-* API response structures
-* Audit aware support
-* Application configuration
-* Email services
-* Notification services
-* Base entity functionality
-* Business identifier/number generation
-* Transaction-related infrastructure
+* Data tables
+* Dynamic forms
+* Confirmation dialogs
+* Button panels
+* File selection
+* PDF/print exports
+* Notifications
+* Side views
+* Statistics grids
+* Nested tables
+* Common messages
+
+This reduces UI duplication across individual business features.
+
+---
+
+# 🎨 UI Architecture
+
+The application uses **Angular Material** together with custom SCSS styling.
+
+Reusable UI components are used throughout the application to maintain consistent behavior and presentation across different modules.
+
+Common reusable UI concerns include:
+
+* Forms
+* Tables
+* Dialogs
+* Notifications
+* Buttons
+* File pickers
+* Export functionality
+* Statistics cards
+* Nested data tables
+* Side panels/views
+
+---
+
+# 🔌 Backend Integration
+
+The client communicates with the RouteNetLK Spring Boot backend through REST APIs.
+
+The overall system communication is:
+
+```text
+┌─────────────────────┐
+│   Angular Client    │
+│                     │
+│ Components          │
+│ Facades             │
+│ Feature Services    │
+└──────────┬──────────┘
+           │
+           │ HTTP / JSON
+           ▼
+┌─────────────────────┐
+│ Spring Boot Backend │
+│                     │
+│ REST Controllers    │
+│ Services            │
+│ Validation          │
+│ State / Events      │
+│ Persistence         │
+└──────────┬──────────┘
+           │
+           ▼
+      ┌──────────┐
+      │  MySQL   │
+      └──────────┘
+```
+
+The frontend is responsible for:
+
+* HTTP communication
+* Request construction
+* JWT authentication headers
+* Response handling
+* UI state management
+* Form interaction
+* User-facing validation and feedback
+* Document/report generation
+
+The backend remains responsible for core business rules, persistence, security enforcement, and domain-level validation.
+
+---
+
+# 📄 Document & Report Generation
+
+The application supports client-side document generation.
+
+## PDF Generation
+
+Implemented using:
+
+* jsPDF
+* jsPDF-AutoTable
+
+Used for generating structured operational reports and printable documents.
+
+## Excel Generation
+
+Implemented using:
+
+* SheetJS (`xlsx`)
+* file-saver
+
+Used to export operational data into spreadsheet-compatible formats.
+
+---
+
+# 📊 Data Visualization
+
+The dashboard and reporting interfaces use:
+
+* Chart.js
+* ng2-charts
+
+These are used to visualize operational information such as:
+
+* Fleet performance
+* Revenue
+* Maintenance trends
+* Incident statistics
+* Dispatch information
 
 ---
 
 # 🛠️ Technology Stack
 
-### Backend
+## Frontend
 
-* Java 17
-* Spring Boot 3
-* Spring MVC
-* Spring Security
-* Spring Data JPA
-* Hibernate
-* MapStruct
-* Lombok
-* Maven
+* Angular 19
+* TypeScript
+* RxJS
+* Angular Signals
+* @ngrx/signals
+* Angular Material
+* SCSS
 
-### Database
+## Architecture & Design
 
-* MySQL 8
-* SQL
-* Relational Database Design
+* Standalone Components
+* Feature-Oriented Architecture
+* Lazy Loading
+* Reactive Forms
+* Facade Pattern
+* Metadata-Driven Form Architecture
+* Component-Based Architecture
 
-### Security
+## Authentication & Authorization
 
-* Spring Security
 * JWT
-* Role-Based Access Control
-* Privilege-Based Authorization
+* HTTP Interceptors
+* Route Guards
+* ngx-permissions
+* jwt-decode
 
-### Optimization
+## Data Visualization
 
-* Timefold Solver
+* Chart.js
+* ng2-charts
 
-### Communication & Notifications
+## Document Generation
 
-* REST APIs
-* Java Mail
-* Thymeleaf
+* jsPDF
+* jsPDF-AutoTable
+* SheetJS (`xlsx`)
+* file-saver
 
-### Testing
+## Development Tools
 
-* JUnit 5
-* Spring Security Test
-* Testcontainers
-* MySQL Testcontainers
-* Postman
-
-### Development Tools
-
+* Angular CLI
+* npm
 * Git
 * GitHub
-* Docker
 
 ---
 
 # 📋 System Scope
 
-## Included
+## Included Features
 
-* Fleet and vehicle management
-* Employee and crew management
-* Permit and route management
-* Trip planning and execution
-* Crew rostering
-* Incident and breakdown management
-* Vehicle maintenance
-* Spare parts and inventory
-* Goods Received Note workflows
-* Fare collection
-* Operational reporting
-* User and privilege management
-* Branch/depot configuration
-* Notifications and email communication
-
-## Out of Scope
-
-* Live GPS tracking and hardware-integrated vehicle positioning
-* Legal accident and insurance claim processing
+* Dashboard
+* Branch Management
+* Employee Management
+* Vehicle Management
+* Permit Management
+* Trip Management
+* Trip Execution
+* Crew Management
+* Roster Management
+* Incident Management
+* Incident Vehicle Allocation
+* Fare Collection
+* Vehicle Service Management
+* Spare Part Management
+* Part Request Management
+* GRN Management
+* User Management
+* Privilege Management
+* Operational Reports
+* PDF and Excel Exports
 
 ---
 
@@ -513,165 +602,145 @@ Examples include:
 Ensure the following are installed:
 
 ```bash
-java -version
-mvn -v
-mysql --version
+node -v
+npm -v
+ng version
 ```
 
-Required:
+Recommended environment:
 
-* JDK 17
-* Maven
-* MySQL 8.x
+* Node.js 20 LTS or higher
+* npm 10.x
+* Angular CLI 19.x
 
 ---
 
-## 1. Clone the Repository
+# 1. Clone the Repository
 
 ```bash
-git clone https://github.com/Ashan-Dissanayake/RouteNetLKServerApplication.git
+git clone https://github.com/Ashan-Dissanayake/RouteNetLKClientApplication.git
 
-cd RouteNetLKServerApplication
+cd RouteNetLKClientApplication
 ```
 
 ---
 
-## 2. Configure MySQL
+# 2. Install Dependencies
 
-Create the application database:
-
-```sql
-CREATE DATABASE routenetlk;
+```bash
+npm install
 ```
 
-Configure the database connection in the application's configuration file.
+---
+
+# 3. Configure Backend URL
+
+Configure the backend API endpoint according to the application's environment configuration.
 
 Example:
 
-```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/routenetlk?createDatabaseIfNotExist=true&useSSL=false
-spring.datasource.username=your_mysql_user
-spring.datasource.password=your_mysql_password
-
-spring.jpa.hibernate.ddl-auto=update
+```typescript
+export const environment = {
+  apiUrl: 'http://localhost:8080'
+};
 ```
+
+Make sure the RouteNetLK Spring Boot backend is running before using API-dependent features.
 
 ---
 
-## 3. Build the Application
-
-Using the Maven wrapper:
+# 4. Run Development Server
 
 ```bash
-./mvnw clean install
+ng serve
 ```
 
-On Windows:
-
-```bash
-mvnw.cmd clean install
-```
-
----
-
-## 4. Run the Application
-
-```bash
-./mvnw spring-boot:run
-```
-
-On Windows:
-
-```bash
-mvnw.cmd spring-boot:run
-```
-
-The application starts on:
+The application will be available at:
 
 ```text
-http://localhost:8080
+http://localhost:4200/
 ```
 
 ---
 
-## 5. Client Application
+# 5. Build for Production
 
-The Angular frontend is maintained in a separate repository:
-
-**RouteNetLK Client Application**
-
-```text
-https://github.com/Ashan-Dissanayake/RouteNetLKClientApplication
+```bash
+ng build
 ```
+
+The production build artifacts will be generated under the `dist/` directory.
 
 ---
 
 # 🧪 Testing
 
-The backend contains unit, integration, security, and API-level testing.
+The frontend can be tested across multiple levels depending on the feature being verified.
 
-### Unit Testing
+Testing areas include:
 
-JUnit 5 is used to verify individual components and business rules.
+* Component behavior
+* Reactive form behavior
+* Form validation
+* Service behavior
+* Authentication and authorization flows
+* API integration
+* User workflows
 
-```bash
-./mvnw test
-```
-
-### Integration Testing
-
-Database-dependent integration tests use **Testcontainers** to execute against isolated MySQL containers.
-
-This allows persistence and application behavior to be tested against a real MySQL database environment.
-
-### Security Testing
-
-Spring Security Test utilities are used to verify authentication and authorization behavior.
-
-### API Testing
-
-REST endpoints are manually and systematically validated using Postman collections.
+The application can also be validated against the running Spring Boot backend for end-to-end workflow verification.
 
 ---
 
-# 📊 Development Approach
+# 📊 Development Methodology
 
-The system was developed using an iterative and incremental approach.
+The project follows an **Iterative Incremental Development** approach.
 
-### 1. Requirements & Domain Analysis
+## 1. Requirements & Workflow Analysis
 
-* Identify operational workflows
-* Analyse domain entities and relationships
-* Define business rules and constraints
+* Analyse operational workflows
+* Identify user roles and privileges
+* Define feature requirements
+* Map frontend workflows to backend APIs
 
-### 2. Architecture & Database Design
+## 2. UI & Component Design
 
-* Design modular application structure
-* Define relational database model
-* Establish entity relationships
-* Define DTO and API contracts
+* Design reusable UI components
+* Define feature interfaces
+* Implement Angular Material components
+* Establish reusable form structures
 
-### 3. Feature Development
+## 3. Feature Development
 
-* Implement domain modules
-* Develop REST APIs
-* Implement business rules
-* Integrate security and persistence
+* Implement feature components
+* Integrate REST APIs
+* Implement reactive forms
+* Implement state and facade services
+* Implement authentication and authorization
 
-### 4. Optimization & Workflow Automation
+## 4. Reporting & Optimization
 
-* Model selected scheduling problems
-* Define hard and soft constraints
-* Integrate Timefold Solver
-* Implement state-based workflows
+* Implement operational dashboards
+* Add data visualization
+* Implement PDF and Excel exports
+* Apply modular and reusable frontend architecture
 
-### 5. Testing & Refinement
+## 5. Testing & Refinement
 
-* Unit testing
-* Integration testing
-* Security testing
-* API testing
-* Business-rule validation
+* Component testing
+* Service testing
+* Form validation testing
+* API integration testing
+* Workflow validation
+
+---
+
+# 🔗 Related Repository
+
+## RouteNetLK Server Application
+
+The Spring Boot backend responsible for REST APIs, business logic, validation, security, persistence, workflow processing, and operational services.
+
+[https://github.com/Ashan-Dissanayake/RouteNetLKServerApplication](https://github.com/Ashan-Dissanayake/RouteNetLKServerApplication)
 
 ---
 
@@ -679,53 +748,47 @@ The system was developed using an iterative and incremental approach.
 
 RouteNetLK was developed as the final-year software development project for the **Bachelor of Information Technology at the University of Colombo School of Computing (UCSC)**.
 
-The project was designed to explore the engineering challenges involved in developing a modular, workflow-oriented enterprise application for fleet and public transport operations.
+The project explores the design and implementation of a modular, workflow-oriented enterprise application for fleet and public transport operations.
 
 ---
 
-# 📌 Project Highlights
+# 📊 Project Highlights
 
-| Area                 | Implementation               |
-| -------------------- | ---------------------------- |
-| Backend              | Java 17 + Spring Boot 3      |
-| Frontend             | Angular 19                   |
-| Database             | MySQL                        |
-| Security             | Spring Security + JWT        |
-| Authorization        | Role & Privilege Based       |
-| Architecture         | Modular Layered Architecture |
-| Business Rules       | Strategy Pattern             |
-| Lifecycle Management | State Pattern                |
-| Optimization         | Timefold Solver              |
-| DTO Mapping          | MapStruct                    |
-| Persistence          | JPA / Hibernate              |
-| Testing              | JUnit 5 + Testcontainers     |
-| API Testing          | Postman                      |
-| Notifications        | Java Mail + Thymeleaf      |
-
----
-
-# 🔗 Related Repository
-
-**RouteNetLK Client Application**
-
-Angular-based frontend application for the RouteNetLK system.
-
-```text
-https://github.com/Ashan-Dissanayake/RouteNetLKClientApplication
-```
+| Area                | Implementation                  |
+| ------------------- | ------------------------------- |
+| Framework           | Angular 19                      |
+| Language            | TypeScript                      |
+| UI                  | Angular Material + SCSS         |
+| Architecture        | Feature-Oriented Architecture   |
+| Components          | Standalone Components           |
+| Routing             | Lazy Loading                    |
+| Forms               | Reactive Forms                  |
+| State               | Angular Signals + @ngrx/signals |
+| Service Abstraction | Facade Pattern                  |
+| Authentication      | JWT                             |
+| Authorization       | Route Guards + Permissions      |
+| API Communication   | REST / HTTP                     |
+| Charts              | Chart.js + ng2-charts           |
+| PDF                 | jsPDF + jsPDF-AutoTable         |
+| Excel               | SheetJS + file-saver            |
+| Backend             | Spring Boot REST API            |
+| Database            | MySQL                           |
 
 ---
 
-## 👨‍💻 Developer
+# 👨‍💻 Developer
 
 **Ashan Dissanayake**
 
 Full-Stack Developer | Java | Spring Boot | Angular
 
-* LinkedIn: https://www.linkedin.com/in/ashan-pdissanayake
-* GitHub: https://github.com/Ashan-Dissanayake
+* LinkedIn: [https://www.linkedin.com/in/Ashan-PDissanayake](https://www.linkedin.com/in/Ashan-PDissanayake)
+* GitHub: [https://github.com/Ashan-Dissanayake](https://github.com/Ashan-Dissanayake)
 * Email: [ashanpathum899@gmail.com](mailto:ashanpathum899@gmail.com)
 
 ---
 
-> **RouteNetLK — a modular software engineering project focused on fleet operations, workflow automation, and public transport service management.**
+> RouteNetLK is an academic software engineering project focused on modular frontend architecture, workflow-oriented interfaces, operational dashboards, reusable UI infrastructure, and integration with a Spring Boot enterprise backend.
+
+```
+```
