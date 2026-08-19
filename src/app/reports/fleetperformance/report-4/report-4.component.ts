@@ -9,16 +9,13 @@ import {
   MatCardTitle
 } from '@angular/material/card';
 import {
-  MatDatepicker,
-  MatDatepickerInput, MatDatepickerModule,
+  MatDatepickerModule,
   MatDatepickerToggle,
-  MatDatepickerToggleIcon,
   MatDateRangeInput,
   MatDateRangePicker,
   MatEndDate
 } from '@angular/material/datepicker';
 import {MatFormField, MatLabel, MatSuffix} from '@angular/material/form-field';
-import {MatInput} from '@angular/material/input';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatDivider} from '@angular/material/divider';
 import {Report4Response} from '../entity/report4response';
@@ -26,7 +23,7 @@ import {ReportService} from '../../service/reportservice';
 import {NgIf} from '@angular/common';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
 import {MatIcon, MatIconModule} from '@angular/material/icon';
-import {MatButtonModule, MatIconButton} from '@angular/material/button';
+import {MatButtonModule} from '@angular/material/button';
 import {MatNativeDateModule, provideNativeDateAdapter} from '@angular/material/core';
 
 @Component({
@@ -46,16 +43,11 @@ import {MatNativeDateModule, provideNativeDateAdapter} from '@angular/material/c
     MatEndDate,
     MatCardContent,
     MatDivider,
-    MatInput,
-    MatDatepicker,
-    MatDatepickerInput,
     MatProgressSpinner,
     MatCardFooter,
     MatIcon,
     ReactiveFormsModule,
     NgIf,
-    MatIconButton,
-    MatDatepickerToggleIcon,
     MatDatepickerModule,
     MatNativeDateModule,
     MatButtonModule,
