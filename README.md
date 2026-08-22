@@ -25,7 +25,6 @@ The client application connects to an independent [RouteNetLK Server Application
 - [Document Generation](#document-generation)
 - [Data Visualization](#data-visualization)
 - [Error / Loading / User Feedback](#error--loading--user-feedback)
-- [Testing](#testing)
 - [Containerization](#containerization)
 - [CI/CD](#cicd)
 - [Technology Stack](#technology-stack)
@@ -55,35 +54,9 @@ The client application exclusively manages presentation, client-side state, user
 ## Frontend Architecture
 
 The application adopts a **Layered, Feature-Oriented Angular Architecture** leveraging **Standalone Components** throughout. Responsibilities are divided into clear architectural layers:
-
-```text
-┌────────────────────────────────────────────────────────────────────────┐
-│                               App Shell                                │
-│        (Responsive Sidenav, Navbar, Notification Bell, Route Outlet)    │
-└───────────────────────────────────┬────────────────────────────────────┘
-                                    │
-       ┌────────────────────────────┼────────────────────────────┐
-       ▼                            ▼                            ▼
-┌──────────────┐             ┌──────────────┐             ┌──────────────┐
-│  Security    │             │     Core     │             │    Shared    │
-│  - AuthState │             │  - BaseHttp  │             │  - BaseComp  │
-│  - JWT Guard │             │  - FormBuild │             │  - BaseFacade│
-│  - PermGuard │             │  - DialogSvc │             │  - DataTable │
-│  - Intercept │             │  - NotifSvc  │             │  - DynFields │
-└──────┬───────┘             └──────┬───────┘             └──────┬───────┘
-       │                            │                            │
-       └────────────────────────────┼────────────────────────────┘
-                                    │
-       ┌────────────────────────────┼────────────────────────────┐
-       ▼                            ▼                            ▼
-┌──────────────┐             ┌──────────────┐             ┌──────────────┐
-│   Features   │             │  Dashboard   │             │   Reports    │
-│  (18 Modules)│             │  - Overview  │             │  - 5 Chart   │
-│  - Facades   │             │  - Metrics   │             │    Analytics │
-│  - FormSvcs  │             │  - Facade    │             │  - Filtering │
-│  - API Svcs  │             │              │             │              │
-└──────────────┘             └──────────────┘             └──────────────┘
-```
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/54ce3a97-5958-46ca-a6e7-b46e33bc161e" width="700" alt="Frontend Architecture">
+</p>
 
 ### Architectural Subsystems
 
@@ -165,25 +138,9 @@ features/vehiclemodule/
 
 The presentation layer is built entirely with **Angular 19 Standalone Components** (`standalone: true`), eliminating NgModule overhead and optimizing tree-shaking.
 
-```text
-┌──────────────────────────────────────────────────────────────────┐
-│                   BaseComponent<TEntity, TMetadata>              │
-│  - Lifecycle: initialize(), reload(), watchFilterForm()          │
-│  - Selection State: activeRow, selectedRows, selectedCount       │
-│  - Form Handlers: openCreateForm(), openEditForm(), save()       │
-│  - Export Actions: toPdf(), toExcel()                            │
-│  - Modal Triggers: showFormPopup(), showConfirmation()           │
-└─────────────────────────────────┬────────────────────────────────┘
-                                  │ extends
-         ┌────────────────────────┴────────────────────────┐
-         ▼                                                 ▼
-┌──────────────────────────────┐        ┌──────────────────────────────┐
-│       VehicleComponent       │        │       EmployeeComponent      │
-│  - Injects VehicleFacade     │        │  - Injects EmployeeFacade    │
-│  - Defines VEHICLE_META      │        │  - Defines EMPLOYEE_META     │
-│  - Custom row actions & rules│        │  - Custom row actions & rules│
-└──────────────────────────────┘        └──────────────────────────────┘
-```
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/8cc2c2f6-9563-4f7c-a63b-e0336196e170" width="450" alt="Component Architecture">
+</p>
 
 ### Inheritance & Reusability
 
@@ -197,29 +154,9 @@ The presentation layer is built entirely with **Angular 19 Standalone Components
 
 The **Facade Pattern** decouples UI components from HTTP communication, metadata resolution, caching, and state synchronization:
 
-```text
-┌────────────────────────┐
-│   Feature Component    │
-│  (e.g., VehicleComp)   │
-└───────────┬────────────┘
-            │ 1. Triggers actions / Observes streams
-            ▼
-┌────────────────────────┐
-│  BaseFacade / Facade   │ ◄─── Manages items$, metadata$, loading$, error$
-│ (e.g., VehicleFacade)  │
-└─────┬────────────┬─────┘
-      │ 2. Calls   │ 3. Aggregates via forkJoin
-      ▼            ▼
-┌───────────┐ ┌───────────────┐
-│ API Client│ │MetadataService│
-│(BaseHttp) │ └───────┬───────┘
-└─────┬─────┘         │
-      │ 4. HTTP / REST│
-      ▼               ▼
-┌─────────────────────────────┐
-│  Spring Boot REST Endpoints │
-└─────────────────────────────┘
-```
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/8b29fb7f-7aca-4393-9882-7a765cafecaa" width="300" alt="Facade Architecture">
+</p>
 
 ### `BaseFacade<TEntity, TMetadata>` Capabilities
 
@@ -238,21 +175,10 @@ The **Facade Pattern** decouples UI components from HTTP communication, metadata
 
 State management in RouteNetLK combines **RxJS BehaviorSubjects** for feature entity caching and **Angular Signals** for application-wide reactive state:
 
-```text
-┌─────────────────────────────────────────────────────────────────────────┐
-│                          State Architecture                             │
-├────────────────────────────────────┬────────────────────────────────────┤
-│     RxJS Facade State Containers   │       Angular Core Signals         │
-│     (Feature & Dashboard State)    │      (Auth, SSE, & UI State)       │
-├────────────────────────────────────┼────────────────────────────────────┤
-│ • itemsSubject: BehaviorSubject    │ • currentUser = signal<User>()     │
-│ • metadataSubject: BehaviorSubject │ • isAuthenticated = computed()     │
-│ • loadingSubject: BehaviorSubject  │ • notifications = signal<Notif[]>()│
-│ • errorSubject: BehaviorSubject    │ • unreadCount = computed()         │
-│ • Normalized filter dispatching    │ • filteredMenuItems = computed()   │
-│ • takeUntil(destroy$) cleanup      │ • Local component UI toggle signals│
-└────────────────────────────────────┴────────────────────────────────────┘
-```
+| State Architecture | |
+| :--- | :--- |
+| **RxJS Facade State Containers**<br>(Feature & Dashboard State) | **Angular Core Signals**<br>(Auth, SSE, & UI State) |
+| • `items`<br>• `metadata`<br>• `loading`<br>• `error`<br>• Normalized filter dispatching<br>• `takeUntil(destroy$)` cleanup | • `currentUser = signal<User>()`<br>• `isAuthenticated = computed()`<br>• `notifications = signal<Notif[]>()`<br>• `unreadCount = computed()`<br>• `filteredMenuItems = computed()`<br>• Local component UI toggle signals |
 
 ### State Boundaries
 
@@ -267,23 +193,9 @@ State management in RouteNetLK combines **RxJS BehaviorSubjects** for feature en
 
 Backend communication is structured through a strongly typed, hierarchical HTTP client layer:
 
-```text
-Feature Component
-       │
-       ▼
-Feature Facade Service
-       │
-       ▼
-Domain API Service (e.g., VehicleService)
-       │ extends
-BaseHttpService<T>
-       │
-       ▼
-HttpClient (with authInterceptor & ErrorInterceptor)
-       │
-       ▼
-Spring Boot REST API (/api/*)
-```
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/b26a1e21-a51f-415a-98a6-6af407f1af7e" width="250" alt="API Integration Architecture">
+</p>
 
 ### `BaseHttpService<T>`
 
@@ -312,28 +224,9 @@ export interface ApiResponse<T, IsArray extends boolean = true> {
 
 RouteNetLK implements a secure **JWT + Privilege-Based Access Control (PBAC)** system:
 
-```text
-┌─────────────┐
-│ Login Form  │──► POST /api/login ──► JWT + Authorities Token
-└─────────────┘
-       │
-       ▼
-┌─────────────────────────────────────────────────────────────┐
-│                        AuthService                          │
-│  - Stores JWT in localStorage ('auth_token')                │
-│  - Decodes token payload via jwt-decode                     │
-│  - Loads authorities into NgxPermissionsService             │
-│  - Sets currentUser signal & isAuthenticated computed signal │
-└──────────────┬──────────────────────────────┬───────────────┘
-               │                              │
-               ▼                              ▼
-┌──────────────────────────────┐ ┌──────────────────────────────┐
-│       authInterceptor        │ │     Route Guards & Shell     │
-│  - Injects Authorization:    │ │  - authGuard: Check session  │
-│    Bearer <token> header     │ │  - permissionGuard('perm'):  │
-│  - Handles 401/403 redirects │ │    Verifies user privileges  │
-└──────────────────────────────┘ └──────────────────────────────┘
-```
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/a013290e-70af-4218-a6d0-5a7713ba6e39" width="400" alt="Authentication and Authorization Architecture">
+</p>
 
 ### Route Guards & Interceptors
 
@@ -348,32 +241,10 @@ RouteNetLK implements a secure **JWT + Privilege-Based Access Control (PBAC)** s
 
 The application implements a **Metadata-Driven Reactive Forms Engine** that eliminates boilerplate form templates and centralizes validation:
 
-```text
-┌────────────────────────────────┐      ┌────────────────────────────────┐
-│   Feature Form Metadata Array  │      │   Backend Dynamic Regexes      │
-│      (FormField[] Meta)        │      │       (/api/regexes)           │
-└───────────────┬────────────────┘      └───────────────┬────────────────┘
-                │                                       │
-                └───────────────────┬───────────────────┘
-                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                         FormbuilderService                             │
-│  - build(fields, dataMap): Generates typed FormGroup                   │
-│  - Injects server-driven Regex validators (Validators.pattern)         │
-│  - Binds dynamic dropdown options from metadata maps                   │
-│  - Handles special control types: inner-table, date-range, time-range  │
-│  - Tracks dirty controls for change-diff calculation                   │
-│  - handleSave(): Orchestrates validation dialogs & update diff modals  │
-└───────────────────────────────────┬────────────────────────────────────┘
-                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                        DynamicFieldComponent                           │
-│  - Renders Material inputs dynamically via ngSwitch                    │
-│  - Types: text, password, select, date, date-range, time-range, file,  │
-│           dual-listbox, inner-table, hidden                            │
-│  - Automatic validation message rendering (required, pattern)          │
-└────────────────────────────────────────────────────────────────────────┘
-```
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/c3491a75-f0ba-467f-9d04-de736c7427bc" width="650" alt="Form Architecture">
+</p>
+
 
 ### Form Features
 
@@ -479,17 +350,9 @@ The dashboard is backed by `DashboardFacadeService` and `DashboardService`, fetc
 
 Client-side document generation enables offline auditing and compliance exports without placing rendering strain on the Spring Boot backend:
 
-```text
-Selected Table Rows
-        │
-        ├───────────────────────────────────┐
-        ▼                                   ▼
-PrintService (jsPDF + AutoTable)     excel-export.util (SheetJS + FileSaver)
-        │                                   │
-        ▼                                   ▼
-Formatted Vector PDF                Structured Excel Workbook (.xlsx)
-(Headers, pagination, styling)      (Dynamic columns, auto-width)
-```
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/d5d9e716-7388-40c5-9fc4-5cb58a695ee2" width="500" alt="Document Generation Architecture">
+</p>
 
 ### PDF Generation (`PrintService`)
 - Implemented using **`jspdf`** and **`jspdf-autotable`**.
@@ -505,19 +368,13 @@ Formatted Vector PDF                Structured Excel Workbook (.xlsx)
 
 Analytics dashboards use **Chart.js** with customized canvas rendering:
 
-```text
-┌────────────────────────────────────────────────────────────────────────┐
-│                        Data Visualization Suite                        │
-├──────────┬─────────────────────────────────────┬───────────────────────┤
-│ View     │ Operational Focus                   │ Chart Type & Palette  │
-├──────────┼─────────────────────────────────────┼───────────────────────┤
-│ Report 1 │ Dispatch Summary vs Breakdowns      │ Dual Bar Chart        │
-│ Report 2 │ Depot Revenue (Cash vs ETM Digital) │ Horizontal Stacked Bar│
-│ Report 3 │ Maintenance Lifecycle Trends        │ Rounded Bar Chart     │
-│ Report 4 │ Fleet Utilization & Density         │ Dual-Axis Line Chart  │
-│ Report 5 │ Incident & Anomaly Distribution     │ Multi-Color Pie Chart │
-└──────────┴─────────────────────────────────────┴───────────────────────┘
-```
+| View | Operational Focus | Chart Type & Palette |
+| :--- | :--- | :--- |
+| **Report 1** | Dispatch Summary vs Breakdowns | Dual Bar Chart |
+| **Report 2** | Depot Revenue (Cash vs ETM Digital) | Horizontal Stacked Bar |
+| **Report 3** | Maintenance Lifecycle Trends | Rounded Bar Chart |
+| **Report 4** | Fleet Utilization & Density | Dual-Axis Line Chart |
+| **Report 5** | Incident & Anomaly Distribution | Multi-Color Pie Chart |
 
 - **Report 1 (Dispatch vs. Breakdown)**: Compares successful trip executions against breakdown incidents over daily intervals.
 - **Report 2 (Revenue Auditing Split)**: Compares physical cash vault collections against digital Electronic Ticket Machine (ETM) collections across depot branches.
@@ -541,45 +398,15 @@ The application implements a multi-tiered feedback mechanism:
 
 ---
 
-## Testing
-
-Testing infrastructure is configured with Karma, Jasmine, and Cypress:
-
-- **Unit Testing**: Configured via `@angular-devkit/build-angular:karma` with Jasmine runner (`tsconfig.spec.json`).
-- **Component Test Harness**: Verification of root shell creation and layout baseline in `src/app/app.component.spec.ts`.
-- **E2E Testing Infrastructure**: Configured via `cypress.config.ts` for end-to-end integration testing.
-
-```bash
-# Execute unit test suite
-npm run test
-
-# Run E2E Cypress tests
-npm run cypress:run
-```
-
 ---
 
 ## Containerization
 
 The client application uses a **Multi-Stage Dockerfile** optimized for security, performance, and minimal image footprint:
 
-```text
-┌────────────────────────────────────────────────────────────────────────┐
-│ Stage 1: Build (node:20-alpine)                                        │
-│  - Copies package.json & runs npm ci --prefer-offline                  │
-│  - Builds production bundle: npm run build -- --configuration production│
-└───────────────────────────────────┬────────────────────────────────────┘
-                                    │ Outputs dist/routenet-lk/browser
-                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│ Stage 2: Runtime (nginx:alpine-slim)                                   │
-│  - Copies custom nginx.conf configuration                              │
-│  - Copies compiled assets to /usr/share/nginx/html                     │
-│  - Sets non-root permissions (chown nginx:nginx)                       │
-│  - Enables Gzip compression & static asset caching                     │
-│  - Configures SPA HTML5 routing fallback & API reverse proxy           │
-└────────────────────────────────────────────────────────────────────────┘
-```
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/be955a45-7713-448f-af75-d32332ae3234" width="200" alt="Containerization Architecture">
+</p>
 
 ### Nginx Production Configuration (`nginx.conf`)
 
@@ -623,23 +450,9 @@ server {
 
 Continuous Integration and Continuous Deployment is automated through **GitHub Actions** (`.github/workflows/deploy.yml`):
 
-```text
-Git Push to master
-       │
-       ▼
-GitHub Actions Runner (ubuntu-latest)
-       │
-       ├─► Set up Docker Buildx
-       ├─► Authenticate with Docker Hub
-       ├─► Build & Push Docker Image (latest + ${{ github.sha }})
-       │
-       ▼
-Deploy to AWS EC2 via SSH (appleboy/ssh-action)
-       │
-       ├─► Pull updated frontend image: docker compose pull frontend
-       ├─► Zero-downtime recreation: docker compose up -d --no-deps frontend
-       └─► Clean up dangling images: docker image prune -f
-```
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/a39a1c85-a9c8-4826-a54c-977c36ae6154" width="300" alt="CI/CD Architecture">
+</p>
 
 ---
 
