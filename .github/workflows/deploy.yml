@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - .gitignore
+      - README.md
+      - .dockerignore
+      - .github/**
   workflow_dispatch:
 
 jobs:
@@ -51,12 +56,12 @@ jobs:
           script: |
             cd ~/RouteNetLK
             export DOCKERHUB_USERNAME="${{ secrets.DOCKERHUB_USERNAME }}"
-            
+
             # Pull only updated frontend image
             docker compose pull frontend
-            
+
             # Recreate frontend container without touching other services
             docker compose up -d --no-deps frontend
-            
+
             # Remove old dangling images
             docker image prune -f
