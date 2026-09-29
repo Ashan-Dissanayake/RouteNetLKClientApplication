@@ -127,8 +127,8 @@ export const routes: Routes = [
       },
 
       {
-        path: 'part',
-        canActivate: [permissionGuard('part-view')],
+        path: 'spare-part',
+        canActivate: [permissionGuard('spare-part-view')],
         loadComponent: () =>
           import('./features/sparepartmodule/sparepart/sparepart.component')
             .then(m => m.SparePartComponent)

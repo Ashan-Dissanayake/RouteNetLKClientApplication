@@ -108,7 +108,7 @@ export class AppComponent {
       children: [
         { icon: 'directions_bus', label: 'Fleet Inventory', route: '/vehicle', permission: 'vehicle-view' },
         { icon: 'build_circle', label: 'Vehicle Service Logs', route: '/vehicle-service', permission: 'vehicle-service-view' },
-        { icon: 'settings', label: 'Spare Parts Registry', route: '/part', permission: 'part-view' },
+        { icon: 'settings', label: 'Spare Parts Registry', route: '/spare-part', permission: 'spare-part-view' },
         { icon: 'shopping_cart', label: 'Part Requests', route: '/part-request', permission: 'part-request-view' },
         { icon: 'receipt_long', label: 'Good Receive Notes (GRN)', route: '/grn', permission: 'grn-view' },
       ],
