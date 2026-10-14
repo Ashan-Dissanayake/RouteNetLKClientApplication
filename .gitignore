@@ -31,7 +31,7 @@ yarn-error.log*
 Thumbs.db
 
 # Environment configuration files
-src/environments/*.ts
+#src/environments/*.ts
 
 # Miscellaneous
 /connect.lock
