@@ -7,9 +7,10 @@ import {LicenseCategoryService} from '../api/licensecategory.service';
 import {CrewStatusService} from '../api/crewstatus.service';
 import {DriverMetadata} from '../../model/driver.metadata.model';
 import {RouteFamiliarityService} from '../api/routefamiliarity.service';
+import {CrudMetadataService} from '../../../../applicationframework/crudmetadata.service';
 
 @Injectable()
-export class DriverMetadataService{
+export class DriverMetadataService implements CrudMetadataService<DriverMetadata>{
 
   constructor(
     private employeeService: EmployeeService,
@@ -22,11 +23,25 @@ export class DriverMetadataService{
 
   loadAll():Observable<DriverMetadata>{
     return forkJoin({
-      employees:this.employeeService.getByDesignationDriver().pipe(map(r=>r.data)),
-      licenceCategories:this.licenceCategoryService.get().pipe(map(r=>r.data)),
-      crewStatuses:this.crewStatusService.get().pipe(map(r=>r.data)),
-      routeFamiliarityLevels:this.routeFamiliarityLevelService.get().pipe(map(r=>r.data)),
-      regexes:this.regexService.getStaticRegexes('drivers').pipe(map(r=>r.data))
+      employees:this.employeeService
+        .getByDesignationDriver()
+        .pipe(map(r=>r.data)),
+
+      licenceCategories:this.licenceCategoryService
+        .get()
+        .pipe(map(r=>r.data)),
+
+      crewStatuses:this.crewStatusService
+        .get()
+        .pipe(map(r=>r.data)),
+
+      routeFamiliarityLevels:this.routeFamiliarityLevelService
+        .get()
+        .pipe(map(r=>r.data)),
+
+      regexes:this.regexService
+        .getStaticRegexes('drivers')
+        .pipe(map(r=>r.data))
     })
 }
 

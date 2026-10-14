@@ -1,4 +1,4 @@
-import {Roster} from '../../features/rostermodule/entity/roster';
+import {Roster} from '../../entity/roster';
 
 export class RosterMapper{
   static fromForm(payload: any):Roster{

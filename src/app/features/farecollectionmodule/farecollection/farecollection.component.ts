@@ -24,7 +24,8 @@ import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
 import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
 import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
 import {MatIcon} from '@angular/material/icon';
-import {BaseComponent} from '../../../shared/base/base.component';
+import {BaseComponent} from '../../../applicationframework/base.component';
+import {CrudPageConfig} from '../../../applicationframework/crudpage.config';
 
 @Component({
   selector: 'app-farecollection',
@@ -49,60 +50,77 @@ import {BaseComponent} from '../../../shared/base/base.component';
     SideViewComponent,
     TableCellDirective,
     MatMenuTrigger,
-    MatIcon
+    MatIcon,
   ],
   templateUrl: './farecollection.component.html',
   styleUrl: './farecollection.component.scss',
-  standalone:true,
+  standalone: true,
   providers: [
     FareCollectionFacadeService,
     FareCollectionFormService,
     FareCollectionMetadataService,
-  ]
+  ],
 })
 export class FareCollectionComponent extends BaseComponent<FareCollection, FareCollectionMetadata> {
 
-  protected override readonly tableColumns = FARE_COLLECTION_TABLE_META;
-  protected override readonly filterFormMeta = FARE_COLLECTION_FILTER_FORM_META;
-  protected override readonly mainFormMeta = FARE_COLLECTION_MAIN_FORM_META;
-  protected override readonly exportMeta = FARE_COLLECTION_DATA_EXPORT_META;
-  protected override readonly actionPanelConfig = buildActionPanel();
+  protected override readonly config: CrudPageConfig = {
+    tableColumns: FARE_COLLECTION_TABLE_META,
+    filterFormMeta: FARE_COLLECTION_FILTER_FORM_META,
+    mainFormMeta: FARE_COLLECTION_MAIN_FORM_META,
+    exportMeta: FARE_COLLECTION_DATA_EXPORT_META,
+    actionPanel: buildActionPanel(),
+    moduleName: 'Fare Collection',
+    excelFileName: 'fare-collection.xlsx',
+  };
 
-  protected override readonly moduleName = 'Fare Collection';
-  protected override readonly excelFileName = 'fare-collection.xlsx';
+  protected override facade =
+    inject(FareCollectionFacadeService);
 
-  protected override facade = inject(FareCollectionFacadeService);
-  protected override formService = inject(FareCollectionFormService);
+  protected override formService =
+    inject(FareCollectionFormService);
 
-  protected readonly fareCollections$ = this.facade.fareCollections$;
-  protected readonly metadata$ = this.facade.metadata$;
-  protected readonly loading$ = this.facade.loading$;
-  protected readonly error$ = this.facade.error$;
+  protected override onRowAction(
+    action: string,
+    row: FareCollection
+  ): void {
 
-  protected override getCustomRowActions(row: FareCollection): Record<string, () => void> {
-    return {
-      reconciled: () =>
-        this.executeTransition(
-          this.facade.reconciled(row),
-          'Fare Collection is Reconciled.',
-          row
-        )
-    };
+    if (action === 'reconciled') {
+      this.executeTransition(
+        this.facade.reconciled(row),
+        'Fare Collection is Reconciled.',
+        row
+      );
+      return;
+    }
+
+    super.onRowAction(action, row);
   }
 
-  private executeTransition(operation$: Observable<FareCollection>, successMessage: string, row: FareCollection): void {
+  private executeTransition(
+    operation$: Observable<FareCollection>,
+    successMessage: string,
+    row: FareCollection
+  ): void {
+
     operation$
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => this.dialog.showSuccess(successMessage),
-        error: err => this.dialog.showErrorMessage('Failed to update fare collection', err),
+        next: () =>
+          this.dialog.showSuccess(successMessage),
+
+        error: err =>
+          this.dialog.showErrorMessage(
+            'Failed to update fare collection',
+            err
+          ),
+
         complete: () => {
           this.facade.reload();
-          if(this.activeRow?.id === row.id){
+
+          if (this.activeRow?.id === row.id) {
             this.activeRow = null;
           }
-        }
+        },
       });
   }
-
 }

@@ -1,6 +1,6 @@
-import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, Observable, Subject, throwError } from 'rxjs';
-import { catchError, finalize, map, takeUntil, tap } from 'rxjs/operators';
+import {Injectable, OnDestroy} from '@angular/core';
+import {BehaviorSubject, Observable, Subject, throwError} from 'rxjs';
+import {catchError, finalize, map, takeUntil, tap} from 'rxjs/operators';
 import {RosterSummary} from '../../entity/rostersummary';
 import {RosterShift} from '../../entity/rostershift';
 import {RosterShiftAssignment} from '../../entity/rostershiftassignment';
@@ -10,34 +10,35 @@ import {RosterShiftService} from '../api/rostershift.service';
 import {RosterShiftAssignmentService} from '../api/rostershiftassignment.service';
 import {RosterMetadataService} from './roster.metadata.service';
 import {Roster} from '../../entity/roster';
-import {RosterMapper} from '../../../../shared/mappers/rosterMapper';
+import {RosterMapper} from './rosterMapper';
 
 @Injectable()
 export class RosterFacadeService implements OnDestroy {
 
   // ===== State =====
-  private rosterSubject              = new BehaviorSubject<RosterSummary[]>([]);
-  private rosterShiftSubject         = new BehaviorSubject<RosterShift[]>([]);
+  private rosterSubject = new BehaviorSubject<RosterSummary[]>([]);
+  private rosterShiftSubject = new BehaviorSubject<RosterShift[]>([]);
   private rosterShiftAssignmentSubject = new BehaviorSubject<RosterShiftAssignment[]>([]);
-  private metadataSubject            = new BehaviorSubject<RosterMetadata>(EMPTY_ROSTER_METADATA);
-  private loadingSubject             = new BehaviorSubject<boolean>(false);
-  private errorSubject               = new BehaviorSubject<any>(null);
-  private destroy$                   = new Subject<void>();
+  private metadataSubject = new BehaviorSubject<RosterMetadata>(EMPTY_ROSTER_METADATA);
+  private loadingSubject = new BehaviorSubject<boolean>(false);
+  private errorSubject = new BehaviorSubject<any>(null);
+  private destroy$ = new Subject<void>();
 
   // ===== Public streams =====
-  readonly rosters$              = this.rosterSubject.asObservable();
-  readonly rosterShifts$         = this.rosterShiftSubject.asObservable();
+  readonly rosters$ = this.rosterSubject.asObservable();
+  readonly rosterShifts$ = this.rosterShiftSubject.asObservable();
   readonly rosterShiftAssignments$ = this.rosterShiftAssignmentSubject.asObservable();
-  readonly metadata$             = this.metadataSubject.asObservable();
-  readonly loading$              = this.loadingSubject.asObservable();
-  readonly error$                = this.errorSubject.asObservable();
+  readonly metadata$ = this.metadataSubject.asObservable();
+  readonly loading$ = this.loadingSubject.asObservable();
+  readonly error$ = this.errorSubject.asObservable();
 
   constructor(
-    private rosterService:             RosterService,
-    private rosterShiftService:        RosterShiftService,
+    private rosterService: RosterService,
+    private rosterShiftService: RosterShiftService,
     private rosterShiftAssignmentService: RosterShiftAssignmentService,
-    private metadataService:           RosterMetadataService,
-  ) {}
+    private metadataService: RosterMetadataService,
+  ) {
+  }
 
   // ===== Lifecycle =====
 
@@ -157,6 +158,11 @@ export class RosterFacadeService implements OnDestroy {
     ).subscribe();
   }
 
-  private setLoading(value: boolean): void { this.loadingSubject.next(value); }
-  private clearError(): void               { this.errorSubject.next(null); }
+  private setLoading(value: boolean): void {
+    this.loadingSubject.next(value);
+  }
+
+  private clearError(): void {
+    this.errorSubject.next(null);
+  }
 }

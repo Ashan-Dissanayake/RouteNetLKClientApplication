@@ -1,9 +1,9 @@
 import { Injectable, signal, computed, NgZone } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ApiEndpoints } from './api-endpoints';
-import { AppNotification } from '../shared/models/notification.model';
-import { ApiResponse } from '../shared/models/apiresponse.model';
+import { ApiEndpoints } from '../../core/api-endpoints';
+import { AppNotification } from '../models/notification.model';
+import { ApiResponse } from '../models/apiresponse.model';
 
 @Injectable({
   providedIn: 'root'

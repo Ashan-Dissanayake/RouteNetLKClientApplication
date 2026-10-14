@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {BaseHttpService} from '../../../../core/basehttp.service';
+import {BaseHttpService} from '../../../../applicationframework/basehttp.service';
 import {Conductor} from '../../entity/conductor';
 import {HttpClient} from '@angular/common/http';
 import {ApiResponse} from '../../../../shared/models/apiresponse.model';

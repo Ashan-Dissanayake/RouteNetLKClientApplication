@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {BranchService} from '../api/branch.service';
 import {BranchMetadataService} from './branch.metadata.service';
-import {BaseFacade} from '../../../../shared/base/base.facade';
+import {BaseFacade} from '../../../../applicationframework/base.facade';
 import {Branch} from '../../entity/branch';
 import {BranchMetadata, EMPTY_BRANCH_METADATA} from '../../model/branch.metadata.model';
 import {NumberService} from '../../../../core/number.service';
@@ -10,9 +10,6 @@ import {map} from 'rxjs/operators';
 
 @Injectable()
 export class BranchFacadeService extends BaseFacade<Branch, BranchMetadata> {
-
-  // ===== Streams =====
-  readonly branches$ = this.items$;
 
   constructor(
     private branchService: BranchService,

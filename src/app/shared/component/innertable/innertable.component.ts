@@ -3,7 +3,7 @@ import {ChangeDetectorRef, Component, forwardRef, Input, OnChanges, SimpleChange
 import {NgForOf, NgIf} from '@angular/common';
 import {InnerTableColumn} from './inner-table-column.model';
 import {FormField} from '../../models/formfieldata.model';
-import {FormbuilderService} from '../../../core/formbuilder.service';
+import {FormbuilderService} from '../../services/formbuilder.service';
 import {DynamicFieldComponent} from '../form/dynamic-field.component';
 
 @Component({

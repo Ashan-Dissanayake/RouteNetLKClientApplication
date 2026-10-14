@@ -23,7 +23,7 @@ export const TRIP_TABLE_META = [
 export const TRIP_FILTER_FORM_META: FormField[] = [
   {name: 'sstriptype', type: 'select', label: 'Bus Type', required: false, mode: 'options'},
   {name: 'sstripstatus', type: 'select', label: 'Trip status', required: false, mode: 'options'},
-] as FormField[];
+];
 
 /**
  * Metadata for the Trip Main Form, defining the fields used for creating or editing trips.
@@ -39,7 +39,7 @@ export const TRIP_MAIN_FORM_META: FormField[] = [
   {name: 'originterminal', type: 'select', label: 'Origin Terminal', required: true, mode: 'options'},
   {name: 'tripstatus', type: 'select', label: 'Status', required: true, mode: 'options'},
   {name: 'opcalender', type: 'select', label: 'OP Calender', required: true, mode: 'options'}
-] as FormField[];
+];
 
 /**
  * Metadata for exporting Trip data, defining the keys and headers for export columns.

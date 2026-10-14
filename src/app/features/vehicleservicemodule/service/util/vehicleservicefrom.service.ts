@@ -1,13 +1,17 @@
 import {Injectable, OnDestroy} from '@angular/core';
 import {Subject} from 'rxjs';
-import {FormbuilderService} from '../../../../core/formbuilder.service';
+import {FormbuilderService} from '../../../../shared/services/formbuilder.service';
 import {FormGroup} from '@angular/forms';
 import {VehicleServiceMetadata} from '../../model/vehicleservice.metadata.model';
 import {VEHICLE_SERVICE_FILTER_FORM_META, VEHICLE_SERVICE_MAIN_FORM_META} from '../../model/vehicleservice.meta';
+import {CrudFormService} from '../../../../applicationframework/crudform.service';
+import {VehicleService} from '../../entity/vehicleservice';
+import BranchFormService from '../../../branchmodule/services/util/branchform.service';
+import {BranchMetadata} from '../../../branchmodule/model/branch.metadata.model';
 
 
 @Injectable()
-export class VehicleServiceFormService implements OnDestroy {
+export class VehicleServiceFormService implements CrudFormService<VehicleService, VehicleServiceMetadata> ,OnDestroy{
 
   private destroy$ = new Subject<void>();
 
@@ -54,4 +58,7 @@ export class VehicleServiceFormService implements OnDestroy {
       vehicleservicestatus:  metadata.vehicleServiceStatuses,
     });
   }
+
 }
+
+export default VehicleServiceFormService

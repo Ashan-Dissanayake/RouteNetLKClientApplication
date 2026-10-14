@@ -14,24 +14,21 @@ export const GRN_FILTER_FORM_META: FormField[] = [
   {name: 'ssnumber', type: 'text', label: 'Number', required: false, mode: 'none'},
   {name: 'sspartrequest', type: 'select', label: 'Request', required: false, mode: 'options',optionLabelKey:'number'},
   {name: 'ssgrnstatus', type: 'select', label: 'Status', required: false, mode: 'options'},
-] as FormField[];
+];
 
 
 export const GRN_LINE_META:FormField[] = [
-  // {name: 'partrequestitem.part.name', type: 'text', label: 'Part', required: true, mode: 'none'},
   {name: 'part', type: 'select', label: 'Part', required: true, mode: 'options'},
   {name: 'quantity', type: 'text', label: 'Quantity', required: true, mode: 'none',},
-] as FormField[]
+] ;
 
 export const GRN_LINE_COLUMNS:InnerTableColumn[] = [
-  // { field: 'partrequestitem.part.name',header: 'Part'},
   { field: 'part.name', header: 'Part'    },
   { field: 'quantity',header: 'Quantity'},
 ];
 
 export const GRN_MAIN_FORM_META: FormField[] = [
   {name: 'id', type: 'hidden', label: 'Grn id', required: false, mode: 'none'},
-  // {name: 'branch', type: 'select', label: 'Branch', required: true, mode: 'options'},
   {name: 'doreceived', type: 'date', label: 'Received Date', required: true, mode: 'none',
     dateConfig:{ maxDate:new Date() }
   },
@@ -43,8 +40,7 @@ export const GRN_MAIN_FORM_META: FormField[] = [
       dataMap:{}
     }
   },
-  // {name: 'grnststatus', type: 'select', label: 'Grn status', required: true, mode: 'options'},
-] as FormField[];
+];
 
 
 export const GRN_DATA_EXPORT_META = [

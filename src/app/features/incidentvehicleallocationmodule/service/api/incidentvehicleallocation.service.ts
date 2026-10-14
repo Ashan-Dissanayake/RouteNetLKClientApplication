@@ -1,27 +1,45 @@
 import {Injectable} from '@angular/core';
-import {BaseHttpService} from '../../../../core/basehttp.service';
+import {BaseHttpService} from '../../../../applicationframework/basehttp.service';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../../core/api-endpoints';
 import {IncidentVehicleAllocation} from '../../entity/incidentvehicleallocation';
+import {CrudApiService} from '../../../../applicationframework/crudapi.service';
 
 @Injectable({ providedIn: 'root' })
-export class IncidentVehicleAllocationService extends BaseHttpService <IncidentVehicleAllocation>{
+export class IncidentVehicleAllocationService extends BaseHttpService<IncidentVehicleAllocation> implements CrudApiService<IncidentVehicleAllocation> {
 
-  constructor(protected override http: HttpClient) {
+  constructor(
+    protected override http: HttpClient
+  ) {
     super(http);
   }
 
-  get(params?:any):Observable<ApiResponse<IncidentVehicleAllocation>>{
-    return  this.getAll(ApiEndpoints.INCIDENT_VEHICLE_ALLOCATION,params);
+  get(
+    params?: Record<string, unknown>
+  ): Observable<ApiResponse<IncidentVehicleAllocation>> {
+
+    return this.getAll<IncidentVehicleAllocation>(
+      ApiEndpoints.INCIDENT_VEHICLE_ALLOCATION,
+      params
+    );
   }
 
-  save(incident:IncidentVehicleAllocation):Observable<IncidentVehicleAllocation>{
-    return this.post(ApiEndpoints.INCIDENT_VEHICLE_ALLOCATION,incident);
+  save(
+    allocation: IncidentVehicleAllocation
+  ): Observable<IncidentVehicleAllocation> {
+
+    return this.post(
+      ApiEndpoints.INCIDENT_VEHICLE_ALLOCATION,
+      allocation
+    );
   }
 
-  inProgress(id: number): Observable<IncidentVehicleAllocation> {
+  inProgress(
+    id: number
+  ): Observable<IncidentVehicleAllocation> {
+
     return this.postActionById(
       ApiEndpoints.INCIDENT_VEHICLE_ALLOCATION,
       id,
@@ -29,7 +47,10 @@ export class IncidentVehicleAllocationService extends BaseHttpService <IncidentV
     );
   }
 
-  released(id: number): Observable<IncidentVehicleAllocation> {
+  released(
+    id: number
+  ): Observable<IncidentVehicleAllocation> {
+
     return this.postActionById(
       ApiEndpoints.INCIDENT_VEHICLE_ALLOCATION,
       id,
@@ -37,7 +58,10 @@ export class IncidentVehicleAllocationService extends BaseHttpService <IncidentV
     );
   }
 
-  pendingAllocation(id: number): Observable<IncidentVehicleAllocation> {
+  pendingAllocation(
+    id: number
+  ): Observable<IncidentVehicleAllocation> {
+
     return this.postActionById(
       ApiEndpoints.INCIDENT_VEHICLE_ALLOCATION,
       id,
@@ -45,12 +69,14 @@ export class IncidentVehicleAllocationService extends BaseHttpService <IncidentV
     );
   }
 
-  cancelled(id: number): Observable<IncidentVehicleAllocation> {
+  cancelled(
+    id: number
+  ): Observable<IncidentVehicleAllocation> {
+
     return this.postActionById(
       ApiEndpoints.INCIDENT_VEHICLE_ALLOCATION,
       id,
       'cancelled'
     );
   }
-
 }

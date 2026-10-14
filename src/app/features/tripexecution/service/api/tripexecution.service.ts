@@ -1,31 +1,46 @@
 import {Injectable} from '@angular/core';
-import {BaseHttpService} from '../../../../core/basehttp.service';
+import {BaseHttpService} from '../../../../applicationframework/basehttp.service';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApiEndpoints} from '../../../../core/api-endpoints';
 import {TripExecution} from '../../entity/tripexecution';
-import {Employee} from '../../../employeemodule/entity/employee';
 import {ApiResponse} from '../../../../shared/models/apiresponse.model';
-import {PartRequest} from '../../../partrequestmodule/entity/partrequest';
-import {Branch} from '../../../branchmodule/entity/branch';
+import {CrudApiService} from '../../../../applicationframework/crudapi.service';
 
 @Injectable({ providedIn: 'root' })
-export class TripExecutionService extends BaseHttpService <TripExecution>{
+export class TripExecutionService extends BaseHttpService<TripExecution> implements CrudApiService<TripExecution> {
 
-  constructor(protected override http: HttpClient) {
+  constructor(
+    protected override http: HttpClient
+  ) {
     super(http);
   }
 
-  initialize(data:any):Observable<TripExecution>{
-    return this.post(ApiEndpoints.TRIP_EXECUTION_INITIALIZATION,data);
+  get(
+    params?: Record<string, unknown>
+  ): Observable<ApiResponse<TripExecution>> {
+    return this.getAll<TripExecution>(
+      ApiEndpoints.TRIP_EXECUTION,
+      params
+    );
   }
 
-  get(params?:any):Observable<ApiResponse<TripExecution>>{
-    return  this.getAll(ApiEndpoints.TRIP_EXECUTION,params);
+  initialize(
+    data: unknown
+  ): Observable<TripExecution> {
+    return this.post(
+      ApiEndpoints.TRIP_EXECUTION_INITIALIZATION,
+      <TripExecution>data
+    );
   }
 
-  assignedResource(data:any):Observable<TripExecution>{
-    return this.post(ApiEndpoints.TRIP_EXECUTION_GENERATE_ASSIGNMENT,data);
+  assignedResource(
+    data: unknown
+  ): Observable<TripExecution> {
+    return this.post(
+      ApiEndpoints.TRIP_EXECUTION_GENERATE_ASSIGNMENT,
+      <TripExecution>data
+    );
   }
 
   checkedIn(id: number): Observable<TripExecution> {
@@ -85,7 +100,8 @@ export class TripExecutionService extends BaseHttpService <TripExecution>{
   }
 
   getSummary(): Observable<ApiResponse<TripExecution>> {
-    return this.getAll(ApiEndpoints.TRIP_EXECUTION_SUMMARIES);
+    return this.getAll<TripExecution>(
+      ApiEndpoints.TRIP_EXECUTION_SUMMARIES
+    );
   }
-
 }

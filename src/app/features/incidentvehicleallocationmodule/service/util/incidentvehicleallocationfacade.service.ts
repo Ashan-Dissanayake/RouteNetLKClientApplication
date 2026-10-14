@@ -9,61 +9,90 @@ import {
   IncidentVehicleAllocationMetadata
 } from '../../model/incidentvehicleallocation.metadata.model';
 import {IncidentVehicleAllocationMetadataService} from './incidentvehicleallocation.metadata.service';
-import {BaseFacade} from '../../../../shared/base/base.facade';
+import {BaseFacade} from '../../../../applicationframework/base.facade';
 
 @Injectable()
 export class IncidentVehicleAllocationFacadeService extends BaseFacade<IncidentVehicleAllocation, IncidentVehicleAllocationMetadata> {
 
   constructor(
     private allocationService: IncidentVehicleAllocationService,
-    private incidentVehicleAllocationMetadataService: IncidentVehicleAllocationMetadataService,
+    metadataService: IncidentVehicleAllocationMetadataService,
   ) {
     super(
       allocationService,
-      incidentVehicleAllocationMetadataService,
+      metadataService,
       EMPTY_INCIDENT_VEHICLE_ALLOCATION_METADATA
     );
   }
 
-  readonly incidentVehicleAllocations$ = this.items$;
+  // ===== Domain-specific status transitions =====
 
+  inProgress(
+    allocation: IncidentVehicleAllocation
+  ): Observable<IncidentVehicleAllocation> {
 
-  // ===== Status transitions =====
-  inProgress(row: IncidentVehicleAllocation): Observable<IncidentVehicleAllocation> {
-    return this.allocationService.inProgress(row.id);
-  }
-
-  pendingAllocation(row: IncidentVehicleAllocation): Observable<IncidentVehicleAllocation> {
-    return this.allocationService.pendingAllocation(row.id);
-  }
-
-  released(row: IncidentVehicleAllocation): Observable<IncidentVehicleAllocation> {
-    return this.allocationService.released(row.id);
-  }
-
-  // ===== Metadata helpers =====
-
-  get metadataSnapshot(): IncidentVehicleAllocationMetadata {
-    return this.metadataSubject.getValue();
-  }
-
-  getBranchesForIncident(incidentId: number): Branch[] {
-    const incidents = this.metadataSnapshot.incidents ?? [];
-    const branches  = this.metadataSnapshot.branches ?? [];
-
-    const incident = incidents.find(i => i.id === incidentId);
-
-    if (!incident) return [];
-
-    return branches.filter(
-      b => b.regionaloffice.id === (incident as any).regionalareaId
+    return this.allocationService.inProgress(
+      allocation.id
     );
   }
 
-  getVehiclesForBranch(branchId: number): Vehicle[] {
-    const vehicles = this.metadataSnapshot.vehicles ?? [];
+  pendingAllocation(
+    allocation: IncidentVehicleAllocation
+  ): Observable<IncidentVehicleAllocation> {
+
+    return this.allocationService.pendingAllocation(
+      allocation.id
+    );
+  }
+
+  released(
+    allocation: IncidentVehicleAllocation
+  ): Observable<IncidentVehicleAllocation> {
+
+    return this.allocationService.released(
+      allocation.id
+    );
+  }
+
+  // ===== Metadata-dependent lookup helpers =====
+
+  private get metadataSnapshot(): IncidentVehicleAllocationMetadata {
+    return this.metadataSubject.getValue();
+  }
+
+  getBranchesForIncident(
+    incidentId: number
+  ): Branch[] {
+
+    const metadata = this.metadataSnapshot;
+
+    const incidents = metadata.incidents ?? [];
+    const branches = metadata.branches ?? [];
+
+    const incident =
+      incidents.find(item => item.id === incidentId);
+
+    if (!incident) {
+      return [];
+    }
+
+    return branches.filter(
+      branch =>
+        branch.regionaloffice.id ===
+        (incident as any).regionalareaId
+    );
+  }
+
+  getVehiclesForBranch(
+    branchId: number
+  ): Vehicle[] {
+
+    const vehicles =
+      this.metadataSnapshot.vehicles ?? [];
+
     return vehicles.filter(
-      v => (v as any).branchId === branchId
+      vehicle =>
+        (vehicle as any).branchId === branchId
     );
   }
 }

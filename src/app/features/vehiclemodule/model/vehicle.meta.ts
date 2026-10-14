@@ -14,11 +14,10 @@ export const VEHICLE_TABLE_META = [
 export const VEHICLE_FILTER_FORM_META: FormField[] = [
   {name: 'ssbustype', type: 'select', label: 'Bus Type', required: false, mode: 'options'},
   {name: 'ssconditionrate', type: 'select', label: 'Condition Rate', required: false, mode: 'options'},
-] as FormField[];
+];
 
 export const VEHICLE_MAIN_FORM_META: FormField[] = [
   {name: 'id', type: 'hidden', label: 'Vehicle id', required: false, mode: 'none'},
-  // {name: 'branch', type: 'select', label: 'Branch', required: true, mode: 'options'},
   {name: 'number', type: 'text', label: 'Number Plate', required: true, mode: 'regex'},
   {name: 'model', type: 'select', label: 'Model', required: true, mode: 'options'},
   {name: 'bustype', type: 'select', label: 'Bus Type', required: true, mode: 'options'},
@@ -27,7 +26,7 @@ export const VEHICLE_MAIN_FORM_META: FormField[] = [
   {name: 'conditionrate', type: 'select', label: 'Condition Rate', required: true, mode: 'options'},
   {name: 'vehiclestatus', type: 'select', label: 'Status', required: true, mode: 'options'},
   {name: 'remarks', type: 'text', label: 'Remakrs', required: false, mode: 'none'}
-] as FormField[];
+];
 
 export const VEHICLE_IMMUTABLE_CONTROLLERS_META = [
   'model', 'number','mileage','bustype'

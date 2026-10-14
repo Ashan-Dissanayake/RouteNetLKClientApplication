@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {ApiEndpoints} from './api-endpoints';
-import {BaseHttpService} from './basehttp.service';
+import {BaseHttpService} from '../applicationframework/basehttp.service';
 import {ApiResponse} from '../shared/models/apiresponse.model';
 
 @Injectable({ providedIn: 'root' })

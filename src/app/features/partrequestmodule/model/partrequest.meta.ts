@@ -13,12 +13,12 @@ export const PART_REQUEST_TABLE_META = [
 export const PART_REQUEST_FILTER_FORM_META: FormField[] = [
   {name: 'ssnumber', type: 'text', label: 'Number', required: false, mode: 'none'},
   {name: 'sspartrequeststatus', type: 'select', label: 'Status', required: false, mode: 'options'},
-] as FormField[];
+];
 
 
 export const PART_REQUEST_LINE_META:FormField[] = [
   {name: 'part', type: 'select', label: 'Part', required: true, mode: 'options'},
-  {name: 'quantity', type: 'text', label: 'Quantity', required: true, mode: 'none',},
+  {name: 'quantity', type: 'text', label: 'Quantity', required: true, mode: 'none',}
 ];
 
 
@@ -42,7 +42,7 @@ export const PART_REQUEST_MAIN_FORM_META: FormField[] = [
     }
   },
   {name: 'partrequeststatus', type: 'select', label: 'Part Request status', required: true, mode: 'options'},
-] as FormField[];
+];
 
 
 export const PART_REQUEST_DATA_EXPORT_META = [

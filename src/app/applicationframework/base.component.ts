@@ -1,11 +1,15 @@
 import { Directive, OnInit, OnDestroy, inject} from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import {debounceTime, Observable, Subject, take, takeUntil} from 'rxjs';
-import { CheckboxEvent } from '../component/data-table/data-table.component';
-import { ButtonClickEvent } from '../component/button/button-panel/button-panel.component';
-import { exportToExcel } from '../component/export/excel-export.util';
-import { DialogService } from '../../core/dialog.service';
-import { FormbuilderService } from '../../core/formbuilder.service';
+import { CheckboxEvent } from '../shared/component/data-table/data-table.component';
+import { ButtonClickEvent } from '../shared/component/button/button-panel/button-panel.component';
+import { exportToExcel } from '../shared/component/export/excel-export.util';
+import { DialogService } from '../shared/services/dialog.service';
+import { FormbuilderService } from '../shared/services/formbuilder.service';
+import {CrudFacade} from './crud.facade';
+import {CrudFormService} from './crudform.service';
+import {CrudPageConfig} from './crudpage.config';
+import {FormField} from '../shared/models/formfieldata.model';
 
 @Directive()
 export abstract class BaseComponent<TEntity extends { id?: number }, TMetadata> implements OnInit, OnDestroy {
@@ -14,35 +18,11 @@ export abstract class BaseComponent<TEntity extends { id?: number }, TMetadata> 
   protected formBuilder = inject(FormbuilderService);
   protected destroy$ = new Subject<void>();
 
-  // Subclass static configuration
-  protected abstract tableColumns: any[];
-  protected abstract filterFormMeta: any[];
-  protected abstract mainFormMeta: any[];
-  protected abstract exportMeta: any[];
-  protected abstract actionPanelConfig: any;
-  protected abstract moduleName: string;      // e.g. 'Employee', 'Vehicle'
-  protected abstract excelFileName: string;   // e.g. 'employees.xlsx'
-  protected immutableControllers: string[] = []; // Optional immutable fields list
+  protected abstract readonly config: CrudPageConfig;
 
-  // Subclass services (declared in constructor or via inject() in child)
-  protected abstract facade: {
-    items$: Observable<TEntity[]>;
-    metadata$: Observable<TMetadata>;
-    loading$: Observable<boolean>;
-    error$: Observable<any>;
-    initialize(): Observable<TMetadata>;
-    reload(): void;
-    filter(criteria: Record<string, any>): void;
-    create?(data: TEntity): Observable<TEntity>;
-    update?(data: TEntity): Observable<TEntity>;
-    deactivate?(items: TEntity[]): Observable<number[]>;
-  };
+  protected abstract facade: CrudFacade<TEntity, TMetadata>;
 
-  protected abstract formService: {
-    buildFilterForm(metadata: TMetadata): FormGroup;
-    buildMainForm(metadata: TMetadata): FormGroup;
-    buildMainFormForEdit?(metadata: TMetadata, row: TEntity): FormGroup;
-  };
+  protected abstract formService: CrudFormService<TEntity, TMetadata>;
 
   // Common UI State
   protected activeRow: TEntity | null = null;
@@ -56,7 +36,7 @@ export abstract class BaseComponent<TEntity extends { id?: number }, TMetadata> 
     this.facade.initialize()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        error: err => this.dialog.showErrorMessage(`Failed to initialize ${this.moduleName} module.`, err),
+        error: err => this.dialog.showErrorMessage(`Failed to initialize ${this.config.moduleName} module.`, err),
       });
 
     this.facade.metadata$.pipe(
@@ -152,12 +132,12 @@ export abstract class BaseComponent<TEntity extends { id?: number }, TMetadata> 
       this.dialog.showWarning('Creating records is not supported in this module.');
       return;
     }
-    this.formBuilder.setControlsState(this.mainForm, this.immutableControllers, false);
+    this.formBuilder.setControlsState(this.mainForm, this.config.immutableControllers ?? [], false);
 
     this.dialog.showFormPopup({
-      heading: `Create ${this.moduleName}`,
+      heading: `Create ${this.config.moduleName}`,
       form:    this.mainForm,
-      meta:    this.mainFormMeta,
+      meta:    this.config.mainFormMeta,
       width:   '900px',
     }).subscribe(formData => {
       if (formData) this.save(formData);
@@ -168,8 +148,8 @@ export abstract class BaseComponent<TEntity extends { id?: number }, TMetadata> 
   protected save(formData: any): void {
     if (!this.facade.create) return;
     this.facade.create(formData).pipe(takeUntil(this.destroy$)).subscribe({
-      next:     () => this.dialog.showSuccess(`${this.moduleName} created successfully.`),
-      error: err => this.dialog.showErrorMessage(`Failed to create ${this.moduleName}`, err),
+      next:     () => this.dialog.showSuccess(`${this.config.moduleName} created successfully.`),
+      error: err => this.dialog.showErrorMessage(`Failed to create ${this.config.moduleName}`, err),
       complete: () => {
         this.facade.reload();
         this.resetMainForm();
@@ -192,12 +172,12 @@ export abstract class BaseComponent<TEntity extends { id?: number }, TMetadata> 
       this.mainForm.patchValue(row);
     }
 
-    this.formBuilder.setControlsState(this.mainForm, this.immutableControllers, true);
+    this.formBuilder.setControlsState(this.mainForm, this.config.immutableControllers ?? [], true);
 
     this.dialog.showFormPopup({
-      heading: `Edit ${this.moduleName}`,
+      heading: `Edit ${this.config.moduleName}`,
       form:    this.mainForm,
-      meta:    this.mainFormMeta,
+      meta:    this.config.mainFormMeta,
       width:   '900px',
     }).subscribe(formData => {
       if (formData) this.update(formData);
@@ -208,8 +188,8 @@ export abstract class BaseComponent<TEntity extends { id?: number }, TMetadata> 
   protected update(formData: any): void {
     if (!this.facade.update) return;
     this.facade.update(formData).pipe(takeUntil(this.destroy$)).subscribe({
-      next:     () => this.dialog.showSuccess(`${this.moduleName} updated successfully.`),
-      error: err => this.dialog.showErrorMessage(`Failed to update ${this.moduleName}`, err),
+      next:     () => this.dialog.showSuccess(`${this.config.moduleName} updated successfully.`),
+      error: err => this.dialog.showErrorMessage(`Failed to update ${this.config.moduleName}`, err),
       complete: () => {
         this.facade.reload();
         this.resetMainForm();
@@ -229,7 +209,7 @@ export abstract class BaseComponent<TEntity extends { id?: number }, TMetadata> 
     }
 
     this.dialog.showConfirmation({
-      heading: `Deactivate ${this.moduleName}s`,
+      heading: `Deactivate ${this.config.moduleName}s`,
       message: this.getDeactivateConfirmationMessage(),
     }).subscribe(confirmed => {
       if (!confirmed) return;
@@ -237,7 +217,7 @@ export abstract class BaseComponent<TEntity extends { id?: number }, TMetadata> 
       this.facade.deactivate!(Array.from(this.selectedRows))
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: () => this.dialog.showSuccess(`Selected ${this.moduleName}s deactivated successfully.`),
+          next: () => this.dialog.showSuccess(`Selected ${this.config.moduleName}s deactivated successfully.`),
           error: err => this.dialog.showErrorMessage('Deactivation failed', err),
           complete: () => {
             this.selectedRows.clear();
@@ -258,10 +238,10 @@ export abstract class BaseComponent<TEntity extends { id?: number }, TMetadata> 
     this.dialog.showPrintDialog({
       width:   '1500px',
       height:  '650px',
-      title:   `${this.moduleName} Details`,
+      title:   `${this.config.moduleName} Details`,
       mode:    'table',
       data:    Array.from(this.selectedRows),
-      columns: this.exportMeta,
+      columns: this.config.exportMeta,
     }).subscribe(result => {
       if (result) {
         this.selectedRows.clear();
@@ -275,11 +255,11 @@ export abstract class BaseComponent<TEntity extends { id?: number }, TMetadata> 
       this.dialog.showWarning('Please select at least one record to export.');
       return;
     }
-    exportToExcel(Array.from(this.selectedRows), this.exportMeta, this.excelFileName);
+    exportToExcel(Array.from(this.selectedRows), this.config.exportMeta, this.config.excelFileName);
   }
 
-  protected trackByField(_: number, field: any): any {
-    return field.key ?? _;
+  protected trackByField(_: number, field: FormField): string {
+    return field.name;
   }
 
   protected resetMainForm(): void {
@@ -288,7 +268,28 @@ export abstract class BaseComponent<TEntity extends { id?: number }, TMetadata> 
     } else {
       this.formBuilder.resetForm(this.mainForm);
     }
-    this.formBuilder.setControlsState(this.mainForm, this.immutableControllers, false);
+    this.formBuilder.setControlsState(
+      this.mainForm,
+      this.config.immutableControllers ?? [],
+      true
+    );
+  }
+
+
+  protected get items$(): Observable<TEntity[]> {
+    return this.facade.items$;
+  }
+
+  protected get metadata$(): Observable<TMetadata> {
+    return this.facade.metadata$;
+  }
+
+  protected get loading$(): Observable<boolean> {
+    return this.facade.loading$;
+  }
+
+  protected get error$(): Observable<unknown> {
+    return this.facade.error$;
   }
 
   // Subclass Extension Hooks
@@ -301,6 +302,6 @@ export abstract class BaseComponent<TEntity extends { id?: number }, TMetadata> 
   }
 
   protected getDeactivateConfirmationMessage(): string {
-    return `Are you sure you want to deactivate the selected ${this.moduleName}s?`;
+    return `Are you sure you want to deactivate the selected ${this.config.moduleName}s?`;
   }
 }

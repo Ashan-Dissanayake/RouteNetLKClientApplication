@@ -23,6 +23,11 @@ import {NgClass, NgForOf, NgIf, NgTemplateOutlet} from '@angular/common';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {FormsModule} from '@angular/forms';
 import {Subject, takeUntil} from 'rxjs';
+import {MatFormField, MatLabel, MatPrefix} from '@angular/material/form-field';
+import {MatInput} from '@angular/material/input';
+import {MatIcon} from '@angular/material/icon';
+import {MatTooltip} from '@angular/material/tooltip';
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
 
 
 @Component({
@@ -47,6 +52,13 @@ import {Subject, takeUntil} from 'rxjs';
     MatCheckbox,
     FormsModule,
     NgClass,
+    MatFormField,
+    MatInput,
+    MatIcon,
+    MatPrefix,
+    MatTooltip,
+    MatProgressSpinner,
+    MatLabel
   ],
   templateUrl: './data-table.component.html',
   standalone: true,
@@ -61,6 +73,9 @@ export class DataTableComponent<T = any> implements OnChanges, AfterViewInit,OnD
   @Input() paginatable = false;
   @Input() pageSizeOptions: number[] = [8, 16, 24];
   @Input() tableClass: string | string[] = '';
+  @Input() loading = false;
+  @Input() searchPlaceholder = 'Search records...';
+  @Input() showSearch = true;
 
   @Output() rowClick = new EventEmitter<T>();
   @Output() actionClick = new EventEmitter<ActionEvent<T>>();
@@ -104,6 +119,15 @@ export class DataTableComponent<T = any> implements OnChanges, AfterViewInit,OnD
 
   onActionClicked(action: string, row: T) {
     this.actionClick.emit({ action, row });
+  }
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
   }
 
   onCheckBoxChanged(row: T, checked: boolean) {

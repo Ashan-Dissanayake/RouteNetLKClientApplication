@@ -1,117 +1,208 @@
 <div class="container">
   <h2>Part Request Details Management</h2>
 </div>
-<!-- Loading -->
-<mat-progress-bar *ngIf="loading$ | async" mode="indeterminate"></mat-progress-bar>
 
+<!-- Loading -->
+<mat-progress-bar
+  *ngIf="loading$ | async"
+  mode="indeterminate">
+</mat-progress-bar>
+
+
+<!-- Error -->
 <!-- Error -->
 <div *ngIf="error$ | async as error" id="error-window">
   <mat-card>
-    <mat-card-title>Error loading parts</mat-card-title>
-    <mat-card-content>{{ error?.message }}</mat-card-content>
-    <button mat-raised-button color="primary" (click)="reload()">Retry</button>
+    <mat-card-title>Error loading Branches</mat-card-title>
+    <mat-card-content>{{ error ? error : 'An unknown error occurred.' }}</mat-card-content>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="reload()">
+      Retry
+    </button>
   </mat-card>
 </div>
 
-<!-- ===== Action Panel ===== -->
+<!-- Action Panel -->
 <app-button-panel
-  *ngIf="metadata$ | async as metadata"
-  [buttons]="actionPanelConfig"
+  [buttons]="config.actionPanel"
   (actionClicked)="onActionTriggered($event)"
   (dropdownClicked)="onDropdownOnlyClick($event)"
-  [contextData]="{ selectedRows: selectedRows }"
->
+  [contextData]="{ selectedRows: selectedRows }">
 </app-button-panel>
 
-<div *ngIf="metadata$ | async as metadata" id="serverSearch">
+
+<!-- Filter -->
+<div id="serverSearch">
+
   <form [formGroup]="filterForm">
+
     <dynamic-field
-      *ngFor="let field of filterFormMeta; trackBy: trackByField"
+      *ngFor="
+        let field of config.filterFormMeta;
+        trackBy: trackByField
+      "
       [formInstance]="filterForm"
-      [field]="field"
-    ></dynamic-field>
+      [field]="field">
+    </dynamic-field>
+
   </form>
+
 </div>
 
-<!-- ===== Main Table with Side View ===== -->
+
+<!-- Main Table -->
 <app-side-view
   [opened]="activeRow !== null"
   [data]="activeRow"
   [title]="'Part Request Details'"
   [viewTemplate]="partDetailTemplate"
-  (closed)="onCloseDetailView()"
->
+  (closed)="onCloseDetailView()">
+
   <app-data-table
-    *ngIf="(partRequests$ | async)?.length"
-    [data]="(partRequests$ | async) || []"
-    [columns]="tableColumns"
+    [loading]="(loading$ | async) || false"
+    [data]="(items$ | async) || []"
+    [columns]="config.tableColumns"
     [sortable]="true"
     [paginatable]="true"
     [pageSizeOptions]="[10, 20]"
     (rowClick)="onRowClick($event)"
     (checkBoxClick)="onRowCheckboxChanged($event)"
     (selectAllClick)="onSelectAll($event)"
-    (actionClick)="onRowAction($event.action, $event.row)"
-  >
-    <!-- Row Actions -->
-    <ng-template tableCell="actions" let-row let-action="action">
-      <button mat-icon-button
-              matTooltip="Approve Request"
-              style="color: #10a695;"
-              (click)="action('approved', row); $event.stopPropagation()">
-        <mat-icon>check_circle</mat-icon>
+    (actionClick)="onRowAction($event.action, $event.row)">
+
+    <ng-template
+      tableCell="actions"
+      let-row
+      let-action="action">
+
+      <button
+        mat-icon-button
+        matTooltip="Approve Request"
+        style="color: #10a695;"
+        (click)="
+          action('approved', row);
+          $event.stopPropagation()
+        ">
+        <mat-icon>
+          check_circle
+        </mat-icon>
       </button>
 
-      <button mat-icon-button
-              matTooltip="Reject Request"
-              style="color: #c53030;"
-              (click)="action('rejected', row); $event.stopPropagation()">
-        <mat-icon>do_not_disturb_on</mat-icon>
+
+      <button
+        mat-icon-button
+        matTooltip="Reject Request"
+        style="color: #c53030;"
+        (click)="
+          action('rejected', row);
+          $event.stopPropagation()
+        ">
+        <mat-icon>
+          do_not_disturb_on
+        </mat-icon>
       </button>
+
     </ng-template>
+
   </app-data-table>
+
 </app-side-view>
 
-<!--Template for detail view -->
+
+<!-- Detail View -->
 <ng-template #partDetailTemplate let-row>
-  <div  class="part-request-detail-container">
+
+  <div class="part-request-detail-container">
+
     <!-- Header -->
     <div class="header">
+
       <div class="title-section">
-        <mat-icon color="primary" class="part-request-icon">shopping_cart_checkout</mat-icon>
+
+        <mat-icon
+          color="primary"
+          class="part-request-icon">
+          shopping_cart_checkout
+        </mat-icon>
+
         <div>
-          <h6 class="part-request-title">{{ row.number }}</h6>
-          <p class="part-request-subtitle">{{ row.branch.name}}</p>
+
+          <h6 class="part-request-title">
+            {{ row.number }}
+          </h6>
+
+          <p class="part-request-subtitle">
+            {{ row.branch.name }}
+          </p>
+
         </div>
+
       </div>
+
 
       <span
         class="status-chip"
         [ngClass]="{
-        'pending': row.partrequeststatus.name === 'Pending',
-        'approved': row.partrequeststatus.name === 'Approved',
-        'rejected': row.partrequeststatus.name === 'Rejected',
-        'completed': row.partrequeststatus.name === 'Completed'
-      }">
-      {{ row.partrequeststatus.name }}
+          'pending':
+            row.partrequeststatus.name === 'Pending',
+
+          'approved':
+            row.partrequeststatus.name === 'Approved',
+
+          'rejected':
+            row.partrequeststatus.name === 'Rejected',
+
+          'completed':
+            row.partrequeststatus.name === 'Completed'
+        }">
+
+        {{ row.partrequeststatus.name }}
+
       </span>
+
     </div>
+
     <mat-divider></mat-divider>
+
 
     <!-- General Info -->
     <div class="info-grid">
+
       <div class="info-item">
-        <span class="label">Ordered Date</span>
-        <span class="value">{{ row.dorequested || '-' }}</span>
+
+        <span class="label">
+          Ordered Date
+        </span>
+
+        <span class="value">
+          {{ row.dorequested || '-' }}
+        </span>
+
       </div>
+
     </div>
+
     <mat-divider></mat-divider>
-    <div class="coverage-grid ">
-      <mat-chip  *ngFor="let item of row.partrequestitems" selected>
+
+
+    <!-- Requested Parts -->
+    <div class="coverage-grid">
+
+      <mat-chip
+        *ngFor="let item of row.partrequestitems"
+        selected>
+
         {{ item.part.name }}
         x{{ item.quantity }}
+
       </mat-chip>
+
     </div>
+
     <mat-divider></mat-divider>
+
   </div>
+
 </ng-template>

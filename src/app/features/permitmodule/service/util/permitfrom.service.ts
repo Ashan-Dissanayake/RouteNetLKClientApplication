@@ -1,42 +1,58 @@
 import {Injectable, OnDestroy} from '@angular/core';
 import {Subject} from 'rxjs';
-import {FormbuilderService} from '../../../../core/formbuilder.service';
+import {FormbuilderService} from '../../../../shared/services/formbuilder.service';
 import {FormGroup} from '@angular/forms';
 import {PermitMetadata} from '../../model/permit.metadata.model';
 import {PERMIT_FILTER_FORM_META, PERMIT_MAIN_FORM_META} from '../../model/permit.meta';
+import {CrudFormService} from '../../../../applicationframework/crudform.service';
+import {Permit} from '../../entity/permit';
 
 
 @Injectable()
-export class PermitFormService implements OnDestroy {
+export class PermitFormService implements CrudFormService<Permit, PermitMetadata> {
 
-  private destroy$ = new Subject<void>();
+  constructor(
+    private formBuilder: FormbuilderService
+  ) {}
 
-  constructor(private formBuilder: FormbuilderService) {}
+  buildFilterForm(
+    metadata: PermitMetadata
+  ): FormGroup {
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    return this.formBuilder.build(
+      [...PERMIT_FILTER_FORM_META],
+      {
+        sspermitstatus: metadata.permitStatuses,
+        ssroute: metadata.routes,
+      }
+    );
   }
 
-  // ===== Filter form =====
+  buildMainForm(
+    metadata: PermitMetadata
+  ): FormGroup {
 
-  buildFilterForm(metadata: PermitMetadata): FormGroup {
-    return this.formBuilder.build([...PERMIT_FILTER_FORM_META], {
-      sspermitstatus: metadata.permitStatuses,
-      ssroute:        metadata.routes,
-    });
+    return this.formBuilder.build(
+      [...PERMIT_MAIN_FORM_META],
+      {
+        vehicle: metadata.vehicles,
+        branch: metadata.branches,
+        permitestatus: metadata.permitStatuses,
+        servicetype: metadata.serviceTypes,
+        route: metadata.routes,
+        regexes: metadata.regexes,
+      }
+    );
   }
 
-  // ===== Main form =====
+  buildMainFormForEdit(
+    metadata: PermitMetadata,
+    row: Permit
+  ): FormGroup {
 
-  buildMainForm(metadata: PermitMetadata): FormGroup {
-    return this.formBuilder.build([...PERMIT_MAIN_FORM_META], {
-      vehicle:       metadata.vehicles,
-      branch:        metadata.branches,
-      permitestatus: metadata.permitStatuses,
-      servicetype:   metadata.serviceTypes,
-      route:         metadata.routes,
-      regexes:       metadata.regexes,
-    });
+    const form = this.buildMainForm(metadata);
+    form.patchValue(row);
+
+    return form;
   }
 }

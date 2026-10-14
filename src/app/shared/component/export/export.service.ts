@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {exportToExcel} from './excel-export.util';
-import {DialogService, PrintDialogOptions} from '../../../core/dialog.service';
+import {DialogService, PrintDialogOptions} from '../../services/dialog.service';
 import {Branch} from '../../../features/branchmodule/entity/branch';
 import {Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';

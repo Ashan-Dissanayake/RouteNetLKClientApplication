@@ -8,9 +8,10 @@ import {RegexService} from '../../../../core/regex.service';
 import {PermitMetadata} from '../../model/permit.metadata.model';
 import {forkJoin, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
+import {CrudMetadataService} from '../../../../applicationframework/crudmetadata.service';
 
 @Injectable()
-export class PermitMetadataService {
+export class PermitMetadataService implements CrudMetadataService<PermitMetadata>{
 
   constructor(
     private permitStatusService:PermitStatusService,
@@ -23,12 +24,24 @@ export class PermitMetadataService {
 
   loadAll(): Observable<PermitMetadata> {
     return forkJoin({
-      permitStatuses:this.permitStatusService.get().pipe(map(r => r.data)),
-      serviceTypes:this.serviceTypeService.get().pipe(map(r => r.data)),
-      routes:this.routeService.get().pipe(map(r => r.data)),
-      vehicles:this.vehicleService.getSummary().pipe(map(r => r.data)),
-      branches:this.branchService.getSummary().pipe(map(r => r.data)),
-      regexes:this.regexService.getStaticRegexes('permits').pipe(map(r => r.data)),
+      permitStatuses:this.permitStatusService
+        .get()
+        .pipe(map(r => r.data)),
+
+      serviceTypes:this.serviceTypeService.get()
+        .pipe(map(r => r.data)),
+
+      routes:this.routeService.get()
+        .pipe(map(r => r.data)),
+
+      vehicles:this.vehicleService.getSummary()
+        .pipe(map(r => r.data)),
+
+      branches:this.branchService.getSummary()
+        .pipe(map(r => r.data)),
+
+      regexes:this.regexService.getStaticRegexes('permits')
+        .pipe(map(r => r.data)),
     });
   }
 }

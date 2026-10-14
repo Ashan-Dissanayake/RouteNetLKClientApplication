@@ -8,30 +8,36 @@
 <div *ngIf="error$ | async as error" id="error-window">
   <mat-card>
     <mat-card-title>Error loading Trips</mat-card-title>
-    <mat-card-content>{{ error?.message }}</mat-card-content>
+    <mat-card-content>{{ error ? error : 'An unknown error occurred.' }}</mat-card-content>
     <button mat-raised-button color="primary" (click)="reload()">Retry</button>
   </mat-card>
 </div>
 
 <!-- ===== Action Panel ===== -->
 <app-button-panel
-  *ngIf="lookUpData$ | async as metadata"
-  [buttons]="actionPanelConfig"
+  *ngIf="items$ | async as metadata"
+  [buttons]="config.actionPanel"
   (actionClicked)="onActionTriggered($event)"
   (dropdownClicked)="onDropdownOnlyClick($event)"
   [contextData]="{ selectedRows: selectedRows }"
 >
 </app-button-panel>
 
-<div *ngIf="lookUpData$ | async as metadata" id="serverSearch">
+<!-- Filter -->
+<div id="serverSearch">
   <form [formGroup]="filterForm">
     <dynamic-field
-      *ngFor="let field of filterFormMeta; trackBy: trackByField"
+      *ngFor="
+        let field of config.filterFormMeta;
+        trackBy: trackByField
+      "
       [formInstance]="filterForm"
-      [field]="field"
-    ></dynamic-field>
+      [field]="field">
+    </dynamic-field>
+
   </form>
 </div>
+
 
 <!-- ===== Main Table with Side View ===== -->
 <app-side-view
@@ -42,9 +48,9 @@
   (closed)="onCloseDetailView()"
 >
   <app-data-table
-    *ngIf="(users$ | async)?.length"
-    [data]="(users$ | async) || []"
-    [columns]="tableColumns"
+    [loading]="(loading$ | async) || false"
+    [data]="(items$ | async) || []"
+    [columns]="config.tableColumns"
     [sortable]="true"
     [paginatable]="true"
     [pageSizeOptions]="[10, 20]"

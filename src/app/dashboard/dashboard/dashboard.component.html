@@ -1,10 +1,10 @@
 <!-- LOADING BAR BUFFER -->
-<div *ngIf="loading$ | async" class="dashboard-loading-buffer">
+<div *ngIf="false" class="dashboard-loading-buffer">
   <mat-progress-bar mode="indeterminate" color="accent"></mat-progress-bar>
 </div>
 
 <!-- CONTAINER STATE ROOT MAP -->
-<div class="dashboard-container" *ngIf="metrics$ | async as metrics">
+<div class="dashboard-container">
 
   <!-- ERROR NOTIFICATION BANNER -->
   <div *ngIf="error$ | async as errorMsg" class="dashboard-error-banner">
@@ -15,148 +15,193 @@
     </button>
   </div>
 
-  <!-- KPI METRICS GRID -->
-  <mat-grid-list cols="4" rowHeight="100px" gutterSize="16px" class="metrics-grid">
-
-    <!-- KPI 1: ACTIVE TRIPS -->
-    <mat-grid-tile>
-      <mat-card class="kpi-card highlight-blue">
-        <mat-card-content>
-          <div class="kpi-icon-pane">
-            <mat-icon>directions_bus</mat-icon>
-          </div>
-          <div class="kpi-data-pane">
-            <div class="kpi-label">Active Trip Executions</div>
-            <div class="kpi-metric">{{ metrics.activeTripsCount | number }}</div>
-            <div class="kpi-trend trend-up">Out of {{ metrics.totalScheduledTrips }} Scheduled</div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </mat-grid-tile>
-
-    <!-- KPI 2: PENDING INCIDENTS -->
-    <mat-grid-tile>
-      <mat-card class="kpi-card" [ngClass]="metrics.pendingIncidentsCount > 0 ? 'highlight-red' : 'highlight-green'">
-        <mat-card-content>
-          <div class="kpi-icon-pane">
-            <mat-icon>report_problem</mat-icon>
-          </div>
-          <div class="kpi-data-pane">
-            <div class="kpi-label">Pending Incidents</div>
-            <div class="kpi-metric">{{ metrics.pendingIncidentsCount | number:'2.0-0' }}</div>
-            <div class="kpi-trend" [ngClass]="metrics.pendingIncidentsCount > 0 ? 'trend-down' : 'trend-stable'">
-              {{ metrics.pendingIncidentsCount > 0 ? '● Attention Required' : '✓ Fleet Operational' }}
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </mat-grid-tile>
-
-    <!-- KPI 3: STANDBY DRIVERS -->
-    <mat-grid-tile>
+<!-- KPI METRICS GRID -->
+<mat-grid-list cols="4" rowHeight="100px" gutterSize="16px" class="metrics-grid">
+  <ng-container *ngIf="loading$ | async; else kpiContent">
+    <mat-grid-tile *ngFor="let i of [1,2,3,4]">
       <mat-card class="kpi-card">
-        <mat-card-content>
-          <div class="kpi-icon-pane">
-            <mat-icon>airline_seat_recline_normal</mat-icon>
-          </div>
-          <div class="kpi-data-pane">
-            <div class="kpi-label">Standby Drivers</div>
-            <div class="kpi-metric">{{ metrics.assignedDriversCount }}</div>
-            <div class="kpi-trend">Available at Depot</div>
+        <mat-card-content style="display: flex; align-items: center; gap: 15px;">
+          <app-skeleton width="40px" height="40px" className="skeleton-circle"></app-skeleton>
+          <div style="flex: 1;">
+            <app-skeleton width="60%" height="10px" style="margin-bottom: 8px;"></app-skeleton>
+            <app-skeleton width="40%" height="20px"></app-skeleton>
           </div>
         </mat-card-content>
       </mat-card>
     </mat-grid-tile>
+  </ng-container>
 
-    <!-- KPI 4: STANDBY CONDUCTORS -->
-    <mat-grid-tile>
-      <mat-card class="kpi-card">
-        <mat-card-content>
-          <div class="kpi-icon-pane">
-            <mat-icon>assignment_ind</mat-icon>
-          </div>
-          <div class="kpi-data-pane">
-            <div class="kpi-label">Standby Conductors</div>
-            <div class="kpi-metric">{{ metrics.assignedConductorsCount }}</div>
-            <div class="kpi-trend">Available at Depot</div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </mat-grid-tile>
-  </mat-grid-list>
-
-  <!-- MAIN OPERATIONAL MATRIX -->
-  <div class="operations-matrix">
-
-    <!-- LEFT PANEL: INCIDENTS CONTROLLER -->
-    <mat-card class="matrix-card">
-      <mat-card-header class="matrix-header">
-        <mat-card-title>Depot Fleet Incidents</mat-card-title>
-        <mat-card-subtitle>Real-time breakdowns and emergency dispatches for this branch</mat-card-subtitle>
-      </mat-card-header>
-
-      <mat-card-content class="matrix-scroll-content">
-        <!-- Dynamic Fallback when there are no live incidents -->
-        <div *ngIf="metrics.breakdownCount === 0" class="empty-state-notice">
-          <mat-icon>verified</mat-icon>
-          <p>No active breakdowns reported for this shift operation.</p>
-        </div>
-
-        <mat-list class="dense-incident-list" *ngIf="metrics.breakdownCount > 0">
-          <mat-list-item class="incident-row state-critical">
-            <mat-icon matListItemIcon class="row-indicator-icon">error_outline</mat-icon>
-            <div matListItemTitle class="row-title-wrap">
-              <span class="route-tag">Live Alert</span>
-              <span class="row-main-title">{{ metrics.breakdownCount }} Active Fleet Breakdowns Recorded</span>
+  <ng-template #kpiContent>
+    <ng-container *ngIf="metrics$ | async as metrics">
+      <!-- KPI 1: ACTIVE TRIPS -->
+      <mat-grid-tile>
+        <mat-card class="kpi-card highlight-blue">
+          <mat-card-content>
+            <div class="kpi-icon-pane">
+              <mat-icon>directions_bus</mat-icon>
             </div>
-            <div matListItemMeta class="row-action-area">
-              <span class="status-lbl text-warn">Awaiting Allocation</span>
+            <div class="kpi-data-pane">
+              <div class="kpi-label">Active Trip Executions</div>
+              <div class="kpi-metric">{{ metrics.activeTripsCount | number }}</div>
+              <div class="kpi-trend trend-up">Out of {{ metrics.totalScheduledTrips }} Scheduled</div>
             </div>
-          </mat-list-item>
-        </mat-list>
-      </mat-card-content>
-    </mat-card>
+          </mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
 
-    <!-- RIGHT PANEL: BRANCH OPERATIONS AND SHIFT COVERAGE MATRIX -->
-    <mat-card class="matrix-card">
-      <mat-card-header class="matrix-header branch-summary-header">
-        <div>
-          <mat-card-title>Depot Target Status</mat-card-title>
-          <mat-card-subtitle>Today's branch operation tracking parameters</mat-card-subtitle>
+      <!-- KPI 2: PENDING INCIDENTS -->
+      <mat-grid-tile>
+        <mat-card class="kpi-card" [ngClass]="metrics.pendingIncidentsCount > 0 ? 'highlight-red' : 'highlight-green'">
+          <mat-card-content>
+            <div class="kpi-icon-pane">
+              <mat-icon>report_problem</mat-icon>
+            </div>
+            <div class="kpi-data-pane">
+              <div class="kpi-label">Pending Incidents</div>
+              <div class="kpi-metric">{{ metrics.pendingIncidentsCount | number:'2.0-0' }}</div>
+              <div class="kpi-trend" [ngClass]="metrics.pendingIncidentsCount > 0 ? 'trend-down' : 'trend-stable'">
+                {{ metrics.pendingIncidentsCount > 0 ? '● Attention Required' : '✓ Fleet Operational' }}
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
+
+      <!-- KPI 3: STANDBY DRIVERS -->
+      <mat-grid-tile>
+        <mat-card class="kpi-card">
+          <mat-card-content>
+            <div class="kpi-icon-pane">
+              <mat-icon>airline_seat_recline_normal</mat-icon>
+            </div>
+            <div class="kpi-data-pane">
+              <div class="kpi-label">Standby Drivers</div>
+              <div class="kpi-metric">{{ metrics.assignedDriversCount }}</div>
+              <div class="kpi-trend">Available at Depot</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
+
+      <!-- KPI 4: STANDBY CONDUCTORS -->
+      <mat-grid-tile>
+        <mat-card class="kpi-card">
+          <mat-card-content>
+            <div class="kpi-icon-pane">
+              <mat-icon>assignment_ind</mat-icon>
+            </div>
+            <div class="kpi-data-pane">
+              <div class="kpi-label">Standby Conductors</div>
+              <div class="kpi-metric">{{ metrics.assignedConductorsCount }}</div>
+              <div class="kpi-trend">Available at Depot</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
+    </ng-container>
+  </ng-template>
+</mat-grid-list>
+
+<!-- MAIN OPERATIONAL MATRIX -->
+<div class="operations-matrix">
+  <!-- LEFT PANEL: INCIDENTS CONTROLLER -->
+  <mat-card class="matrix-card">
+    <mat-card-header class="matrix-header">
+      <mat-card-title>Depot Fleet Incidents</mat-card-title>
+      <mat-card-subtitle>Real-time breakdowns and emergency dispatches for this branch</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="matrix-scroll-content">
+      <ng-container *ngIf="loading$ | async; else matrixContentLeft">
+        <div style="padding: 15px;">
+          <app-skeleton height="40px" style="margin-bottom: 15px;"></app-skeleton>
+          <app-skeleton height="40px" style="margin-bottom: 15px;"></app-skeleton>
+          <app-skeleton height="40px"></app-skeleton>
         </div>
+      </ng-container>
+
+      <ng-template #matrixContentLeft>
+        <ng-container *ngIf="metrics$ | async as metrics">
+          <!-- Dynamic Fallback when there are no live incidents -->
+          <div *ngIf="metrics.breakdownCount === 0" class="empty-state-notice">
+            <mat-icon>verified</mat-icon>
+            <p>No active breakdowns reported for this shift operation.</p>
+          </div>
+
+          <mat-list class="dense-incident-list" *ngIf="metrics.breakdownCount > 0">
+            <mat-list-item class="incident-row state-critical">
+              <mat-icon matListItemIcon class="row-indicator-icon">error_outline</mat-icon>
+              <div matListItemTitle class="row-title-wrap">
+                <span class="route-tag">Live Alert</span>
+                <span class="row-main-title">{{ metrics.breakdownCount }} Active Fleet Breakdowns Recorded</span>
+              </div>
+              <div matListItemMeta class="row-action-area">
+                <span class="status-lbl text-warn">Awaiting Allocation</span>
+              </div>
+            </mat-list-item>
+          </mat-list>
+        </ng-container>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- RIGHT PANEL: BRANCH OPERATIONS AND SHIFT COVERAGE MATRIX -->
+  <mat-card class="matrix-card">
+    <mat-card-header class="matrix-header branch-summary-header">
+      <div>
+        <mat-card-title>Depot Target Status</mat-card-title>
+        <mat-card-subtitle>Today's branch operation tracking parameters</mat-card-subtitle>
+      </div>
+      <ng-container *ngIf="metrics$ | async as metrics">
         <span class="badge-status" [ngClass]="metrics.shiftCoveragePercentage >= 90 ? 'st-done' : 'st-wait'">
           Coverage: {{ metrics.shiftCoveragePercentage }}%
         </span>
-      </mat-card-header>
+      </ng-container>
+    </mat-card-header>
 
-      <mat-card-content class="branch-matrix-content">
-        <!-- TRIP COMPLETION PROGRESS STRIP -->
-        <div class="depot-revenue-strip">
-          <div class="rev-block">
-            <span class="rev-lbl">Scheduled Trips</span>
-            <span class="rev-val">{{ metrics.totalScheduledTrips }}</span>
+    <mat-card-content class="branch-matrix-content">
+      <ng-container *ngIf="loading$ | async; else matrixContentRight">
+        <div style="padding: 20px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+            <app-skeleton width="30%" height="40px"></app-skeleton>
+            <app-skeleton width="30%" height="40px"></app-skeleton>
+            <app-skeleton width="30%" height="40px"></app-skeleton>
           </div>
-          <div class="rev-block">
-            <span class="rev-lbl">Completed Clean</span>
-            <span class="rev-val text-success">{{ metrics.completedTripsCount }}</span>
-          </div>
-          <div class="rev-block">
-            <span class="rev-lbl">Delayed/Disrupted</span>
-            <span class="rev-val text-warn">{{ metrics.delayedTripsCount }}</span>
-          </div>
+          <app-skeleton height="20px" style="margin-bottom: 10px;"></app-skeleton>
+          <app-skeleton height="10px"></app-skeleton>
         </div>
+      </ng-container>
 
-        <div class="matrix-section-title">Roster Operations Metrics Summary</div>
+      <ng-template #matrixContentRight>
+        <ng-container *ngIf="metrics$ | async as metrics">
+          <!-- TRIP COMPLETION PROGRESS STRIP -->
+          <div class="depot-revenue-strip">
+            <div class="rev-block">
+              <span class="rev-lbl">Scheduled Trips</span>
+              <span class="rev-val">{{ metrics.totalScheduledTrips }}</span>
+            </div>
+            <div class="rev-block">
+              <span class="rev-lbl">Completed Clean</span>
+              <span class="rev-val text-success">{{ metrics.completedTripsCount }}</span>
+            </div>
+            <div class="rev-block">
+              <span class="rev-lbl">Delayed/Disrupted</span>
+              <span class="rev-val text-warn">{{ metrics.delayedTripsCount }}</span>
+            </div>
+          </div>
 
-        <div class="coverage-overview-progress-panel">
-          <p class="summary-text-desc">
-            The branch is operating at a <b>{{ metrics.shiftCoveragePercentage }}%</b> compliance rate.
-            There are currently <b>{{ metrics.completedTripsCount }}</b> journeys closed out of the daily target schedule, with <b>{{ metrics.activeTripsCount }}</b> active wheels on transit routes.
-          </p>
-          <mat-progress-bar mode="determinate" [value]="metrics.shiftCoveragePercentage" class="clean-progress-bar"></mat-progress-bar>
-        </div>
-      </mat-card-content>
-    </mat-card>
+          <div class="matrix-section-title">Roster Operations Metrics Summary</div>
 
-  </div>
+          <div class="coverage-overview-progress-panel">
+            <p class="summary-text-desc">
+              The branch is operating at a <b>{{ metrics.shiftCoveragePercentage }}%</b> compliance rate.
+              There are currently <b>{{ metrics.completedTripsCount }}</b> journeys closed out of the daily target schedule, with <b>{{ metrics.activeTripsCount }}</b> active wheels on transit routes.
+            </p>
+            <mat-progress-bar mode="determinate" [value]="metrics.shiftCoveragePercentage" class="clean-progress-bar"></mat-progress-bar>
+          </div>
+        </ng-container>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+</div>
 </div>

@@ -14,7 +14,7 @@ import {ReportService} from '../../service/reportservice';
 import {Report1Response} from '../entity/report1response';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
 import {NgIf} from '@angular/common';
-import {DialogService} from '../../../core/dialog.service';
+import {DialogService} from '../../../shared/services/dialog.service';
 
 @Component({
   selector: 'app-report-1',

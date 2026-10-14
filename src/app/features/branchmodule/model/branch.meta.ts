@@ -17,7 +17,7 @@ export const BRANCH_FILTER_FORM_META: FormField[] = [
   { name: 'ssname', type: 'text', label: 'Branch Name', required: false, mode:"none" },
   { name: 'sscode', type: 'text', label: 'Branch Code', required: false, mode: 'none' },
   { name: 'ssbranchstatus', type: 'select', label: 'Branch Status', required: false, mode: 'options' },
-] as FormField[];
+] ;
 
 export const BRANCH_MAIN_FORM_META:FormField[] = [
   { name: 'id', type: 'hidden', label: 'Branch id', required: false, mode: 'none'},
@@ -34,7 +34,7 @@ export const BRANCH_MAIN_FORM_META:FormField[] = [
   { name: 'branchtype', type: 'select', label: 'Branch Type', required: true, mode: 'options'},
   { name: 'regionaloffice', type: 'select', label: 'Regional Office', required: true, mode: 'options'},
   { name: 'branchstatus', type: 'select', label: 'Branch Status', required: true, mode: 'options' }
-] as FormField[];
+] ;
 
 export const BRANCH_IMMUTABLE_CONTROLLERS_META = [
   'docreated',

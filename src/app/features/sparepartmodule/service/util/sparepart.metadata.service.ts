@@ -7,9 +7,10 @@ import {BranchService} from '../../../branchmodule/services/api/branch.service';
 import {RegexService} from '../../../../core/regex.service';
 import {PartMetadata} from '../../model/sparepart.metadata.model';
 import {PartCategoryService} from '../api/partcategory.service';
+import {CrudMetadataService} from '../../../../applicationframework/crudmetadata.service';
 
 @Injectable()
-export class PartMetadataService {
+export class PartMetadataService implements CrudMetadataService<PartMetadata>{
 
   constructor(
     private partStatusService: PartStatusService,
@@ -21,11 +22,21 @@ export class PartMetadataService {
 
   loadAll(): Observable<PartMetadata> {
     return forkJoin({
-      partStatuses: this.partStatusService.get().pipe(map(r => r.data)),
-      partCategories: this.partCategoryService.get().pipe(map(r => r.data)),
-      partMasters:  this.partMasterService.get().pipe(map(r => r.data)),
-      branches:     this.branchService.getSummary().pipe(map(r => r.data)),
-      regexRules:   this.regexService.getStaticRegexes('parts').pipe(map(r => r.data)),
+      partStatuses:this.partStatusService
+        .get()
+        .pipe(map(r => r.data)),
+
+      partCategories:this.partCategoryService.get()
+        .pipe(map(r => r.data)),
+
+      partMasters:this.partMasterService.get()
+        .pipe(map(r => r.data)),
+
+      branches:this.branchService.getSummary()
+        .pipe(map(r => r.data)),
+
+      regexRules:this.regexService.getStaticRegexes('parts')
+        .pipe(map(r => r.data)),
     });
   }
 }

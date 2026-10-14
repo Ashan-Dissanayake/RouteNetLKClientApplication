@@ -1,4 +1,5 @@
 import {FormField} from '../../../shared/models/formfieldata.model';
+import {getTomorrow} from '../../../shared/util/date.util';
 
 export const TRIP_EXECUTION_TABLE_META = [
   {key: 'branch.name', label: 'Branch'},
@@ -17,11 +18,6 @@ export const TRIP_EXECUTION_TABLE_META = [
   {key: 'actions', label: 'Actions'}
 ];
 
-// export const TRIP_EXECUTION_FILTER_FORM_META: FormField[] = [
-//   {name: 'ssdoservice', type: 'date', label: 'Service Date', required: false, mode: 'date'},
-//   {name: 'sstripexecutionstatus', type: 'select', label: 'Status', required: false, mode: 'options'},
-// ] as FormField[];
-
 export const TRIP_EXECUTION_MAIN_FORM_META: FormField[] = [
   // {name: 'id', type: 'hidden', label: 'Part id', required: false, mode: 'none'},
   {name: 'branch', type: 'select', label: 'Branch', required: true, mode: 'options'},
@@ -31,14 +27,9 @@ export const TRIP_EXECUTION_MAIN_FORM_META: FormField[] = [
 
     }
   },
-] as FormField[];
+];
 
 
-function getTomorrow(): Date {
-  const date = new Date();
-  date.setDate(date.getDate() + 1);
-  return date;
-}
 
 
 // export const TRIP_EXECUTION_UPDATE_FORM_META:FormField[] = [

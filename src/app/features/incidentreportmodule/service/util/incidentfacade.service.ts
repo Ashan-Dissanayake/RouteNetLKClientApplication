@@ -4,43 +4,90 @@ import {Incident} from '../../entity/incident';
 import {IncidentService} from '../api/incident.service';
 import {EMPTY_INCIDENT_METADATA, IncidentMetadata} from '../../model/incidentreport.metadata.model';
 import {IncidentMetadataService} from './incident.metadata.service';
-import {BaseFacade} from '../../../../shared/base/base.facade';
+import {BaseFacade} from '../../../../applicationframework/base.facade';
 
 @Injectable()
-export class IncidentFacadeService extends BaseFacade<Incident, IncidentMetadata> {
-
-  readonly incidents$ = this.items$;
+export class IncidentFacadeService
+  extends BaseFacade<Incident, IncidentMetadata> {
 
   constructor(
     private incidentService: IncidentService,
-    private incidentMetadataService: IncidentMetadataService,
+    metadataService: IncidentMetadataService,
   ) {
     super(
       incidentService,
-      incidentMetadataService,
+      metadataService,
       EMPTY_INCIDENT_METADATA
     );
   }
 
-  // ===== Domain operations =====
-  inProgress(incident: Incident): Observable<Incident> {
-    return this.incidentService.inProgress(incident.id);
+  // ===== Deactivation business rule =====
+
+  protected override getDeactivationIds(
+    incidents: Incident[]
+  ): number[] {
+
+    return incidents
+      .filter(incident =>
+        // Keep your existing incident-specific
+        // deactivation eligibility rule here.
+        // Example:
+        (incident.incidentstatus?.name ?? '').toLowerCase() === 'closed'
+      )
+      .map(incident => incident.id)
+      .filter(
+        (id): id is number => id != null
+      );
   }
 
-  vehicleRecovery(incident: Incident): Observable<Incident> {
-    return this.incidentService.vehicleRecovery(incident.id);
+  protected override getNoQualifyingDeactivateErrorMessage(): string {
+    return 'Selected incidents cannot be deactivated because none are closed.';
   }
 
-  pendingAllocation(incident: Incident): Observable<Incident> {
-    return this.incidentService.pendingAllocation(incident.id);
+  // ===== Domain-specific status transitions =====
+
+  inProgress(
+    incident: Incident
+  ): Observable<Incident> {
+
+    return this.incidentService.inProgress(
+      incident.id
+    );
   }
 
-  resolved(incident: Incident): Observable<Incident> {
-    return this.incidentService.resolved(incident.id);
+  vehicleRecovery(
+    incident: Incident
+  ): Observable<Incident> {
+
+    return this.incidentService.vehicleRecovery(
+      incident.id
+    );
   }
 
-  closed(incident: Incident): Observable<Incident> {
-    return this.incidentService.closed(incident.id);
+  pendingAllocation(
+    incident: Incident
+  ): Observable<Incident> {
+
+    return this.incidentService.pendingAllocation(
+      incident.id
+    );
   }
 
+  resolved(
+    incident: Incident
+  ): Observable<Incident> {
+
+    return this.incidentService.resolved(
+      incident.id
+    );
+  }
+
+  closed(
+    incident: Incident
+  ): Observable<Incident> {
+
+    return this.incidentService.closed(
+      incident.id
+    );
+  }
 }

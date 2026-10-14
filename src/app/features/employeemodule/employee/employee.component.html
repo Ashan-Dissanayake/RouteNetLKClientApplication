@@ -5,7 +5,7 @@
       <h2>Employee Management</h2>
     </div>
     <app-button-panel
-      [buttons]="actionPanelConfig"
+      [buttons]="config.actionPanel"
       (actionClicked)="onActionTriggered($event)"
       (dropdownClicked)="onDropdownOnlyClick($event)"
       [contextData]="{ selectedRows: this.selectedRows }"
@@ -13,15 +13,19 @@
     </app-button-panel>
   </div>
 
-  <section *ngIf="metadata$ | async as metadata" id="serverSearch">
+  <div id="serverSearch">
     <form [formGroup]="filterForm">
       <dynamic-field
-        *ngFor="let field of filterFormMeta; trackBy: trackByField"
+        *ngFor="
+        let field of config.filterFormMeta;
+        trackBy: trackByField
+      "
         [formInstance]="filterForm"
         [field]="field">
       </dynamic-field>
+
     </form>
-  </section>
+  </div>
 
   <section class="main-content-area">
     <app-side-view
@@ -32,9 +36,9 @@
       (closed)="onCloseDetailView()"
     >
       <app-data-table
-        *ngIf="(employees$ | async)?.length"
-        [data]="(employees$ | async) || []"
-        [columns]="tableColumns"
+        [loading]="(loading$ | async) || false"
+        [data]="(items$ | async) || []"
+        [columns]="config.tableColumns"
         [sortable]="true"
         [paginatable]="true"
         [pageSizeOptions]="[10, 20]"

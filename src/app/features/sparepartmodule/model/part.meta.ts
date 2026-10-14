@@ -18,7 +18,7 @@ export const PART_TABLE_META = [
 export const PART_FILTER_FORM_META: FormField[] = [
   {name: 'sscategory', type: 'select', label: 'Category', required: false, mode: 'options'},
   {name: 'sspartstatus', type: 'select', label: 'Status', required: false, mode: 'options'},
-] as FormField[];
+];
 
 export const PART_MAIN_FORM_META: FormField[] = [
   {name: 'id', type: 'hidden', label: 'Part id', required: false, mode: 'none'},
@@ -32,7 +32,7 @@ export const PART_MAIN_FORM_META: FormField[] = [
   },
   {name: 'remakrs', type: 'text', label: 'Remarks', required: false, mode: 'regex'},
   {name: 'partstatus', type: 'select', label: 'Status', required: true, mode: 'options'},
-] as FormField[];
+];
 
 export const PART_IMMUTABLE_CONTROLLERS_META = [
   'branch', 'qoh','dolastordered','partmaster'

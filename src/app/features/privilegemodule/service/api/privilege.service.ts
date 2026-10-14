@@ -1,29 +1,44 @@
 import {Injectable} from '@angular/core';
-import {BaseHttpService} from '../../../../core/basehttp.service';
+import {BaseHttpService} from '../../../../applicationframework/basehttp.service';
 import {HttpClient} from '@angular/common/http';
 import {ApiEndpoints} from '../../../../core/api-endpoints';
 import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../../shared/models/apiresponse.model';
 import {Privilege} from '../../entity/privilege';
+import {CrudApiService} from '../../../../applicationframework/crudapi.service';
 
 @Injectable({
-  providedIn:'root'
+  providedIn: 'root'
 })
-export class PrivilegeService extends BaseHttpService<Privilege> {
+export class PrivilegeService extends BaseHttpService<Privilege> implements CrudApiService<Privilege> {
 
-  constructor(http: HttpClient){
+  constructor(
+    protected override http: HttpClient
+  ) {
     super(http);
   }
 
+  get(
+    params?: Record<string, unknown>
+  ): Observable<ApiResponse<Privilege>> {
 
-  get(params?:any):Observable<ApiResponse<Privilege>>{
-    return  this.getAll(ApiEndpoints.PRIVILEGE,params);
+    return this.getAll<Privilege>(
+      ApiEndpoints.PRIVILEGE,
+      params
+    );
   }
 
+  // Feature-specific API operations
+
   assignPrivileges(
-    roleId:number,
-    payload:any
-  ){
+    roleId: number,
+    payload: {
+      privileges: {
+        module: { id: number };
+        operation: { id: number };
+      }[];
+    }
+  ) {
     return this.postActionById(
       ApiEndpoints.PRIVILEGE,
       roleId,
@@ -32,11 +47,10 @@ export class PrivilegeService extends BaseHttpService<Privilege> {
     );
   }
 
-
   revokePrivilege(
-    roleId:number,
-    privilegeId:number
-  ){
+    roleId: number,
+    privilegeId: number
+  ) {
     return this.deleteActionByIds(
       ApiEndpoints.PRIVILEGE,
       roleId,
@@ -44,5 +58,4 @@ export class PrivilegeService extends BaseHttpService<Privilege> {
       'revoke'
     );
   }
-
 }

@@ -1,14 +1,12 @@
 import {FormField} from '../../../shared/models/formfieldata.model';
+import {getTomorrow} from '../../../shared/util/date.util';
 
 
 export const ROSTER_SHIFT_TABLE_META = [
   {key: 'shift.name', label: 'Shift'},
-  // {key: 'shift.tostart', label: 'Start Time'},
-  // {key: 'shift.toend', label: 'End Time'},
   {key: 'doshift', label: 'Date'},
   {key: 'designation.name', label: 'Role'},
   {key: 'requiredemployeecount', label: 'Count'},
-  // {key: 'actions', label: 'Actions'}
 ];
 
 
@@ -25,12 +23,8 @@ export const ROSTER_MAIN_FORM_META: FormField[] = [
         years:0,months: 0,days:6
       },
       minDate:getTomorrow()
-    }
-  },
-] as FormField[];
+    },
+    mode:"date"
+  }
+];
 
-function getTomorrow(): Date {
-  const date = new Date();
-  date.setDate(date.getDate() + 1);
-  return date;
-}

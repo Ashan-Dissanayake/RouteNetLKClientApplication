@@ -16,11 +16,47 @@
   $transition-speed: 0.15s ease-in-out;
 
   /* === TABLE CONTAINER === */
+  .table-container {
+    position: relative;
+    max-height: 600px;
+    overflow: auto;
+  }
+
   mat-table, table.mat-mdc-table {
     background-color: #fff;
     border-radius: 0px !important; /* Force absolute sharp grid alignment */
-    overflow: hidden;
+    width: 100%;
     border: 1px solid $border-color;
+  }
+
+  .table-actions {
+    padding: 8px 16px;
+    background: #fff;
+    display: flex;
+    justify-content: flex-end;
+
+    .search-field {
+      width: 100%;
+      max-width: 400px;
+      margin-bottom: 8px;
+
+      ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+        display: none;
+      }
+    }
+  }
+
+  .loading-shade {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 56px;
+    right: 0;
+    background: rgba(0, 0, 0, 0.15);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   /* === ROWS === */
@@ -33,6 +69,7 @@
     text-transform: uppercase;
     letter-spacing: 0.04em;
     height: 44px;
+    z-index: 100;
 
     @media (max-width: 768px) {
       font-size: 11.5px;
@@ -53,7 +90,7 @@
       box-shadow: inset 4px 0 0 $sltb-accent-teal;
     }
 
-    &.selected {
+    &.selected-row {
       background-color: #F0FDF4; /* Discrete green/teal accent for active selections */
       box-shadow: inset 4px 0 0 $sltb-active-blue;
     }
@@ -139,6 +176,29 @@
   }
 
   /* === NO DATA STATE === */
+  .no-data-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: $text-muted;
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 8px;
+      opacity: 0.5;
+    }
+
+    p {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 500;
+    }
+  }
+
   ::ng-deep .mat-mdc-table .mat-mdc-no-data-row {
     color: $text-muted;
     font-style: italic;

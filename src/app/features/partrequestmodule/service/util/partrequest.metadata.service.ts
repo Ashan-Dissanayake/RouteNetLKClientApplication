@@ -5,9 +5,10 @@ import {BranchService} from '../../../branchmodule/services/api/branch.service';
 import {PartRequestStatusService} from '../api/partrequeststatus.service';
 import {PartService} from '../../../sparepartmodule/service/api/part.service';
 import {PartRequestMetadata} from '../../model/partrequest.metadata.model';
+import {CrudMetadataService} from '../../../../applicationframework/crudmetadata.service';
 
 @Injectable()
-export class PartRequestMetadataService {
+export class PartRequestMetadataService implements CrudMetadataService<PartRequestMetadata>{
 
   constructor(
     private partRequestStatusService: PartRequestStatusService,
@@ -17,9 +18,17 @@ export class PartRequestMetadataService {
 
   loadAll(): Observable<PartRequestMetadata> {
     return forkJoin({
-      partRequestStatuses: this.partRequestStatusService.get().pipe(map(r => r.data)),
-      parts:               this.partService.getSummary().pipe(map(r => r.data)),
-      branches:            this.branchService.getSummary().pipe(map(r => r.data)),
+      partRequestStatuses:this.partRequestStatusService
+        .get()
+        .pipe(map(r => r.data)),
+
+      parts:this.partService
+        .getSummary()
+        .pipe(map(r => r.data)),
+
+      branches:this.branchService
+        .getSummary()
+        .pipe(map(r => r.data)),
     });
   }
 }

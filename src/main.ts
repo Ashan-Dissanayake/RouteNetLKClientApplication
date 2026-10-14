@@ -13,7 +13,7 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatButtonModule} from '@angular/material/button';
 import {provideRouter} from '@angular/router';
 import {routes} from './app/app.routes';
-import {ErrorInterceptor} from './app/core/errorInterceptor';
+import {ErrorInterceptor} from './app/shared/util/errorInterceptor';
 import {authInterceptor} from './app/security/auth.interceptor';
 import {NgxPermissionsModule} from 'ngx-permissions';
 import {Chart, registerables} from 'chart.js';

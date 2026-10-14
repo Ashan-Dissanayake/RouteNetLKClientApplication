@@ -8,7 +8,7 @@
 <div *ngIf="error$ | async as error" id="error-window">
   <mat-card>
     <mat-card-title>Error loading parts</mat-card-title>
-    <mat-card-content>{{ error?.message }}</mat-card-content>
+    <mat-card-content>{{ error ? error : 'An unknown error occurred.' }}</mat-card-content>
     <button mat-raised-button color="primary" (click)="reload()">Retry</button>
   </mat-card>
 </div>
@@ -16,20 +16,24 @@
 <!-- ===== Action Panel ===== -->
 <app-button-panel
   *ngIf="metadata$ | async as metadata"
-  [buttons]="actionPanelConfig"
+  [buttons]="config.actionPanel"
   (actionClicked)="onActionTriggered($event)"
   (dropdownClicked)="onDropdownOnlyClick($event)"
   [contextData]="{ selectedRows: selectedRows }"
 >
 </app-button-panel>
 
-<div *ngIf="metadata$ | async as metadata" id="serverSearch">
+<div id="serverSearch">
   <form [formGroup]="filterForm">
     <dynamic-field
-      *ngFor="let field of filterFormMeta; trackBy: trackByField"
+      *ngFor="
+        let field of config.filterFormMeta;
+        trackBy: trackByField
+      "
       [formInstance]="filterForm"
-      [field]="field"
-    ></dynamic-field>
+      [field]="field">
+    </dynamic-field>
+
   </form>
 </div>
 
@@ -42,9 +46,9 @@
   (closed)="onCloseDetailView()"
 >
   <app-data-table
-    *ngIf="(incidents$ | async)?.length"
-    [data]="(incidents$ | async) || []"
-    [columns]="tableColumns"
+    [loading]="(loading$ | async) || false"
+    [data]="(items$ | async) || []"
+    [columns]="config.tableColumns"
     [sortable]="true"
     [paginatable]="true"
     [pageSizeOptions]="[10, 20]"

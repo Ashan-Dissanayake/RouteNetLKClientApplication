@@ -3,11 +3,11 @@ import {FormField} from '../../../shared/models/formfieldata.model';
 export const EMPLOYEE_TABLE_META = [
   {key: 'number', label: 'Number'},
   {key: 'fullname', label: 'Full Name'},
-  {key: 'nic', label: 'NIC'},
-  {key: 'mobile', label: 'Mobile'},
+  // {key: 'nic', label: 'NIC'},
+  // {key: 'mobile', label: 'Mobile'},
   {key: 'email', label: 'Email'},
   {key: 'address', label: 'Address'},
-  {key: 'branch.name', label: 'Branch'},
+  // {key: 'branch.name', label: 'Branch'},
   {key: 'designation.name', label: 'Designation'},
   {key: 'department.name', label: 'Department'},
   {key: 'employeestatus.name', label: 'Status'},
@@ -18,7 +18,7 @@ export const EMPLOYEE_FILTER_FORM_META: FormField[] = [
   {name: 'ssname', type: 'text', label: 'Full Name', required: false, mode: "none"},
   {name: 'ssnumber', type: 'text', label: 'Number', required: false, mode: 'none'},
   {name: 'ssdepartment', type: 'select', label: 'Department', required: false, mode: 'options'},
-] as FormField[];
+] ;
 
 export const EMPLOYEE_MAIN_FORM_META: FormField[] = [
   {name: 'id', type: 'hidden', label: 'Employee id', required: false, mode: 'none'},
@@ -42,7 +42,7 @@ export const EMPLOYEE_MAIN_FORM_META: FormField[] = [
   {name: 'designation', type: 'select', label: 'Designation', required: true, mode: 'options'},
   {name: 'employeetype', type: 'select', label: 'Employee Type', required: true, mode: 'options'},
   {name: 'employeestatus', type: 'select', label: 'Employee Status', required: true, mode: 'options'},
-] as FormField[];
+] ;
 
 export const EMPLOYEE_IMMUTABLE_CONTROLLERS_META = [
   'doj'

@@ -17,7 +17,7 @@ export const INCIDENT_FILTER_FORM_META: FormField[] = [
   {name: 'ssincidenttype', type: 'select', label: 'Type', required: false, mode: 'options'},
   {name: 'sstripexecution', type: 'select', label: 'Trip Execution', required: false, mode: 'options'},
   {name: 'ssdoreport', type: 'date', label: 'Incident Date', required: false, mode: 'date'},
-] as FormField[];
+];
 
 export const INCIDENT_MAIN_FORM_META: FormField[] = [
   {name: 'id', type: 'hidden', label: 'Part id', required: false, mode: 'none'},
@@ -32,7 +32,7 @@ export const INCIDENT_MAIN_FORM_META: FormField[] = [
   {name: 'odometeratincident', type: 'text', label: 'Odo: at Incident', required: true, mode: 'none'},
   {name: 'remakrs', type: 'text', label: 'Remarks', required: true, mode: 'none'},
   {name: 'incidentstatus', type: 'select', label: 'status', required: true, mode: 'options'},
-] as FormField[];
+];
 
 export const INCIDENT_DATA_EXPORT_META = [
   {key: 'branch.name', header: 'Branch'},

@@ -24,7 +24,8 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {PermitMetadata} from '../model/permit.metadata.model';
 import {PermitFormService} from '../service/util/permitfrom.service';
 import {PermitMetadataService} from '../service/util/permit.metadata.service';
-import {BaseComponent} from '../../../shared/base/base.component';
+import {BaseComponent} from '../../../applicationframework/base.component';
+import {CrudPageConfig} from '../../../applicationframework/crudpage.config';
 
 @Component({
   selector: 'app-permit',
@@ -49,7 +50,7 @@ import {BaseComponent} from '../../../shared/base/base.component';
   ],
   templateUrl: './permit.component.html',
   styleUrl: './permit.component.scss',
-  standalone:true,
+  standalone: true,
   providers: [
     PermitFacadeService,
     PermitFormService,
@@ -58,34 +59,30 @@ import {BaseComponent} from '../../../shared/base/base.component';
 })
 export class PermitComponent extends BaseComponent<Permit, PermitMetadata> {
 
-  // ===== Static config =====
-  protected override readonly tableColumns = PERMIT_TABLE_META;
-  protected override readonly filterFormMeta = PERMIT_FILTER_FORM_META;
-  protected override readonly mainFormMeta = PERMIT_MAIN_FORM_META;
-  protected override readonly exportMeta = PERMIT_EXPORT_META;
-  protected override readonly actionPanelConfig = buildActionPanel();
+  protected override readonly config: CrudPageConfig = {
+    tableColumns: PERMIT_TABLE_META,
+    filterFormMeta: PERMIT_FILTER_FORM_META,
+    mainFormMeta: PERMIT_MAIN_FORM_META,
+    exportMeta: PERMIT_EXPORT_META,
+    actionPanel: buildActionPanel(),
+    moduleName: 'Permit',
+    excelFileName: 'permits.xlsx',
+  };
 
-  protected override readonly moduleName = 'Permit';
-  protected override readonly excelFileName = 'permits.xlsx';
+  protected override facade =
+    inject(PermitFacadeService);
 
-  // ===== Services =====
-  protected override facade = inject(PermitFacadeService);
-  protected override formService = inject(PermitFormService);
+  protected override formService =
+    inject(PermitFormService);
 
-  // ===== Streams =====
-  protected readonly permits$ = this.facade.permits$;
-  protected readonly metadata$ = this.facade.metadata$;
-  protected readonly loading$ = this.facade.loading$;
-  protected readonly error$ = this.facade.error$;
-
-  // ===== Custom actions =====
-  protected override getCustomRowActions(row: Permit): Record<string, () => void> {
+  protected override getCustomRowActions(
+    row: Permit
+  ): Record<string, () => void> {
     return {
-      transfer: () => this.transferPermit(row)
+      transfer: () => this.transferPermit(row),
     };
   }
 
-  // ===== Domain operation =====
   private transferPermit(row: Permit): void {
     this.dialog.showConfirmation({
       heading: 'Permit Transfer',
@@ -94,6 +91,7 @@ export class PermitComponent extends BaseComponent<Permit, PermitMetadata> {
     })
       .subscribe(confirmed => {
         if (!confirmed) return;
+
         this.facade.transfer(row.id)
           .pipe(takeUntil(this.destroy$))
           .subscribe({
@@ -102,21 +100,23 @@ export class PermitComponent extends BaseComponent<Permit, PermitMetadata> {
                 'Permit transferred successfully.'
               );
             },
+
             error: err => {
               const validationMessage =
                 err.friendlyMessage ||
                 err.error?.details?.join('\n') ||
                 err.message;
+
               this.dialog.showMessage({
                 heading: 'Failed to transfer permit',
-                message: validationMessage
+                message: validationMessage,
               });
             },
+
             complete: () => {
               this.facade.reload();
-            }
+            },
           });
       });
   }
-
 }
