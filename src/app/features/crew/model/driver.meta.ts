@@ -16,7 +16,7 @@ export const DRIVER_FILTER_FORM_META: FormField[] = [
   {name: 'sslicensenumber', type: 'text', label: 'License Number', required: false, mode: "none"},
   {name: 'sscrewstatus', type: 'select', label: 'Crew Status', required: false, mode: 'options'},
   {name: 'ssroutefamilitylevel', type: 'select', label: 'Route Familiarity Level', required: false, mode: 'options'},
-] as FormField[];
+] ;
 
 export const DRIVER_MAIN_FORM_META: FormField[] = [
   {name: 'id', type: 'hidden', label: 'Vehicle id', required: false, mode: 'none'},
@@ -49,7 +49,7 @@ export const DRIVER_MAIN_FORM_META: FormField[] = [
   },
   {name: 'crewstatus', type: 'select', label: 'Status', required: true, mode: 'options'},
   {name: 'routefamiliaritylevel', type: 'select', label: 'Route Familiarity Level', required: true, mode: 'options'},
-] as FormField[];
+] ;
 
 export const DRIVER_IMMUTABLE_CONTROLLERS_META = [
   'employee','number','licensenumber','crewstatus',

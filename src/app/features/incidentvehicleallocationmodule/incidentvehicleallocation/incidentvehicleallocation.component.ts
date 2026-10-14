@@ -21,7 +21,8 @@ import {MatIcon} from '@angular/material/icon';
 import {IncidentVehicleAllocationMetadata} from '../model/incidentvehicleallocation.metadata.model';
 import {IncidentVehicleAllocationFormService} from '../service/util/incidentvehicleallocationform.service';
 import {IncidentVehicleAllocationMetadataService} from '../service/util/incidentvehicleallocation.metadata.service';
-import {BaseComponent} from '../../../shared/base/base.component';
+import {BaseComponent} from '../../../applicationframework/base.component';
+import {CrudPageConfig} from '../../../applicationframework/crudpage.config';
 
 @Component({
   selector: 'app-incidentvehicleallocation',
@@ -48,7 +49,7 @@ import {BaseComponent} from '../../../shared/base/base.component';
   ],
   templateUrl: './incidentvehicleallocation.component.html',
   styleUrl: './incidentvehicleallocation.component.scss',
-  standalone:true,
+  standalone: true,
   providers: [
     IncidentVehicleAllocationFacadeService,
     IncidentVehicleAllocationFormService,
@@ -57,64 +58,93 @@ import {BaseComponent} from '../../../shared/base/base.component';
 })
 export class IncidentVehicleAllocationComponent extends BaseComponent<IncidentVehicleAllocation, IncidentVehicleAllocationMetadata> {
 
-  protected override readonly tableColumns = INCIDENT_VEHICLE_ALLOCATION_TABLE_META;
-  protected override readonly filterFormMeta = INCIDENT_VEHICLE_ALLOCATION_FILTER_FORM_META;
-  protected override readonly mainFormMeta = INCIDENT_VEHICLE_ALLOCATION_MAIN_FORM_META;
-  protected override readonly exportMeta = [];
-  protected override readonly actionPanelConfig =
-    buildActionPanel({ exclude: ['export'] });
+  protected override readonly config: CrudPageConfig = {
+    tableColumns: INCIDENT_VEHICLE_ALLOCATION_TABLE_META,
+    filterFormMeta: INCIDENT_VEHICLE_ALLOCATION_FILTER_FORM_META,
+    mainFormMeta: INCIDENT_VEHICLE_ALLOCATION_MAIN_FORM_META,
+    exportMeta: [],
+    actionPanel: buildActionPanel({
+      exclude: ['export'],
+    }),
+    moduleName: 'Incident Vehicle Allocation',
+    excelFileName: '',
+  };
 
-  protected override readonly moduleName = 'Incident Vehicle Allocation';
-  protected override readonly excelFileName = "";
+  protected override facade =
+    inject(IncidentVehicleAllocationFacadeService);
 
-  protected override facade = inject(IncidentVehicleAllocationFacadeService);
-  protected override formService = inject(IncidentVehicleAllocationFormService);
+  protected override formService =
+    inject(IncidentVehicleAllocationFormService);
 
-  protected readonly incidentVehicleAllocations$ = this.facade.incidentVehicleAllocations$;
-  protected readonly metadata$ = this.facade.metadata$;
-  protected readonly loading$ = this.facade.loading$;
-  protected readonly error$ = this.facade.error$;
+  protected override onRowAction(
+    action: string,
+    row: IncidentVehicleAllocation
+  ): void {
 
-  protected override getCustomRowActions(row: IncidentVehicleAllocation): Record<string, () => void> {
-    return {
+    const transitions: Record<
+      string,
+      () => Observable<IncidentVehicleAllocation>
+    > = {
       inProgress: () =>
-        this.executeTransition(
-          this.facade.inProgress(row),
-          'Allocation set to in progress.',
-          row
-        ),
+        this.facade.inProgress(row),
 
       pendingAllocation: () =>
-        this.executeTransition(
-          this.facade.pendingAllocation(row),
-          'Allocation set to pending.',
-          row
-        ),
+        this.facade.pendingAllocation(row),
 
       released: () =>
-        this.executeTransition(
-          this.facade.released(row),
-          'Allocation released.',
-          row
-        )
+        this.facade.released(row),
     };
+
+    const operation = transitions[action];
+
+    if (operation) {
+      this.executeTransition(
+        operation(),
+        this.getSuccessMessage(action),
+        row
+      );
+      return;
+    }
+
+    super.onRowAction(action, row);
   }
 
+  private getSuccessMessage(action: string): string {
 
-  private executeTransition(operation$: Observable<IncidentVehicleAllocation>, successMessage: string, row: IncidentVehicleAllocation): void {
+    const messages: Record<string, string> = {
+      inProgress: 'Allocation set to in progress.',
+      pendingAllocation: 'Allocation set to pending.',
+      released: 'Allocation released.',
+    };
+
+    return messages[action] ?? 'Allocation updated successfully.';
+  }
+
+  private executeTransition(
+    operation$: Observable<IncidentVehicleAllocation>,
+    successMessage: string,
+    row: IncidentVehicleAllocation
+  ): void {
+
     operation$
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => this.dialog.showSuccess(successMessage),
-        error: err => this.dialog.showErrorMessage('Failed to update allocation', err),
+        next: () =>
+          this.dialog.showSuccess(successMessage),
+
+        error: err =>
+          this.dialog.showErrorMessage(
+            'Failed to update allocation',
+            err
+          ),
+
         complete: () => {
           this.facade.reload();
+
           if (this.activeRow?.id === row.id) {
             this.activeRow = null;
           }
-        }
+        },
       });
   }
-
-
 }

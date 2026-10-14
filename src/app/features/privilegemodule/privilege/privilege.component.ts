@@ -1,21 +1,9 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {PrivilegeFacadeService} from '../service/util/privilegefacade.service';
-import {PrivilegeFormService} from '../service/util/privilegeform.service';
 import {PrivilegeLookUpDataService} from '../service/util/privilege.lookupdata.service';
 import {ReactiveFormsModule} from '@angular/forms';
-import { DataTableComponent} from '../../../shared/component/data-table/data-table.component';
-import {ButtonPanelComponent} from '../../../shared/component/button/button-panel/button-panel.component';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
-import {MatButton, MatIconButton} from '@angular/material/button';
-import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
-import {MatProgressBar} from '@angular/material/progress-bar';
-import {DynamicFieldComponent} from '../../../shared/component/form/dynamic-field.component';
-import {MatDivider} from '@angular/material/divider';
-import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
 import {NgxPermissionsModule} from 'ngx-permissions';
-import {SideViewComponent} from '../../../shared/component/side-view/side-view.component';
-import {TableCellDirective} from '../../../shared/component/data-table/table-cell.directive';
-import {MatIcon} from '@angular/material/icon';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {
   MatAccordion,
@@ -23,7 +11,7 @@ import {
   MatExpansionPanelHeader,
   MatExpansionPanelTitle
 } from '@angular/material/expansion';
-import {combineLatest, Observable, Subject, takeUntil} from 'rxjs';
+import {combineLatest, Subject, takeUntil} from 'rxjs';
 import {Role} from '../../usermodule/entity/role';
 import {Module} from '../entity/module';
 import {Operation} from '../entity/operation';
@@ -43,44 +31,53 @@ import {MatProgressSpinner} from '@angular/material/progress-spinner';
     MatExpansionPanel,
     MatExpansionPanelTitle,
     MatExpansionPanelHeader,
-    MatProgressSpinner
+    MatProgressSpinner,
   ],
   templateUrl: './privilege.component.html',
   styleUrl: './privilege.component.scss',
-  standalone:true,
-  providers:[
+  standalone: true,
+  providers: [
     PrivilegeFacadeService,
-    PrivilegeFormService,
-    PrivilegeLookUpDataService
-  ]
+    PrivilegeLookUpDataService,
+  ],
 })
-export class PrivilegeComponent{
-  private destroy$ = new Subject<void>();
+export class PrivilegeComponent implements OnInit, OnDestroy {
 
-  // UI Render Array
+  protected readonly facade = inject(PrivilegeFacadeService);
+
+  private readonly destroy$ = new Subject<void>();
+  protected readonly loading$ = this.facade.loading$;
+  protected readonly error$ = this.facade.error$;
+
   matrixModules: UiMatrixModule[] = [];
 
-  // Expose status streams for template loading states
-  protected readonly loading$:               Observable<boolean>;
-
   constructor(
-    private facade: PrivilegeFacadeService
-  ) {
-    this.loading$                = this.facade.loading$;
-  }
+  ) {}
 
   ngOnInit(): void {
-    // 1. Trigger lookup and master data load sequence
-    this.facade.initialize().pipe(takeUntil(this.destroy$)).subscribe();
 
-    // 2. Combine lookups and current active privileges to compute grid states reactively
+    this.facade.initialize()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        error: err => {
+          // Optional: show error message through your DialogService
+          console.error('Failed to initialize privilege module.', err);
+        }
+      });
+
     combineLatest({
-      lookups: this.facade.lookUpData$,
-      activePrivileges: this.facade.privileges$
+      metadata: this.facade.metadata$,
+      privileges: this.facade.items$,
     })
       .pipe(takeUntil(this.destroy$))
-      .subscribe(({ lookups, activePrivileges }) => {
-        this.buildMatrix(lookups.roles, lookups.modules, lookups.operations, activePrivileges);
+      .subscribe(({ metadata, privileges }) => {
+
+        this.buildMatrix(
+          metadata.roles,
+          metadata.modules,
+          metadata.operations,
+          privileges
+        );
       });
   }
 
@@ -90,37 +87,56 @@ export class PrivilegeComponent{
   }
 
   /**
-   * Transforms relational data into an organized Matrix grouped by Module -> Operations -> Roles
+   * Converts relational privilege data into the
+   * Module → Operations → Roles UI matrix.
    */
-  private buildMatrix(roles: Role[], modules: Module[], operations: Operation[], activePrivileges: Privilege[]): void {
-    this.matrixModules = modules.map(mod => {
-      // Find operations assigned to this module based on your schema foreign keys
-      const moduleOps = operations.filter(op => op.module.id === mod.id);
+  private buildMatrix(
+    roles: Role[],
+    modules: Module[],
+    operations: Operation[],
+    activePrivileges: Privilege[]
+  ): void {
 
-      // Construct a structural configuration mapping for each system user role
+    this.matrixModules = modules.map(module => {
+
+      const moduleOperations = operations.filter(
+        operation =>
+          operation.module.id === module.id
+      );
+
       const rows: MatrixRow[] = roles.map(role => {
-        const cellState: { [operationId: number]: Privilege | null } = {};
 
-        moduleOps.forEach(op => {
-          // Identify if a mapping entry exists in the privilege list
-          const activePriv = activePrivileges.find(p =>
-            p.role.id === role.id &&
-            p.module.id === mod.id &&
-            p.operation.id === op.id
-          );
-          cellState[op.id] = activePriv || null;
+        const cellState: {
+          [operationId: number]: Privilege | null;
+        } = {};
+
+        moduleOperations.forEach(operation => {
+
+          const activePrivilege =
+            activePrivileges.find(privilege =>
+              privilege.role.id === role.id &&
+              privilege.module.id === module.id &&
+              privilege.operation.id === operation.id
+            );
+
+          cellState[operation.id] =
+            activePrivilege ?? null;
         });
 
-        return { role, cellState };
+        return {
+          role,
+          cellState,
+        };
       });
 
-      return { module: mod, operations: moduleOps, rows };
+      return {
+        module,
+        operations: moduleOperations,
+        rows,
+      };
     });
   }
 
-  /**
-   * Dispatches network calls on toggle interactions based on the presence of existing IDs
-   */
   onToggleCell(
     roleId: number,
     moduleId: number,
@@ -133,33 +149,52 @@ export class PrivilegeComponent{
 
       const privilegePayload = {
         module: {
-          id: moduleId
+          id: moduleId,
         },
         operation: {
-          id: operationId
-        }
+          id: operationId,
+        },
       };
 
-      this.facade.assignPrivileges(roleId, [privilegePayload])
+      this.facade
+        .assignPrivileges(roleId, [privilegePayload])
+        .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: () => this.facade.reload()
+          next: () => this.facade.reload(),
+          error: err => {
+            console.error(
+              'Failed to assign privilege.',
+              err
+            );
+          },
         });
 
-    } else if (!checked && existingPrivilege) {
+      return;
+    }
 
-      this.facade.revokePrivileges(roleId, [existingPrivilege])
+    if (!checked && existingPrivilege) {
+
+      this.facade
+        .revokePrivileges(roleId, [existingPrivilege])
+        .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: () => this.facade.reload()
+          next: () => this.facade.reload(),
+          error: err => {
+            console.error(
+              'Failed to revoke privilege.',
+              err
+            );
+          },
         });
     }
   }
-
 }
 
 interface MatrixRow {
   role: Role;
-  // Maps operation_id -> active Privilege object if assigned, or null if unassigned
-  cellState: { [operationId: number]: Privilege | null };
+  cellState: {
+    [operationId: number]: Privilege | null;
+  };
 }
 
 interface UiMatrixModule {

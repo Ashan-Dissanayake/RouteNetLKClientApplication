@@ -3,12 +3,12 @@ import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {MatSnackBar, MatSnackBarConfig} from '@angular/material/snack-bar';
 import {Observable} from 'rxjs';
 import {FormGroup} from '@angular/forms';
-import {FormField} from '../shared/models/formfieldata.model';
-import {MessageComponent} from '../shared/component/message/message.component';
-import {ConfirmComponent} from '../shared/component/confirm/confirm.component';
-import {FormpopupComponent} from '../shared/component/form/formpopup/formpopup.component';
-import {PrintTableComponent} from '../shared/component/export/print/print-table.component';
-import {getErrorMessage} from './error.util';
+import {FormField} from '../models/formfieldata.model';
+import {MessageComponent} from '../component/message/message.component';
+import {ConfirmComponent} from '../component/confirm/confirm.component';
+import {FormpopupComponent} from '../component/form/formpopup/formpopup.component';
+import {PrintTableComponent} from '../component/export/print/print-table.component';
+import {getErrorMessage} from '../util/error.util';
 import {ComponentType} from '@angular/cdk/portal';
 
 const DEFAULT_CONFIG = {

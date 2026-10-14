@@ -10,31 +10,58 @@ import {RegexService} from '../../../../core/regex.service';
 import {VehicleMetadata} from '../../model/vehicle.metadata.model';
 import {forkJoin, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
+import {CrudMetadataService} from '../../../../applicationframework/crudmetadata.service';
 
 @Injectable()
-export class VehicleMetadataService {
+export class VehicleMetadataService
+  implements CrudMetadataService<VehicleMetadata> {
 
   constructor(
     private vehicleStatusService: VehicleStatusService,
-    private makeService:MakeService,
-    private modelService:ModelService,
-    private fuelTypeService:FuelTypeService,
-    private busTypeService:BusTypeService,
-    private conditionRateService:ConditionRateService,
-    private branchService:BranchService,
-    private regexService:RegexService,
+    private makeService: MakeService,
+    private modelService: ModelService,
+    private fuelTypeService: FuelTypeService,
+    private busTypeService: BusTypeService,
+    private conditionRateService: ConditionRateService,
+    private branchService: BranchService,
+    private regexService: RegexService,
   ) {}
 
   loadAll(): Observable<VehicleMetadata> {
+
     return forkJoin({
-      vehicleStatuses: this.vehicleStatusService.get().pipe(map(r => r.data)),
-      makes:this.makeService.get().pipe(map(r => r.data)),
-      models:this.modelService.get().pipe(map(r => r.data)),
-      fuelTypes:this.fuelTypeService.get().pipe(map(r => r.data)),
-      busTypes:this.busTypeService.get().pipe(map(r => r.data)),
-      conditionRates:this.conditionRateService.get().pipe(map(r => r.data)),
-      branches:this.branchService.getSummary().pipe(map(r => r.data)),
-      regexRules:this.regexService.getStaticRegexes('vehicles').pipe(map(r => r.data)),
+
+      vehicleStatuses: this.vehicleStatusService
+        .get()
+        .pipe(map(response => response.data)),
+
+      makes: this.makeService
+        .get()
+        .pipe(map(response => response.data)),
+
+      models: this.modelService
+        .get()
+        .pipe(map(response => response.data)),
+
+      fuelTypes: this.fuelTypeService
+        .get()
+        .pipe(map(response => response.data)),
+
+      busTypes: this.busTypeService
+        .get()
+        .pipe(map(response => response.data)),
+
+      conditionRates: this.conditionRateService
+        .get()
+        .pipe(map(response => response.data)),
+
+      branches: this.branchService
+        .getSummary()
+        .pipe(map(response => response.data)),
+
+      regexRules: this.regexService
+        .getStaticRegexes('vehicles')
+        .pipe(map(response => response.data)),
     });
   }
 }

@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { forkJoin, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import {Injectable} from '@angular/core';
+import {forkJoin, Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 import {BranchService} from '../../../branchmodule/services/api/branch.service';
 import {TripTypeService} from '../api/triptype.service';
 import {TripStatusService} from '../api/tripstatus.service';
@@ -9,6 +9,7 @@ import {OpCalenderService} from '../api/opcalender.service';
 import {OriginTerminalService} from '../api/originterminal.service';
 import {TripLookUpDataModel} from '../../model/trip.lookupdata.model';
 import {ShiftService} from '../../../rostermodule/service/api/shift.service';
+import {CrudMetadataService} from '../../../../applicationframework/crudmetadata.service';
 
 /**
  * Service to load lookup data for trips.
@@ -16,7 +17,7 @@ import {ShiftService} from '../../../rostermodule/service/api/shift.service';
  * and provides it as a single observable.
  */
 @Injectable()
-export class TripLookupDataService {
+export class TripLookupDataService implements CrudMetadataService<TripLookUpDataModel>{
   /**
    * Constructor for `TripLookupDataService`.
    * @param branchService Service to fetch branch-related data.
@@ -42,13 +43,33 @@ export class TripLookupDataService {
    */
   loadAll(): Observable<TripLookUpDataModel> {
     return forkJoin({
-      branches:        this.branchService.getSummary().pipe(map(r => r.data)),
-      tripTypes:       this.tripTypeService.get().pipe(map(r => r.data)),
-      tripStatuses:    this.tripStatusService.get().pipe(map(r => r.data)),
-      permits:         this.permitService.getSummary().pipe(map(r => r.data)),
-      opCalenders:     this.opCalenderService.get().pipe(map(r => r.data)),
-      shifts:     this.shiftService.get().pipe(map(r => r.data)),
-      originTerminals: this.originTerminalService.get().pipe(map(r => r.data)),
+      branches:this.branchService
+        .getSummary()
+        .pipe(map(r => r.data)),
+
+      tripTypes:this.tripTypeService
+        .get()
+        .pipe(map(r => r.data)),
+
+      tripStatuses:this.tripStatusService
+        .get()
+        .pipe(map(r => r.data)),
+
+      permits:this.permitService
+        .getSummary()
+        .pipe(map(r => r.data)),
+
+      opCalenders:this.opCalenderService
+        .get()
+        .pipe(map(r => r.data)),
+
+      shifts:this.shiftService
+        .get()
+        .pipe(map(r => r.data)),
+
+      originTerminals: this.originTerminalService
+        .get()
+        .pipe(map(r => r.data)),
     });
   }
 }

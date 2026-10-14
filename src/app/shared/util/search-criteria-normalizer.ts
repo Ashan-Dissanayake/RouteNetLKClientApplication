@@ -1,9 +1,11 @@
-export function normalizeSearchCriteria(criteria: Record<string, any>) {
+export function normalizeSearchCriteria(
+  criteria: Record<string, unknown>
+): Record<string, unknown> {
   return Object.fromEntries(
     Object.entries(criteria).map(([key, value]) => {
-      // 1. Handle Date objects (New Logic)
+
+      // 1. Handle Date objects
       if (value instanceof Date) {
-        // Using 'en-CA' is a clean way to get YYYY-MM-DD without extra libraries
         return [key, value.toLocaleDateString('en-CA')];
       }
 
@@ -13,7 +15,11 @@ export function normalizeSearchCriteria(criteria: Record<string, any>) {
       }
 
       // 3. Handle Objects with IDs
-      if (value && typeof value === 'object' && 'id' in value) {
+      if (
+        value &&
+        typeof value === 'object' &&
+        'id' in value
+      ) {
         return [key, value.id];
       }
 

@@ -5,8 +5,9 @@ import {DynamicFieldComponent} from '../dynamic-field.component';
 import {NgFor, NgIf} from '@angular/common';
 import {FormField} from '../../../models/formfieldata.model';
 import {ButtonAction, ButtonClickEvent, ButtonPanelComponent} from '../../button/button-panel/button-panel.component';
-import {DialogService} from '../../../../core/dialog.service';
-import {FormbuilderService} from '../../../../core/formbuilder.service';
+import {DialogService} from '../../../services/dialog.service';
+import {FormbuilderService} from '../../../services/formbuilder.service';
+import {FormSubmissionService} from '../../../services/formsubmission.service';
 
 @Component({
   selector: 'app-formpopup',
@@ -24,8 +25,6 @@ import {FormbuilderService} from '../../../../core/formbuilder.service';
 })
 export class FormpopupComponent {
 
-  isUpdate!:boolean;
-
   readonly  buttons: ButtonAction[] = [
     { label: 'Save', type: 'create', icon: 'add', disabled: false },
     { label: 'Cancel', type: 'cancel', icon: 'cancel', disabled: false }
@@ -33,13 +32,17 @@ export class FormpopupComponent {
 
   constructor(
     public dialogRef: MatDialogRef<FormpopupComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { form: FormGroup; meta: FormField[]; heading: string },
-    private dialogService:DialogService,
-    private formBuilderService:FormbuilderService
+    @Inject(MAT_DIALOG_DATA)
+    public data: {
+      form: FormGroup;
+      meta: FormField[];
+      heading: string;
+    },
+    private formSubmissionService: FormSubmissionService
   ) {}
 
   private onSave(): void {
-    this.formBuilderService.handleSave(
+    this.formSubmissionService.handleSave(
       this.data.form,
       this.data.heading,
       (payload) => {
@@ -49,96 +52,12 @@ export class FormpopupComponent {
     );
   }
 
-  //  private onSave(): void {
-  //   const form = this.data.form;
-  //
-  //   if (!form.valid) {
-  //     const invalidControls = this.formBuilderService.getInvalidControls(form)
-  //     const errorList = invalidControls.map(ctrl => `<li>${ctrl}</li>`).join('');
-  //
-  //     this.dialogService.showMessage({
-  //       heading: 'Validation Error',
-  //       message: `
-  //       <p>You have errors in the following fields:</p>
-  //       <ul>${errorList}</ul>
-  //     `
-  //     });
-  //     return;
-  //   }
-  //
-  //   this.isUpdate = !!form.get('id')?.value;
-  //
-  //   if (this.isUpdate) {
-  //     this.handleUpdate(form);
-  //   } else {
-  //     this.handleCreate(form);
-  //   }
-  // }
-
-  // private onCancel():void {
-  //   this.dialogRef.close();
-  //   this.data.form.reset();
-  // }
-
+  //not belongs to here.latter will change
   private onCancel(): void {
     this.data.form.reset();
     this.dialogRef.close();
   }
 
-  private handleCreate(form: FormGroup): void {
-    this.dialogService.showConfirmation({
-      heading:'Creating',
-      message: 'Do you want to create this?'
-    }).subscribe(confirmed => {
-      if (confirmed) {
-        this.dialogRef.close(form.getRawValue());
-      }
-    });
-  }
-
-  private handleUpdate(form: FormGroup): void {
-    const heading = 'Updating';
-    const dirtyValues = this.formBuilderService.getUpdatedValues(form);
-    const changedKeys = Object.keys(dirtyValues).filter(k => k !== 'id');
-
-    if (changedKeys.length === 0) {
-      this.dialogService.showMessage({
-        heading: heading,
-        message: `
-        <p>No fields have been modified. There’s nothing to update.</p>
-        <p>Please make some changes before submitting.</p>
-      `
-      });
-      return;
-    }
-
-    const changeListHtml = changedKeys
-      .map(key => `
-      <li>
-        <strong>${this.formBuilderService.formatLabel(key)}</strong>
-      </li>
-    `)
-      .join('');
-
-    const message = `
-    <p>You are about to update the following field${changedKeys.length > 1 ? 's' : ''}:</p>
-    <ul style="margin-top: 8px; margin-bottom: 8px;">${changeListHtml}</ul>
-    <p>Do you want to proceed with these changes?</p>
-  `;
-
-    this.dialogService.showConfirmation({ heading, message })
-      .subscribe(confirmed => {
-        if (confirmed) {
-          const submissionPayload = { ...form.getRawValue(), ...dirtyValues };
-          this.dialogRef.close(submissionPayload);
-        }
-      });
-  }
-
-  private actionHandlers: Record<string, () => void> = {
-    create: () => this.onSave(),
-    cancel: () => this.onCancel()
-  };
 
   handleAction(event: ButtonClickEvent | string) {
     const type = typeof event === 'string' ? event : event.type;
@@ -150,11 +69,5 @@ export class FormpopupComponent {
     }
   }
 
-  // handleAction(event: ButtonClickEvent | string) {
-  //   const type = typeof event === 'string' ? event : event.type;
-  //   const handler = this.actionHandlers[type];
-  //   if (handler) handler();
-  //   else this.dialogService.showWarning('Unhandled button action:', type);
-  // }
 
 }

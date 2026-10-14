@@ -1,7 +1,9 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, finalize, Observable, Subject, takeUntil, tap, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { normalizeSearchCriteria } from '../../core/search-criteria-normalizer';
+import { normalizeSearchCriteria } from '../shared/util/search-criteria-normalizer';
+import {CrudApiService} from './crudapi.service';
+import {CrudMetadataService} from './crudmetadata.service';
 
 @Injectable()
 export abstract class BaseFacade<TEntity, TMetadata> implements OnDestroy {
@@ -9,29 +11,18 @@ export abstract class BaseFacade<TEntity, TMetadata> implements OnDestroy {
   protected itemsSubject = new BehaviorSubject<TEntity[]>([]);
   protected metadataSubject: BehaviorSubject<TMetadata>;
   protected loadingSubject = new BehaviorSubject<boolean>(false);
-  protected errorSubject = new BehaviorSubject<any>(null);
+  protected errorSubject = new BehaviorSubject<unknown>(null);
   protected destroy$ = new Subject<void>();
 
   readonly items$ = this.itemsSubject.asObservable();
   readonly metadata$: Observable<TMetadata>;
   readonly loading$  = this.loadingSubject.asObservable();
-  readonly error$    = this.errorSubject.asObservable();
+  readonly error$ = this.errorSubject.asObservable();
 
   protected constructor(
-
-    protected apiService: {
-      get(params?: any): Observable<{ data: TEntity[] }>;
-      save?(data: TEntity): Observable<TEntity>;
-      update?(data: TEntity): Observable<TEntity>;
-      deactivate?(ids: number[]): Observable<number[]>;
-    },
-
-    protected metadataService: {
-      loadAll(): Observable<TMetadata>;
-    },
-
+    protected apiService: CrudApiService<TEntity>,
+    protected metadataService: CrudMetadataService<TMetadata>,
     emptyMetadata: TMetadata
-
   ) {
     this.metadataSubject = new BehaviorSubject<TMetadata>(emptyMetadata);
     this.metadata$ = this.metadataSubject.asObservable();
@@ -62,7 +53,7 @@ export abstract class BaseFacade<TEntity, TMetadata> implements OnDestroy {
     this.fetchItems();
   }
 
-  filter(criteria: Record<string, any>): void {
+  filter(criteria: Record<string, unknown>): void {
     const params = normalizeSearchCriteria(criteria);
     this.fetchItems(params);
   }
@@ -106,7 +97,8 @@ export abstract class BaseFacade<TEntity, TMetadata> implements OnDestroy {
     if (!this.apiService.deactivate) {
       return throwError(() => new Error('Deactivate operation is not implemented for this service.'));
     }
-    if (!items || items.length === 0) {
+
+    if (items.length === 0) {
       return throwError(() => new Error('No items selected.'));
     }
 
@@ -118,12 +110,14 @@ export abstract class BaseFacade<TEntity, TMetadata> implements OnDestroy {
     return this.apiService.deactivate(ids);
   }
 
-  protected fetchItems(params?: any): void {
+  protected fetchItems(
+    params?: Record<string, unknown>
+  ): void {
     this.setLoading(true);
     this.clearError();
 
     this.apiService.get(params).pipe(
-      map(res => res.data as TEntity[]),
+      map(res => res.data),
       tap(data => this.itemsSubject.next(data)),
       catchError(err => {
         this.errorSubject.next(err);
@@ -139,7 +133,7 @@ export abstract class BaseFacade<TEntity, TMetadata> implements OnDestroy {
 
   // Extensibility Hooks
   protected validateCreate(data: TEntity): string | null { return null; }
-  protected getDeactivationIds(items: TEntity[]): number[] { return []; }
+  protected getDeactivationIds(items: TEntity[]): number[] {return [];}
   protected getNoQualifyingDeactivateErrorMessage(): string { return 'No qualifying items could be deactivated.'; }
   protected beforeCreate(data: TEntity): TEntity {return data;}
   protected beforeUpdate(data: TEntity): TEntity {return data;}

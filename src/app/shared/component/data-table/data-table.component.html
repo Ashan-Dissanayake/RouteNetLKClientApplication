@@ -1,48 +1,77 @@
 
 <div class="table-wrapper" [ngClass]="tableClass" >
-  <mat-table [dataSource]="dataSource" matSort *ngIf="dataSource" class="mat-elevation-z0">
 
-    <!-- Checkbox Column -->
-    <ng-container matColumnDef="select">
-      <mat-header-cell class="checkbox-cell"  *matHeaderCellDef>
-        <mat-checkbox
-          (change)="toggleSelectAll($event.checked)">
-        </mat-checkbox>
-      </mat-header-cell>
-      <mat-cell class="checkbox-cell" *matCellDef="let row">
-        <mat-checkbox
-          [(ngModel)]="row.selected"
-          (ngModelChange)="onCheckBoxChanged(row, $event)"
-          (click)="$event.stopPropagation()">
-        </mat-checkbox>
-      </mat-cell>
-    </ng-container>
+  <div class="table-actions" *ngIf="showSearch">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>{{ searchPlaceholder }}</mat-label>
+      <input matInput (keyup)="applyFilter($event)" [placeholder]="searchPlaceholder" #input>
+      <mat-icon matPrefix>search</mat-icon>
+    </mat-form-field>
+  </div>
 
-    <!-- Dynamic columns -->
-    <ng-container *ngFor="let col of columns" [matColumnDef]="col.key">
-      <mat-header-cell *matHeaderCellDef [mat-sort-header]="sortable ? '' :''">
-        {{ col.label }}
-      </mat-header-cell>
+  <div class="loading-shade" *ngIf="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
 
-      <mat-cell *matCellDef="let row">
-        <!-- If consumer provided a custom template -->
-        <ng-container *ngIf="getTemplateForColumn(col.key) as tpl; else defaultCell">
-          <ng-container *ngTemplateOutlet="tpl; context: { $implicit: row, row: row, action: onActionClicked.bind(this) }"></ng-container>
-        </ng-container>
+  <div class="table-container">
+    <mat-table [dataSource]="dataSource" matSort *ngIf="dataSource" class="mat-elevation-z0">
 
-        <ng-template #defaultCell>
-          {{ getValue(row, col.key) }}
-        </ng-template>
-      </mat-cell>
-    </ng-container>
+      <!-- Checkbox Column -->
+      <ng-container matColumnDef="select">
+        <mat-header-cell class="checkbox-cell"  *matHeaderCellDef>
+          <mat-checkbox
+            (change)="toggleSelectAll($event.checked)"
+            matTooltip="Select All">
+          </mat-checkbox>
+        </mat-header-cell>
+        <mat-cell class="checkbox-cell" *matCellDef="let row">
+          <mat-checkbox
+            [(ngModel)]="row.selected"
+            (ngModelChange)="onCheckBoxChanged(row, $event)"
+            (click)="$event.stopPropagation()"
+            matTooltip="Select Row">
+          </mat-checkbox>
+        </mat-cell>
+      </ng-container>
 
-    <!-- Header Row -->
-    <mat-header-row *matHeaderRowDef="displayedColumns;" ></mat-header-row>
-    <!--  Data Row-->
-    <mat-row *matRowDef="let row; columns: displayedColumns" (click)="onRowClicked(row)"></mat-row>
+      <!-- Dynamic columns -->
+      <ng-container *ngFor="let col of columns" [matColumnDef]="col.key">
+        <mat-header-cell *matHeaderCellDef [mat-sort-header]="sortable ? '' :''" sticky>
+          {{ col.label }}
+        </mat-header-cell>
 
+        <mat-cell *matCellDef="let row">
+          <!-- If consumer provided a custom template -->
+          <ng-container *ngIf="getTemplateForColumn(col.key) as tpl; else defaultCell">
+            <ng-container *ngTemplateOutlet="tpl; context: { $implicit: row, row: row, action: onActionClicked.bind(this) }"></ng-container>
+          </ng-container>
 
-  </mat-table>
+          <ng-template #defaultCell>
+            {{ getValue(row, col.key) }}
+          </ng-template>
+        </mat-cell>
+      </ng-container>
+
+      <!-- No Data Row -->
+      <tr class="mat-row no-data-row" *matNoDataRow>
+        <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+          <div class="no-data-content">
+            <mat-icon>inbox</mat-icon>
+            <p>No records found matching the criteria.</p>
+          </div>
+        </td>
+      </tr>
+
+      <!-- Header Row -->
+      <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" ></mat-header-row>
+      <!--  Data Row-->
+      <mat-row *matRowDef="let row; columns: displayedColumns"
+               (click)="onRowClicked(row)"
+               [ngClass]="{'selected-row': row.selected}">
+      </mat-row>
+
+    </mat-table>
+  </div>
 
   <mat-paginator *ngIf="paginatable"
                  [pageSizeOptions]="pageSizeOptions"

@@ -25,7 +25,8 @@ import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
 import {IncidentMetadata} from '../model/incidentreport.metadata.model';
 import {IncidentFormService} from '../service/util/incidentform.service';
 import {IncidentMetadataService} from '../service/util/incident.metadata.service';
-import {BaseComponent} from '../../../shared/base/base.component';
+import {BaseComponent} from '../../../applicationframework/base.component';
+import {CrudPageConfig} from '../../../applicationframework/crudpage.config';
 
 @Component({
   selector: 'app-incidentreport',
@@ -46,16 +47,15 @@ import {BaseComponent} from '../../../shared/base/base.component';
     ReactiveFormsModule,
     SideViewComponent,
     TableCellDirective,
-    MatIcon,
     NgClass,
     MatIconButton,
     MatMenu,
     MatMenuItem,
-    MatMenuTrigger
+    MatMenuTrigger,
   ],
   templateUrl: './incidentreport.component.html',
   styleUrl: './incidentreport.component.scss',
-  standalone:true,
+  standalone: true,
   providers: [
     IncidentFacadeService,
     IncidentFormService,
@@ -64,83 +64,103 @@ import {BaseComponent} from '../../../shared/base/base.component';
 })
 export class IncidentReportComponent extends BaseComponent<Incident, IncidentMetadata> {
 
-  // ===== Static config =====
-  protected override readonly tableColumns = INCIDENT_TABLE_META;
-  protected override readonly filterFormMeta = INCIDENT_FILTER_FORM_META;
-  protected override readonly mainFormMeta = INCIDENT_MAIN_FORM_META;
-  protected override readonly exportMeta = INCIDENT_DATA_EXPORT_META;
-  protected override readonly actionPanelConfig =
-    buildActionPanel({
+  protected override readonly config: CrudPageConfig = {
+    tableColumns: INCIDENT_TABLE_META,
+    filterFormMeta: INCIDENT_FILTER_FORM_META,
+    mainFormMeta: INCIDENT_MAIN_FORM_META,
+    exportMeta: INCIDENT_DATA_EXPORT_META,
+    actionPanel: buildActionPanel({
       permissionMap: {
-        create: 'incident-add'
-      }
-    });
+        create: 'incident-add',
+      },
+    }),
+    moduleName: 'Incident',
+    excelFileName: 'incidents.xlsx',
+  };
 
-  protected override readonly moduleName = 'Incident';
-  protected override readonly excelFileName = 'incidents.xlsx';
+  protected override facade =
+    inject(IncidentFacadeService);
 
-  // ===== Subclass services =====
-  protected override facade = inject(IncidentFacadeService);
-  protected override formService = inject(IncidentFormService);
+  protected override formService =
+    inject(IncidentFormService);
 
-  // ===== Template streams mapping =====
-  protected readonly incidents$ = this.facade.incidents$;
-  protected readonly metadata$ = this.facade.metadata$;
-  protected readonly loading$ = this.facade.loading$;
-  protected readonly error$ = this.facade.error$;
+  protected override onRowAction(
+    action: string,
+    row: Incident
+  ): void {
 
-
-  // ===== Override domain actions =====
-  protected override getCustomRowActions(row: Incident): Record<string, () => void> {
-    return {
+    const transitions: Record<
+      string,
+      () => Observable<Incident>
+    > = {
       inProgress: () =>
-        this.executeDomainAction(
-          this.facade.inProgress(row),
-          'Incident set to in progress.',
-          row
-        ),
+        this.facade.inProgress(row),
 
       vehicleRecovery: () =>
-        this.executeDomainAction(
-          this.facade.vehicleRecovery(row),
-          'Vehicle recovery initiated.',
-          row
-        ),
+        this.facade.vehicleRecovery(row),
 
       pendingAllocation: () =>
-        this.executeDomainAction(
-          this.facade.pendingAllocation(row),
-          'Incident pending allocation.',
-          row
-        ),
+        this.facade.pendingAllocation(row),
 
       resolved: () =>
-        this.executeDomainAction(
-          this.facade.resolved(row),
-          'Incident resolved.',
-          row
-        ),
+        this.facade.resolved(row),
 
       closed: () =>
-        this.executeDomainAction(
-          this.facade.closed(row),
-          'Incident closed.',
-          row
-        )
+        this.facade.closed(row),
     };
+
+    const operation = transitions[action];
+
+    if (operation) {
+      this.executeDomainAction(
+        operation(),
+        this.getSuccessMessage(action),
+        row
+      );
+      return;
+    }
+
+    super.onRowAction(action, row);
   }
 
-  private executeDomainAction(operation$: Observable<Incident>, successMessage: string, row: Incident): void {
+  private getSuccessMessage(action: string): string {
+
+    const messages: Record<string, string> = {
+      inProgress: 'Incident set to in progress.',
+      vehicleRecovery: 'Vehicle recovery initiated.',
+      pendingAllocation: 'Incident pending allocation.',
+      resolved: 'Incident resolved.',
+      closed: 'Incident closed.',
+    };
+
+    return messages[action] ?? 'Incident updated successfully.';
+  }
+
+  private executeDomainAction(
+    operation$: Observable<Incident>,
+    successMessage: string,
+    row: Incident
+  ): void {
+
     operation$
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => this.dialog.showSuccess(successMessage),
-        error: err => this.dialog.showErrorMessage('Failed to update incident', err),
+        next: () =>
+          this.dialog.showSuccess(successMessage),
+
+        error: err =>
+          this.dialog.showErrorMessage(
+            'Failed to update incident',
+            err
+          ),
+
         complete: () => {
           this.facade.reload();
-          if (this.activeRow?.id === row.id) this.activeRow = null;
-        }
+
+          if (this.activeRow?.id === row.id) {
+            this.activeRow = null;
+          }
+        },
       });
   }
-
 }

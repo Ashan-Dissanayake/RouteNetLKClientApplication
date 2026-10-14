@@ -1,32 +1,53 @@
 import {Injectable} from '@angular/core';
-import {BaseHttpService} from '../../../../core/basehttp.service';
+import {BaseHttpService} from '../../../../applicationframework/basehttp.service';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../../core/api-endpoints';
 import {Incident} from '../../entity/incident';
 import {Trip} from '../../../tripmodule/entity/trip';
+import {CrudApiService} from '../../../../applicationframework/crudapi.service';
 
 @Injectable({ providedIn: 'root' })
-export class IncidentService extends BaseHttpService <Incident>{
+export class IncidentService extends BaseHttpService<Incident> implements CrudApiService<Incident> {
 
-  constructor(protected override http: HttpClient) {
+  constructor(
+    protected override http: HttpClient
+  ) {
     super(http);
   }
 
-  get(params?:any):Observable<ApiResponse<Incident>>{
-    return  this.getAll(ApiEndpoints.INCIDENTS,params);
+  get(
+    params?: Record<string, unknown>
+  ): Observable<ApiResponse<Incident>> {
+
+    return this.getAll<Incident>(
+      ApiEndpoints.INCIDENTS,
+      params
+    );
   }
 
-  getSummary():Observable<ApiResponse<Incident>>{
-    return  this.getAll(ApiEndpoints.INCIDENTS_SUMMARIES);
+  getSummary(): Observable<ApiResponse<Incident>> {
+
+    return this.getAll<Incident>(
+      ApiEndpoints.INCIDENTS_SUMMARIES
+    );
   }
 
-  save(incident:Incident):Observable<Incident>{
-    return this.post(ApiEndpoints.INCIDENTS,incident);
+  save(
+    incident: Incident
+  ): Observable<Incident> {
+
+    return this.post(
+      ApiEndpoints.INCIDENTS,
+      incident
+    );
   }
 
-  inProgress(id: number): Observable<Incident> {
+  inProgress(
+    id: number
+  ): Observable<Incident> {
+
     return this.postActionById(
       ApiEndpoints.INCIDENTS,
       id,
@@ -34,7 +55,10 @@ export class IncidentService extends BaseHttpService <Incident>{
     );
   }
 
-  vehicleRecovery(id: number): Observable<Incident> {
+  vehicleRecovery(
+    id: number
+  ): Observable<Incident> {
+
     return this.postActionById(
       ApiEndpoints.INCIDENTS,
       id,
@@ -42,7 +66,10 @@ export class IncidentService extends BaseHttpService <Incident>{
     );
   }
 
-  pendingAllocation(id: number): Observable<Incident> {
+  pendingAllocation(
+    id: number
+  ): Observable<Incident> {
+
     return this.postActionById(
       ApiEndpoints.INCIDENTS,
       id,
@@ -50,7 +77,10 @@ export class IncidentService extends BaseHttpService <Incident>{
     );
   }
 
-  resolved(id: number): Observable<Incident> {
+  resolved(
+    id: number
+  ): Observable<Incident> {
+
     return this.postActionById(
       ApiEndpoints.INCIDENTS,
       id,
@@ -58,7 +88,10 @@ export class IncidentService extends BaseHttpService <Incident>{
     );
   }
 
-  closed(id: number): Observable<Incident> {
+  closed(
+    id: number
+  ): Observable<Incident> {
+
     return this.postActionById(
       ApiEndpoints.INCIDENTS,
       id,
@@ -66,9 +99,13 @@ export class IncidentService extends BaseHttpService <Incident>{
     );
   }
 
-  deactivate(ids: number[] | number): Observable<number[]> {
-    const payload = Array.isArray(ids) ? ids : [ids];
-    return this.http.post<number[]>(ApiEndpoints.INCIDENTS,payload);
-  }
+  deactivate(
+    ids: number[]
+  ): Observable<number[]> {
 
+    return this.http.post<number[]>(
+      ApiEndpoints.INCIDENTS,
+      ids
+    );
+  }
 }

@@ -15,7 +15,7 @@ export const FARE_COLLECTION_TABLE_META = [
 export const FARE_COLLECTION_FILTER_FORM_META: FormField[] = [
   {name: 'sstripexecution', type: 'select', label: 'Trip Execution', required: false, mode: 'options'},
   {name: 'ssticketmachine', type: 'select', label: 'Ticket Machine', required: false, mode: 'options'},
-] as FormField[];
+] ;
 
 export const FARE_COLLECTION_MAIN_FORM_META: FormField[] = [
   {name: 'id', type: 'hidden', label: 'Grn id', required: false, mode: 'none'},
@@ -25,7 +25,7 @@ export const FARE_COLLECTION_MAIN_FORM_META: FormField[] = [
   {name: 'totaltickets', type: 'number', label: 'Total Tickets', required: true, mode: 'none'},
   {name: 'cachecollected', type: 'number', label: 'Cache Collected', required: true, mode: 'none'},
   {name: 'digitalpayments', type: 'number', label: 'Digital Payment', required: true, mode: 'none'}
-] as FormField[];
+] ;
 
 export const FARE_COLLECTION_DATA_EXPORT_META = [
   {key: 'branch.name', header: 'Branch'},

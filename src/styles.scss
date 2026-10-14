@@ -60,6 +60,36 @@ mat-card-title {
   margin-bottom: 16px;
 }
 
+/* --- Skeleton Loading Animation --- */
+@keyframes skeleton-loading {
+  0% { background-color: #E2E8F0; }
+  50% { background-color: #F1F5F9; }
+  100% { background-color: #E2E8F0; }
+}
+
+.skeleton {
+  animation: skeleton-loading 1.5s infinite linear;
+  border-radius: 4px;
+  display: inline-block;
+  width: 100%;
+}
+
+.skeleton-text {
+  height: 12px;
+  margin-bottom: 8px;
+}
+
+.skeleton-card {
+  height: 100px;
+  width: 100%;
+}
+
+.skeleton-circle {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+}
+
 /* --- Production Clean Scrollbar Layouts --- */
 ::-webkit-scrollbar {
   width: 6px;

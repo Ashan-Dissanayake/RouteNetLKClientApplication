@@ -16,12 +16,12 @@ export const VEHICLE_SERVICE_TABLE_META = [
 export const VEHICLE_SERVICE_FILTER_FORM_META: FormField[] = [
   {name: 'ssvehicle', type: 'select', label: 'Vehicle', required: false, mode: 'options',optionLabelKey:'number'},
   {name: 'ssdocreated', type: 'date', label: 'Created Date', required: false, mode: 'date'},
-] as FormField[];
+];
 
 export const VEHICLE_SERVICE_LINE_META:FormField[] = [
   {name: 'part', type: 'select', label: 'Part', required: true, mode: 'options'},
   {name: 'quantity', type: 'text', label: 'Quantity', required: true, mode: 'none',},
-] as FormField[]
+];
 
 export const VEHICLE_SERVICE_LINE_COLUMNS:InnerTableColumn[] = [
   { field: 'part.name',header: 'Part'},
@@ -43,7 +43,7 @@ export const VEHICLE_SERVICE_MAIN_FORM_META: FormField[] = [
   {name: 'vehicleservicetype', type: 'select', label: 'Service Type', required: true, mode: 'options'},
   {name: 'vehicleservicepriority', type: 'select', label: 'Priority', required: true, mode: 'options'},
   {name: 'vehicleservicestatus', type: 'select', label: 'Status', required: true, mode: 'options'},
-] as FormField[];
+]
 
 
 export const VEHICLE_SERVICE_DATA_EXPORT_META = [

@@ -3,35 +3,31 @@ import {Part} from '../../entity/part';
 import {PartService} from '../api/part.service';
 import {EMPTY_PART_METADATA, PartMetadata} from '../../model/sparepart.metadata.model';
 import {PartMetadataService} from './sparepart.metadata.service';
-import {BaseFacade} from '../../../../shared/base/base.facade';
+import {BaseFacade} from '../../../../applicationframework/base.facade';
 
 @Injectable()
 export class SparePartFacadeService extends BaseFacade<Part, PartMetadata> {
 
   constructor(
     private partService: PartService,
-    private sparePartMetadataService: PartMetadataService,
+    metadataService: PartMetadataService,
   ) {
     super(
       partService,
-      sparePartMetadataService,
+      metadataService,
       EMPTY_PART_METADATA
     );
   }
 
-  readonly parts$ = this.items$;
-
-
-  protected override getDeactivationIds(parts: Part[]): number[] {
-
+  protected override getDeactivationIds(
+    parts: Part[]
+  ): number[] {
     return parts
-      .map(p => p.id!)
-      .filter(id => id != null);
+      .map(part => part.id)
+      .filter((id): id is number => id != null);
   }
-
 
   protected override getNoQualifyingDeactivateErrorMessage(): string {
     return 'No parts selected for deactivation.';
   }
-
 }

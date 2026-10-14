@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {PrintService} from '../print-service';
-import {PrintDialogOptions} from '../../../../core/dialog.service';
+import {PrintDialogOptions} from '../../../services/dialog.service';
 import {ButtonAction, ButtonClickEvent, ButtonPanelComponent} from '../../button/button-panel/button-panel.component';
 
 

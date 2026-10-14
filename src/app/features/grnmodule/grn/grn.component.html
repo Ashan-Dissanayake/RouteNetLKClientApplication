@@ -1,106 +1,172 @@
 <div class="container">
   <h2>GRN Details Management</h2>
 </div>
+
 <!-- Loading -->
 <mat-progress-bar *ngIf="loading$ | async" mode="indeterminate"></mat-progress-bar>
 
 <!-- Error -->
 <div *ngIf="error$ | async as error" id="error-window">
   <mat-card>
-    <mat-card-title>Error loading parts</mat-card-title>
-    <mat-card-content>{{ error?.message }}</mat-card-content>
-    <button mat-raised-button color="primary" (click)="reload()">Retry</button>
+    <mat-card-title>Error loading GRNs</mat-card-title>
+    <mat-card-content>{{ error ? error : 'An unknown error occurred.' }}</mat-card-content>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="reload()">
+      Retry
+    </button>
   </mat-card>
 </div>
 
-<!-- ===== Action Panel ===== -->
+<!-- Action Panel -->
 <app-button-panel
-  *ngIf="metadata$ | async as metadata"
-  [buttons]="actionPanelConfig"
+  [buttons]="config.actionPanel"
   (actionClicked)="onActionTriggered($event)"
   (dropdownClicked)="onDropdownOnlyClick($event)"
-  [contextData]="{ selectedRows: selectedRows }"
->
+  [contextData]="{ selectedRows: selectedRows }">
 </app-button-panel>
 
-<div *ngIf="metadata$ | async as metadata" id="serverSearch">
+<!-- Filter -->
+<div id="serverSearch">
   <form [formGroup]="filterForm">
+
     <dynamic-field
-      *ngFor="let field of filterFormMeta; trackBy: trackByField"
+      *ngFor="
+        let field of config.filterFormMeta;
+        trackBy: trackByField
+      "
       [formInstance]="filterForm"
-      [field]="field"
-    ></dynamic-field>
+      [field]="field">
+    </dynamic-field>
+
   </form>
 </div>
 
-
-<!-- ===== Main Table with Side View ===== -->
+<!-- Main Table with Side View -->
 <app-side-view
   [opened]="activeRow !== null"
   [data]="activeRow"
   [title]="'GRN Details'"
   [viewTemplate]="partDetailTemplate"
-  (closed)="onCloseDetailView()"
->
+  (closed)="onCloseDetailView()">
+
   <app-data-table
-    *ngIf="(grns$ | async)?.length"
-    [data]="(grns$ | async) || []"
-    [columns]="tableColumns"
+    [loading]="(loading$ | async) || false"
+    [data]="(items$  | async) || []"
+    [columns]="config.tableColumns"
     [sortable]="true"
     [paginatable]="true"
     [pageSizeOptions]="[10, 20]"
     (rowClick)="onRowClick($event)"
     (checkBoxClick)="onRowCheckboxChanged($event)"
     (selectAllClick)="onSelectAll($event)"
-    (actionClick)="onRowAction($event.action, $event.row)"
-  >
+    (actionClick)="onRowAction($event.action, $event.row)">
+
     <!-- Row Actions -->
-    <ng-template tableCell="actions" let-row let-action="action">
-      <button mat-button (click)="action('edit', row); $event.stopPropagation()">
+    <ng-template
+      tableCell="actions"
+      let-row
+      let-action="action">
+
+      <button
+        mat-button
+        (click)="action('edit', row); $event.stopPropagation()">
+
         <mat-icon>mode_edit</mat-icon>
+
       </button>
+
     </ng-template>
+
   </app-data-table>
+
 </app-side-view>
 
-<!--Template for detail view -->
+
+<!-- Detail View Template -->
 <ng-template #partDetailTemplate let-row>
-  <div  class="grn-detail-container">
+
+  <div class="grn-detail-container">
+
     <!-- Header -->
     <div class="header">
+
       <div class="title-section">
-        <mat-icon color="primary" class="grn-icon">assignment_turned_in</mat-icon>
+
+        <mat-icon
+          color="primary"
+          class="grn-icon">
+          assignment_turned_in
+        </mat-icon>
+
         <div>
-          <h6 class="grn-title">{{ row.number }}</h6>
-          <p class="grn-subtitle">{{ row.branch.name}}</p>
+          <h6 class="grn-title">
+            {{ row.number }}
+          </h6>
+
+          <p class="grn-subtitle">
+            {{ row.branch.name }}
+          </p>
         </div>
+
       </div>
 
       <span
         class="status-chip"
         [ngClass]="{
-        'draft': row.grnstatus.name === 'Draft',
-        'partially-received': row.grnstatus.name === 'Partially Received',
-        'received': row.grnstatus.name === 'Received',
-      }">
-      {{ row.grnstatus.name }}
+          'draft': row.grnstatus.name === 'Draft',
+          'partially-received':
+            row.grnstatus.name === 'Partially Received',
+          'received':
+            row.grnstatus.name === 'Received'
+        }">
+
+        {{ row.grnstatus.name }}
+
       </span>
+
     </div>
+
     <mat-divider></mat-divider>
+
 
     <!-- General Info -->
     <div class="info-grid">
+
       <div class="info-item">
-        <span class="label">Received Date</span>
-        <span class="value">{{ row.doreceived || '-' }}</span>
+
+        <span class="label">
+          Received Date
+        </span>
+
+        <span class="value">
+          {{ row.doreceived || '-' }}
+        </span>
+
       </div>
+
     </div>
+
     <mat-divider></mat-divider>
-    <div class="coverage-grid ">
-      <mat-chip  *ngFor="let item of row.grnpartrequestitems" selected>
-        x{{ item.quantity}} x{{ item.partrequestitem.part.name}}
+
+
+    <!-- GRN Part Request Items -->
+    <div class="coverage-grid">
+
+      <mat-chip
+        *ngFor="let item of row.grnpartrequestitems"
+        selected>
+
+        x{{ item.quantity }}
+        x{{ item.partrequestitem.part.name }}
+
       </mat-chip>
+
     </div>
+
     <mat-divider></mat-divider>
+
   </div>
+
 </ng-template>

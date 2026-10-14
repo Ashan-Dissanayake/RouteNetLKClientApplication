@@ -19,7 +19,8 @@ import {MatIcon} from '@angular/material/icon';
 import {PartMetadata} from '../model/sparepart.metadata.model';
 import {PartFormService} from '../service/util/sparepartform.service';
 import {PartMetadataService} from '../service/util/sparepart.metadata.service';
-import {BaseComponent} from '../../../shared/base/base.component';
+import {BaseComponent} from '../../../applicationframework/base.component';
+import {CrudPageConfig} from '../../../applicationframework/crudpage.config';
 
 @Component({
   selector: 'app-sparepart',
@@ -53,68 +54,26 @@ import {BaseComponent} from '../../../shared/base/base.component';
 })
 export class SparePartComponent extends BaseComponent<Part, PartMetadata> {
 
-  protected override readonly tableColumns = PART_TABLE_META;
-  protected override readonly filterFormMeta = PART_FILTER_FORM_META;
-  protected override readonly mainFormMeta = PART_MAIN_FORM_META;
-  protected override readonly immutableControllers = PART_IMMUTABLE_CONTROLLERS_META;
-  protected override readonly exportMeta = PART_DATA_EXPORT_META;
+  protected override readonly config: CrudPageConfig = {
+    tableColumns: PART_TABLE_META,
+    filterFormMeta: PART_FILTER_FORM_META,
+    mainFormMeta: PART_MAIN_FORM_META,
+    immutableControllers: PART_IMMUTABLE_CONTROLLERS_META,
+    exportMeta: PART_DATA_EXPORT_META,
 
-  protected override readonly actionPanelConfig = buildActionPanel();
+    actionPanel: buildActionPanel(),
 
-  protected override readonly moduleName = 'Spare Part';
-  protected override readonly excelFileName = 'spare-parts.xlsx';
+    moduleName: 'Spare Part',
+    excelFileName: 'spare-parts.xlsx',
+  };
 
-  protected override facade = inject(SparePartFacadeService);
-  protected override formService = inject(PartFormService);
+  protected override facade =
+    inject(SparePartFacadeService);
 
-  protected readonly parts$ = this.facade.items$;
-  protected readonly metadata$ = this.facade.metadata$;
-  protected readonly loading$ = this.facade.loading$;
-  protected readonly error$ = this.facade.error$;
+  protected override formService =
+    inject(PartFormService);
 
-  protected override getCustomRowActions(row: Part): Record<string, () => void> {
-    return {
-      edit: () =>
-        this.openEditForm(row)
-    };
+  protected override getDeactivateConfirmationMessage(): string {
+    return 'Selected parts will be deactivated. Are you sure?';
   }
-
-
-  protected override getCustomActionPanelHandlers() {
-    return {
-      'bulk-deactivate': () =>
-        this.deactivateSelected()
-    };
-  }
-
-  protected override deactivateSelected(): void {
-    if(this.selectedRows.size === 0){
-      this.dialog.showWarning(
-        'Please select at least one record to deactivate.'
-      );
-      return;
-    }
-
-    this.dialog.showConfirmation({
-      heading: 'Deactivate Parts',
-      message: 'Selected parts will be deactivated. Are you sure?'
-
-    })
-      .subscribe(confirmed => {
-        if(!confirmed) return;
-        this.facade
-          .deactivate(Array.from(this.selectedRows))
-          .pipe(takeUntil(this.destroy$))
-          .subscribe({
-            next: () => this.dialog.showSuccess('Selected parts deactivated successfully.'),
-            error: err => this.dialog.showErrorMessage('Failed to deactivate', err),
-            complete: () => {
-              this.selectedRows.clear();
-              this.selectedCount = 0;
-              this.facade.reload();
-            }
-          });
-      });
-  }
-
 }

@@ -9,7 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { AuthService } from '../../security/auth.service';
-import { DialogService } from '../../core/dialog.service';
+import { DialogService } from '../../shared/services/dialog.service';
 
 @Component({
   selector: 'app-login',

@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
-import { NotificationService } from '../../../core/notification.service';
+import { NotificationService } from '../../services/notification.service';
 import { AppNotification } from '../../models/notification.model';
 
 @Component({

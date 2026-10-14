@@ -6,9 +6,10 @@ import {IncidentVehicleAllocationStatusService} from '../api/incidenvehiclealloc
 import {IncidentService} from '../../../incidentreportmodule/service/api/incident.service';
 import {VehicleService} from '../../../vehiclemodule/service/api/vehicle.service';
 import {IncidentVehicleAllocationMetadata} from '../../model/incidentvehicleallocation.metadata.model';
+import {CrudMetadataService} from '../../../../applicationframework/crudmetadata.service';
 
 @Injectable()
-export class IncidentVehicleAllocationMetadataService {
+export class IncidentVehicleAllocationMetadataService implements CrudMetadataService<IncidentVehicleAllocationMetadata>{
 
   constructor(
     private statusService:   IncidentVehicleAllocationStatusService,
@@ -19,10 +20,18 @@ export class IncidentVehicleAllocationMetadataService {
 
   loadAll(): Observable<IncidentVehicleAllocationMetadata> {
     return forkJoin({
-      incidentVehicleAllocationStatuses: this.statusService.get().pipe(map(r => r.data)),
-      incidents:this.incidentService.getSummary().pipe(map(r => r.data)),
-      vehicles:this.vehicleService.getSummary().pipe(map(r => r.data)),
-      branches:this.branchService.getSummary().pipe(map(r => r.data))
+      incidentVehicleAllocationStatuses: this.statusService
+        .get()
+        .pipe(map(r => r.data)),
+
+      incidents:this.incidentService.getSummary()
+        .pipe(map(r => r.data)),
+
+      vehicles:this.vehicleService.getSummary()
+        .pipe(map(r => r.data)),
+
+      branches:this.branchService.getSummary()
+        .pipe(map(r => r.data))
     });
   }
 }

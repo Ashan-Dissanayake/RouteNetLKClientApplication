@@ -7,9 +7,10 @@ import {GrnStatusService} from '../api/grnstatus.service';
 import {PartRequestService} from '../../../partrequestmodule/service/api/partrequest.service';
 import {PartService} from '../../../sparepartmodule/service/api/part.service';
 import {GrnMetadata} from '../../model/grn.metadata.model';
+import {CrudMetadataService} from '../../../../applicationframework/crudmetadata.service';
 
 @Injectable()
-export class GrnMetadataService {
+export class GrnMetadataService implements CrudMetadataService<GrnMetadata>{
 
   constructor(
     private grnStatusService:   GrnStatusService,
@@ -20,10 +21,21 @@ export class GrnMetadataService {
 
   loadAll(): Observable<GrnMetadata> {
     return forkJoin({
-      grnStatuses:this.grnStatusService.get().pipe(map(r => r.data)),
-      partRequests:this.partRequestService.getSummary().pipe(map(r => r.data)),
-      branches:this.branchService.getSummary().pipe(map(r => r.data)),
-      parts:this.partService.getSummary().pipe(map(r => r.data)),
+      grnStatuses:this.grnStatusService
+        .get()
+        .pipe(map(r => r.data)),
+
+      partRequests:this.partRequestService
+        .getSummary()
+        .pipe(map(r => r.data)),
+
+      branches:this.branchService
+        .getSummary()
+        .pipe(map(r => r.data)),
+
+      parts:this.partService
+        .getSummary()
+        .pipe(map(r => r.data)),
     });
   }
 }

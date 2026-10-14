@@ -9,9 +9,10 @@ import {GenderService} from '../api/gender.service';
 import {DepartmentService} from '../api/department.service';
 import {EmployeeMetadata} from '../../model/employee.metadata.model';
 import {BranchService} from '../../../branchmodule/services/api/branch.service';
+import {CrudMetadataService} from '../../../../applicationframework/crudmetadata.service';
 
 @Injectable()
-export class EmployeeMetadataService{
+export class EmployeeMetadataService implements CrudMetadataService<EmployeeMetadata>{
 
   constructor(
     private employeeTypeService: EmployeeTypeService,
@@ -26,13 +27,33 @@ export class EmployeeMetadataService{
 
   loadAll():Observable<EmployeeMetadata>{
     return forkJoin({
-      employeeTypes:this.employeeTypeService.get().pipe(map(r=>r.data)),
-      employeeStatuses:this.employeeStatusService.get().pipe(map(r=>r.data)),
-      designations:this.designationService.get().pipe(map(r=>r.data)),
-      genders:this.genderService.get().pipe(map(r=>r.data)),
-      departments:this.departmentService.get().pipe(map(r=>r.data)),
-      branches:this.branchService.getSummary().pipe(map(r=>r.data)),
-      regexes:this.regexService.getStaticRegexes('employees').pipe(map(r=>r.data))
+      employeeTypes:this.employeeTypeService
+        .get()
+        .pipe(map(r=>r.data)),
+
+      employeeStatuses:this.employeeStatusService
+        .get()
+        .pipe(map(r=>r.data)),
+
+      designations:this.designationService
+        .get()
+        .pipe(map(r=>r.data)),
+
+      genders:this.genderService
+        .get()
+        .pipe(map(r=>r.data)),
+
+      departments:this.departmentService
+        .get()
+        .pipe(map(r=>r.data)),
+
+      branches:this.branchService
+        .getSummary()
+        .pipe(map(r=>r.data)),
+
+      regexes:this.regexService
+        .getStaticRegexes('employees')
+        .pipe(map(r=>r.data))
     })
 }
 

@@ -1,24 +1,25 @@
 import {Injectable} from '@angular/core';
-import {BaseHttpService} from '../../../../core/basehttp.service';
+import {BaseHttpService} from '../../../../applicationframework/basehttp.service';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApiResponse} from '../../../../shared/models/apiresponse.model';
 import {ApiEndpoints} from '../../../../core/api-endpoints';
 import {VehicleService} from '../../entity/vehicleservice';
+import {CrudApiService} from '../../../../applicationframework/crudapi.service';
 
-@Injectable({ providedIn: 'root' })
-export class VehicleServiceService extends BaseHttpService <VehicleService>{
+@Injectable({providedIn: 'root'})
+export class VehicleServiceService extends BaseHttpService <VehicleService> implements CrudApiService<VehicleService>{
 
   constructor(protected override http: HttpClient) {
     super(http);
   }
 
-  get(params?:any):Observable<ApiResponse<VehicleService>>{
-    return  this.getAll(ApiEndpoints.VEHICLE_SERVICE,params);
+  get(params?: any): Observable<ApiResponse<VehicleService>> {
+    return this.getAll(ApiEndpoints.VEHICLE_SERVICE, params);
   }
 
-  save(vehicleService:VehicleService):Observable<VehicleService>{
-    return this.post(ApiEndpoints.VEHICLE_SERVICE,vehicleService);
+  save(vehicleService: VehicleService): Observable<VehicleService> {
+    return this.post(ApiEndpoints.VEHICLE_SERVICE, vehicleService);
   }
 
   startExecution(id: number): Observable<VehicleService> {

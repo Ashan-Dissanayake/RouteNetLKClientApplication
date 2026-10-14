@@ -22,11 +22,12 @@ import {DriverMetadataService} from '../service/util/driver.metadata.service';
 import {DriverMetadata} from '../model/driver.metadata.model';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
-import {BaseComponent} from '../../../shared/base/base.component';
+import {BaseComponent} from '../../../applicationframework/base.component';
+import {CrudPageConfig} from '../../../applicationframework/crudpage.config';
 
 @Component({
   selector: 'app-crew',
-  standalone:true,
+  standalone: true,
   imports: [
     DataTableComponent,
     MatButton,
@@ -45,7 +46,7 @@ import {BaseComponent} from '../../../shared/base/base.component';
     MatProgressBar,
     MatCard,
     MatCardContent,
-    MatCardTitle
+    MatCardTitle,
   ],
   providers: [
     DriverFacadeService,
@@ -53,42 +54,33 @@ import {BaseComponent} from '../../../shared/base/base.component';
     DriverMetadataService,
   ],
   templateUrl: './driver.component.html',
-  styleUrl: './driver.component.scss'
+  styleUrl: './driver.component.scss',
 })
 export class DriverComponent extends BaseComponent<Driver, DriverMetadata> {
 
-  // ===== Static configuration =====
-  protected override readonly tableColumns = DRIVER_TABLE_META;
-  protected override readonly filterFormMeta = DRIVER_FILTER_FORM_META;
-  protected override readonly mainFormMeta = DRIVER_MAIN_FORM_META;
-  protected override readonly exportMeta = DRIVER_DATA_EXPORT_META;
-  protected override readonly immutableControllers = DRIVER_IMMUTABLE_CONTROLLERS_META;
-  protected override readonly actionPanelConfig = buildActionPanel(
-    {exclude: ['bulk-deactivate'],}
-  );
+  protected override readonly config: CrudPageConfig = {
+    tableColumns: DRIVER_TABLE_META,
+    filterFormMeta: DRIVER_FILTER_FORM_META,
+    mainFormMeta: DRIVER_MAIN_FORM_META,
+    exportMeta: DRIVER_DATA_EXPORT_META,
 
-  protected override readonly moduleName = 'Driver';
-  protected override readonly excelFileName = 'drivers.xlsx';
+    immutableControllers:
+    DRIVER_IMMUTABLE_CONTROLLERS_META,
 
-  // ===== Services =====
-  protected override readonly facade = inject(DriverFacadeService);
-  protected override readonly formService = inject(DriverFormService);
+    actionPanel: buildActionPanel({
+      permissionMap: {
+        create: 'branch-add',
+        'bulk-deactivate': 'branch-delete',
+      },
+    }),
 
-  // ===== Template accessible streams =====
-  protected readonly drivers$ = this.facade.drivers$;
-  protected readonly metadata$ = this.facade.metadata$;
-  protected readonly loading$ = this.facade.loading$;
-  protected readonly error$ = this.facade.error$;
+    moduleName: 'Driver',
+    excelFileName: 'drivers.xlsx',
+  };
 
-  // ===== Custom row actions =====
-  protected override getCustomRowActions(row: Driver): Record<string, () => void> {
-    return {};
-  }
+  protected override readonly facade =
+    inject(DriverFacadeService);
 
-  // ===== Custom action panel handlers =====
-  protected override getCustomActionPanelHandlers(): Record<string, () => void> {
-    return {};
-  }
-
-
+  protected override readonly formService =
+    inject(DriverFormService);
 }

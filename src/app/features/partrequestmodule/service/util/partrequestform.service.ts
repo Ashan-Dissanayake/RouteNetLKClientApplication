@@ -1,47 +1,77 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
-import {FormbuilderService} from '../../../../core/formbuilder.service';
+import {FormbuilderService} from '../../../../shared/services/formbuilder.service';
 import {PartRequestMetadata} from '../../model/partrequest.metadata.model';
 import {PART_REQUEST_FILTER_FORM_META, PART_REQUEST_MAIN_FORM_META} from '../../model/partrequest.meta';
+import {CrudFormService} from '../../../../applicationframework/crudform.service';
+import {PartRequest} from '../../entity/partrequest';
 
 
 @Injectable()
-export class PartRequestFormService implements OnDestroy {
+export class PartRequestFormService implements CrudFormService<PartRequest, PartRequestMetadata> {
 
-  private destroy$ = new Subject<void>();
+  constructor(
+    private formBuilder: FormbuilderService
+  ) {}
 
-  constructor(private formBuilder: FormbuilderService) {}
+  buildFilterForm(
+    metadata: PartRequestMetadata
+  ): FormGroup {
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    return this.formBuilder.build(
+      [...PART_REQUEST_FILTER_FORM_META],
+      {
+        sspartrequeststatus:
+        metadata.partRequestStatuses,
+      }
+    );
   }
 
-  // ===== Filter form =====
+  buildMainForm(
+    metadata: PartRequestMetadata
+  ): FormGroup {
 
-  buildFilterForm(metadata: PartRequestMetadata): FormGroup {
-    return this.formBuilder.build([...PART_REQUEST_FILTER_FORM_META], {
-      sspartrequeststatus: metadata.partRequestStatuses,
-    });
-  }
+    const metaCopy =
+      PART_REQUEST_MAIN_FORM_META.map(
+        field => ({ ...field })
+      );
 
-  // ===== Main form =====
-  buildMainForm(metadata: PartRequestMetadata): FormGroup {
-    const metaCopy = PART_REQUEST_MAIN_FORM_META.map(f => ({ ...f }));
+    const lineField =
+      metaCopy.find(
+        field => field.name === 'partrequestitems'
+      );
 
-    const lineField = metaCopy.find(f => f.name === 'partrequestitems');
     if (lineField?.innerTableConfig) {
       lineField.innerTableConfig = {
         ...lineField.innerTableConfig,
-        dataMap: { part: metadata.parts },   // same pattern
+
+        dataMap: {
+          part: metadata.parts,
+        },
       };
-      console.log('innerTableConfig:', lineField.innerTableConfig);
     }
 
-    return this.formBuilder.build(metaCopy, {
-      branch:            metadata.branches,
-      partrequeststatus: metadata.partRequestStatuses,
-    });
+    return this.formBuilder.build(
+      metaCopy,
+      {
+        branch: metadata.branches,
+        partrequeststatus:
+        metadata.partRequestStatuses,
+      }
+    );
+  }
+
+  buildMainFormForEdit(
+    metadata: PartRequestMetadata,
+    row: PartRequest
+  ): FormGroup {
+
+    const form =
+      this.buildMainForm(metadata);
+
+    form.patchValue(row);
+
+    return form;
   }
 }

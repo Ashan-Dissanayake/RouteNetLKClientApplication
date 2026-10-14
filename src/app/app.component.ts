@@ -11,8 +11,10 @@ import {MAT_DATE_FORMATS, MatDateFormats, provideNativeDateAdapter} from "@angul
 import {AuthService} from './security/auth.service';
 import {NgxPermissionsModule, NgxPermissionsService} from 'ngx-permissions';
 import {NotificationBellComponent} from './shared/component/notification-bell/notification-bell.component';
-import {NotificationService} from './core/notification.service';
+import {NotificationService} from './shared/services/notification.service';
 
+
+import {BreadcrumbComponent} from './shared/component/breadcrumb/breadcrumb.component';
 
 interface MenuItem {
   icon: string;
@@ -50,7 +52,8 @@ const formats: MatDateFormats = {
     NgIf,
     NgFor,
     NgxPermissionsModule,
-    NotificationBellComponent
+    NotificationBellComponent,
+    BreadcrumbComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'

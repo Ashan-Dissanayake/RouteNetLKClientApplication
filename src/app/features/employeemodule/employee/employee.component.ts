@@ -20,8 +20,9 @@ import {buildActionPanel} from '../../../shared/component/button/action-panel.fa
 import {EmployeeFormService} from '../services/util/employeefrom.service';
 import {EmployeeMetadataService} from '../services/util/employee.metadata.service';
 import {EmployeeMetadata} from '../model/employee.metadata.model';
-import {BaseComponent} from '../../../shared/base/base.component';
+import {BaseComponent} from '../../../applicationframework/base.component';
 import {async} from 'rxjs';
+import {CrudPageConfig} from '../../../applicationframework/crudpage.config';
 
 @Component({
   selector: 'app-employee',
@@ -53,28 +54,23 @@ import {async} from 'rxjs';
 })
 export class EmployeeComponent extends BaseComponent<Employee, EmployeeMetadata> {
 
-  // ===== Static configuration =====
-  protected override readonly tableColumns    = EMPLOYEE_TABLE_META;
-  protected override readonly filterFormMeta  = EMPLOYEE_FILTER_FORM_META;
-  protected override readonly mainFormMeta    = EMPLOYEE_MAIN_FORM_META;
-  protected override readonly exportMeta      = EMPLOYEE_DATA_EXPORT_META;
-  protected override readonly immutableControllers = EMPLOYEE_IMMUTABLE_CONTROLLERS_META;
-  protected override readonly actionPanelConfig = buildActionPanel();
+  protected override readonly config: CrudPageConfig = {
+    tableColumns: EMPLOYEE_TABLE_META,
+    filterFormMeta: EMPLOYEE_FILTER_FORM_META,
+    mainFormMeta: EMPLOYEE_MAIN_FORM_META,
+    exportMeta: EMPLOYEE_DATA_EXPORT_META,
+    immutableControllers: EMPLOYEE_IMMUTABLE_CONTROLLERS_META,
+    actionPanel: buildActionPanel(),
+    moduleName: 'Employee',
+    excelFileName: 'employees.xlsx',
+  };
 
-  protected override readonly moduleName = 'Employee';
-  protected override readonly excelFileName = 'employees.xlsx';
+  protected override facade =
+    inject(EmployeeFacadeService);
 
-  // ===== Subclass services resolution =====
-  protected override facade = inject(EmployeeFacadeService);
-  protected override formService = inject(EmployeeFormService);
+  protected override formService =
+    inject(EmployeeFormService);
 
-  // ===== Template-accessible streams mapping =====
-  protected readonly employees$ = this.facade.employees$;
-  protected readonly metadata$  = this.facade.metadata$;
-  protected readonly loading$   = this.facade.loading$;
-  protected readonly error$     = this.facade.error$;
-
-  // ===== Overridden hooks =====
   protected override getDeactivateConfirmationMessage(): string {
     return 'Only resigned employees will be deactivated. Are you sure?';
   }

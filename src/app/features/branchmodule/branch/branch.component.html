@@ -1,120 +1,191 @@
 <div class="container">
   <h2>Branch Details Management</h2>
 </div>
+
 <!-- Loading -->
 <mat-progress-bar *ngIf="loading$ | async" mode="indeterminate"></mat-progress-bar>
 
 <!-- Error -->
 <div *ngIf="error$ | async as error" id="error-window">
   <mat-card>
-    <mat-card-title>Error loading Trips</mat-card-title>
-    <mat-card-content>{{ error?.message }}</mat-card-content>
-    <button mat-raised-button color="primary" (click)="reload()">Retry</button>
+    <mat-card-title>Error loading Branches</mat-card-title>
+    <mat-card-content>{{ error ? error : 'An unknown error occurred.' }}</mat-card-content>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="reload()">
+      Retry
+    </button>
   </mat-card>
 </div>
 
-<!-- ===== Action Panel ===== -->
+<!-- Action Panel -->
 <app-button-panel
-  *ngIf="metadata$ | async as metadata"
-  [buttons]="actionPanelConfig"
+  [buttons]="config.actionPanel"
   (actionClicked)="onActionTriggered($event)"
   (dropdownClicked)="onDropdownOnlyClick($event)"
-  [contextData]="{ selectedRows: selectedRows }"
->
+  [contextData]="{ selectedRows: selectedRows }">
 </app-button-panel>
 
-<div *ngIf="metadata$ | async as metadata" id="serverSearch">
+<!-- Filter -->
+<div id="serverSearch">
   <form [formGroup]="filterForm">
     <dynamic-field
-      *ngFor="let field of filterFormMeta; trackBy: trackByField"
+      *ngFor="
+        let field of config.filterFormMeta;
+        trackBy: trackByField
+      "
       [formInstance]="filterForm"
-      [field]="field"
-    ></dynamic-field>
+      [field]="field">
+    </dynamic-field>
+
   </form>
 </div>
 
-<!-- ===== Main Table with Side View ===== -->
+<!-- Main Table with Side View -->
 <app-side-view
   [opened]="activeRow !== null"
   [data]="activeRow"
   [title]="'Branch Details'"
   [viewTemplate]="branchDetailTemplate"
-  (closed)="onCloseDetailView()"
->
+  (closed)="onCloseDetailView()">
+
   <app-data-table
-    *ngIf="(branches$ | async)?.length"
-    [data]="(branches$ | async) || []"
-    [columns]="tableColumns"
+    [loading]="(loading$ | async) || false"
+    [data]="(items$ | async) || []"
+    [columns]="config.tableColumns"
     [sortable]="true"
     [paginatable]="true"
     [pageSizeOptions]="[10, 20]"
     (rowClick)="onRowClick($event)"
     (actionClick)="onRowAction($event.action, $event.row)"
     (checkBoxClick)="onRowCheckboxChanged($event)"
-    (selectAllClick)="onSelectAll($event)"
-  >
+    (selectAllClick)="onSelectAll($event)">
+
     <!-- Row Actions -->
-    <ng-template tableCell="actions" let-row let-action="action">
-      <button *ngxPermissionsOnly="['branch-update']" mat-button (click)="action('edit', row); $event.stopPropagation()">
-        <mat-icon>mode_edit</mat-icon>
+    <ng-template
+      tableCell="actions"
+      let-row
+      let-action="action">
+
+      <button
+        *ngxPermissionsOnly="['branch-update']"
+        mat-button
+        (click)="
+          action('edit', row);
+          $event.stopPropagation()
+        ">
+
+        <mat-icon>
+          mode_edit
+        </mat-icon>
+
       </button>
+
     </ng-template>
+
   </app-data-table>
+
 </app-side-view>
 
-<!--Template for detail view -->
-<ng-template #branchDetailTemplate let-row>
-  <div  class="part-detail-container">
+<!-- Branch Detail View -->
+<ng-template
+  #branchDetailTemplate
+  let-row>
+
+  <div class="part-detail-container">
+
     <!-- Header -->
     <div class="header">
+
       <div class="title-section">
-        <mat-icon color="primary" class="branch-icon">apartment</mat-icon>
+
+        <mat-icon
+          color="primary"
+          class="branch-icon">
+          apartment
+        </mat-icon>
+
         <div>
-          <h6 class="branch-title">{{ row.name }}</h6>
-          <p class="branch-subtitle">Address: {{ row.address }}</p>
+
+          <h6 class="branch-title">
+            {{ row.name }}
+          </h6>
+
+          <p class="branch-subtitle">
+            Address: {{ row.address }}
+          </p>
+
         </div>
+
       </div>
 
-        <span
-          class="status-chip"
-          [ngClass]="{
-          'ACTIVE': row.branchstatus.name === 'Active',
-          'SUSPENDED': row.branchstatus.name === 'Suspended',
-          'CLOSED': row.branchstatus.name === 'Closed'
-          }">
-          {{ row.branchstatus.name }}
-        </span>
+      <span
+        class="status-chip"
+        [ngClass]="{
+          'ACTIVE': row.branchstatus?.name === 'Active',
+          'SUSPENDED': row.branchstatus?.name === 'Suspended',
+          'CLOSED': row.branchstatus?.name === 'Closed'
+        }">
+
+        {{ row.branchstatus?.name }}
+
+      </span>
+
     </div>
+
     <mat-divider></mat-divider>
 
-    <!-- General Info -->
+    <!-- General Information -->
     <div class="info-grid">
+
       <div class="info-item">
         <span class="label">Code</span>
-        <span class="value">{{ row.code || '-' }}</span>
+        <span class="value">
+          {{ row.code || '-' }}
+        </span>
       </div>
+
       <div class="info-item">
         <span class="label">Regional Office</span>
-        <span class="value">{{ row.regionaloffice.name || '-' }}</span>
+        <span class="value">
+          {{ row.regionaloffice?.name || '-' }}
+        </span>
       </div>
+
       <div class="info-item">
         <span class="label">Contact</span>
-        <span class="value">{{ row.telephone || '-' }}</span>
+        <span class="value">
+          {{ row.telephone || '-' }}
+        </span>
       </div>
+
       <div class="info-item">
         <span class="label">Email</span>
-        <span class="value">{{ row.email || '-' }}</span>
+        <span class="value">
+          {{ row.email || '-' }}
+        </span>
       </div>
+
       <div class="info-item">
         <span class="label">Created Date</span>
-        <span class="value">{{ row.docreated | date: 'mediumDate' }}</span>
+        <span class="value">
+          {{ row.docreated | date: 'mediumDate' }}
+        </span>
       </div>
+
       <div class="info-item">
         <span class="label">Type</span>
-        <span class="value">{{ row.branchtype?.name || '-' }}</span>
+        <span class="value">
+          {{ row.branchtype?.name || '-' }}
+        </span>
       </div>
+
     </div>
+
     <mat-divider></mat-divider>
+
   </div>
+
 </ng-template>
 

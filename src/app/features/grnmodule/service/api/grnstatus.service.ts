@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {BaseHttpService} from '../../../../core/basehttp.service';
+import {BaseHttpService} from '../../../../applicationframework/basehttp.service';
 import {PartStatus} from '../../../sparepartmodule/entity/partstatus';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';

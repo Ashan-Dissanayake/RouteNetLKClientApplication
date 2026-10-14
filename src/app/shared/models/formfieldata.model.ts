@@ -17,6 +17,7 @@ export type OptionsField<T = unknown> = {
 
 export type FieldType =
     | 'text'
+    | 'hidden'
     | 'number'
     | 'date'
     | 'file'

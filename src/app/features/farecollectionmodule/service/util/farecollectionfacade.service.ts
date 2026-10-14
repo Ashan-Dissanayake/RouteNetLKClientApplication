@@ -3,7 +3,7 @@ import {FareCollection} from '../../entity/farecollection';
 import {FareCollectionService} from '../api/farecollection.service';
 import {EMPTY_FARE_COLLECTION_METADATA, FareCollectionMetadata} from '../../model/farecollection.metadata.model';
 import {FareCollectionMetadataService} from './farecollection.metadata.service';
-import {BaseFacade} from '../../../../shared/base/base.facade';
+import {BaseFacade} from '../../../../applicationframework/base.facade';
 import {Observable} from 'rxjs';
 
 @Injectable()
@@ -11,19 +11,21 @@ export class FareCollectionFacadeService extends BaseFacade<FareCollection, Fare
 
   constructor(
     private fareCollectionService: FareCollectionService,
-    private fareCollectionMetadataService: FareCollectionMetadataService
+    metadataService: FareCollectionMetadataService,
   ) {
     super(
       fareCollectionService,
-      fareCollectionMetadataService,
+      metadataService,
       EMPTY_FARE_COLLECTION_METADATA
     );
   }
 
-  readonly fareCollections$ = this.items$;
+  reconciled(
+    row: FareCollection
+  ): Observable<FareCollection> {
 
-  reconciled(row: FareCollection): Observable<FareCollection> {
-    return this.fareCollectionService.reconciled(row.id);
+    return this.fareCollectionService.reconciled(
+      row.id
+    );
   }
-
 }
